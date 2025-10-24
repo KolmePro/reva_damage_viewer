@@ -1,18 +1,37 @@
 import logging
 import sys
 from logging.handlers import RotatingFileHandler
+from PySide6.QtCore import qInstallMessageHandler, QtMsgType, QStandardPaths
 from pathlib import Path
 
-from core.config import APP_NAME, LOG_DIR
+from core.config import APP_NAME
+
+logger = logging.getLogger(APP_NAME)
 
 
-def get_logger():
-    log_dir = Path(LOG_DIR)
-    log_dir.mkdir(exist_ok=True)
+def qt_message_handler(mode, context, message):
+    if mode == QtMsgType.QtDebugMsg:
+        logger.debug(message)
+    elif mode == QtMsgType.QtInfoMsg:
+        logger.info(message)
+    elif mode == QtMsgType.QtWarningMsg:
+        logger.warning(message)
+    elif mode == QtMsgType.QtCriticalMsg:
+        logger.error(message)
+    elif mode == QtMsgType.QtFatalMsg:
+        logger.critical(message)
+
+
+def setup_logger():
+    # Каталог приложения по стандартам ОС
+    app_dir = Path(
+        QStandardPaths.writableLocation(QStandardPaths.AppDataLocation)
+    )
+    log_dir = app_dir / "logs"
+    log_dir.mkdir(parents=True, exist_ok=True)
 
     file_path = log_dir / "app.log"
 
-    logger = logging.getLogger(APP_NAME)
     logger.setLevel(logging.INFO)
 
     if not logger.handlers:
@@ -30,6 +49,8 @@ def get_logger():
         console_handler = logging.StreamHandler()
         console_handler.setFormatter(logging.Formatter('%(asctime)s [%(levelname)s] %(message)s'))
         logger.addHandler(console_handler)
+
+    # qInstallMessageHandler(qt_message_handler)
 
     # Перехват необработанных исключений
     def handle_exception(exc_type, exc_value, exc_traceback):

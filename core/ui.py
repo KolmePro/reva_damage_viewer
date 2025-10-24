@@ -1,7 +1,9 @@
-from PySide6.QtGui import QPainter
+from PySide6.QtCore import QFile
+from PySide6.QtGui import QFontDatabase, QFont
 from PySide6.QtUiTools import QUiLoader
-from PySide6.QtCore import QFile, QRect
-from PySide6.QtWidgets import QStyledItemDelegate
+from PySide6.QtWidgets import QTableView
+
+from core.config import RESOURCE_PATH
 
 
 def load_ui(ui_path):
@@ -20,3 +22,19 @@ def load_ui(ui_path):
         raise RuntimeError(f"Не удалось загрузить UI из файла: {ui_path}")
 
     return widget
+
+
+def setup_font(app):
+    table = app.window.findChild(QTableView, "damage_table_view")
+    font_id = QFontDatabase.addApplicationFont(str(RESOURCE_PATH / "roboto.ttf"))
+    if font_id != -1:
+        families = QFontDatabase.applicationFontFamilies(font_id)
+        if families:
+            font = QFont(families[0], 12)
+            app.setFont(font)
+    font_id = QFontDatabase.addApplicationFont(str(RESOURCE_PATH / "roboto_mono.ttf"))
+    if font_id != -1:
+        families = QFontDatabase.applicationFontFamilies(font_id)
+        if families:
+            font = QFont(families[0], 12)
+            table.setFont(font)
