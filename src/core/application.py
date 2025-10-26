@@ -26,7 +26,7 @@ class Application(QApplication):
         self.installTranslator(translator)
 
         self.logger.info("Загрузка интерфейса.")
-        self.window = MainWindow()
+        self.window = MainWindow(self)
         self.window.setWindowTitle("Калькулятор урона")
 
         self.logger.info("Настройка внешнего вида.")

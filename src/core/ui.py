@@ -1,7 +1,6 @@
 from PySide6.QtCore import QFile
 from PySide6.QtGui import QFontDatabase, QFont
 from PySide6.QtUiTools import QUiLoader
-from PySide6.QtWidgets import QTableView
 
 from core.config import RESOURCE_PATH
 

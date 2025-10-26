@@ -1,8 +1,9 @@
 import logging
 import sys
 from logging.handlers import RotatingFileHandler
-from PySide6.QtCore import qInstallMessageHandler, QtMsgType, QStandardPaths
 from pathlib import Path
+
+from PySide6.QtCore import QtMsgType, QStandardPaths
 
 from core.config import APP_NAME
 
