@@ -9,7 +9,7 @@ DAMAGE_DEALT_REGEX = re.compile(
 )
 RECORD_TYPES = {
     "damage_dealt": re.compile(
-        r"(?P<subject>.*?):?(?! дух ) (использует|использовано) умение:? \[?(?P<skill>.*?)\]?\. (?P<target>.*?):(?! дух ) получено (?P<damage>\d*) ед\. урона \((?P<property1>.*), (?P<property2>.*)\)\."
+        r"(?P<attacker>.*?):?(?! дух ) (использует|использовано) умение:? \[?(?P<skill>.*?)\]?\. (?P<target>.*?):(?! дух ) получено (?P<damage>\d*) ед\. урона \((?P<property1>.*), (?P<property2>.*)\)\."
     ),
     "effect_applied": re.compile(r"(?P<target>.*?): действует эффект (?P<skill>.*?)\."),
     "effect_removed": re.compile(r"Эффект \[(?P<skill>.*?)\] больше не действует на объект \"(?P<target>.*?)\"\."),

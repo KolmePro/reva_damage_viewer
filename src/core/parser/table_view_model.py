@@ -1,6 +1,5 @@
-from PySide6.QtCore import QAbstractTableModel, Qt, Signal
+from PySide6.QtCore import QAbstractTableModel, Qt
 from PySide6.QtGui import QBrush, QColor, QIcon
-from PySide6.QtWidgets import QStyle
 
 from core.parser.record import DamageRecord
 
@@ -8,10 +7,10 @@ from core.parser.record import DamageRecord
 class DamageTableModel(QAbstractTableModel):
     headers = ["", "Время", "Атакующий", "Цель", "Навык", "Урон", "Свойство 1", "Свойство 2"]
 
-    def __init__(self, records: list[DamageRecord]):
+    def __init__(self):
         super().__init__()
-        self._all_records = records
-        self._filtered_records = records
+        self._all_records = []
+        self._filtered_records = []
         self.filters = {
             "outgoing_spirit_damage": True,
             "incoming_spirit_damage": True,
@@ -24,6 +23,10 @@ class DamageTableModel(QAbstractTableModel):
             "attack_o": True,
         }
         self.msg_icon = QIcon.fromTheme("emblem-mail")
+
+    def set_records(self, records: list[DamageRecord]):
+        self._all_records = records
+        self.apply_filters()
 
     def rowCount(self, parent=None):
         return len(self._filtered_records)
@@ -77,6 +80,7 @@ class DamageTableModel(QAbstractTableModel):
 
     def set_filter(self, key, value):
         self.filters[key] = value
+        self.apply_filters()
 
     def apply_filters(self):
         self.beginResetModel()

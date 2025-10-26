@@ -4,7 +4,8 @@ from PySide6.QtWidgets import QApplication
 from core.actions import connect_actions
 from core.config import APP_NAME, COMPANY_NAME, RESOURCE_PATH
 from core.logger import setup_logger
-from core.ui import load_ui, setup_font
+from core.ui import setup_font
+from gui.windows.main_window import MainWindow
 
 
 class Application(QApplication):
@@ -25,7 +26,7 @@ class Application(QApplication):
         self.installTranslator(translator)
 
         self.logger.info("Загрузка интерфейса.")
-        self.window = load_ui(RESOURCE_PATH / "main_window.ui")
+        self.window = MainWindow()
         self.window.setWindowTitle("Калькулятор урона")
 
         self.logger.info("Настройка внешнего вида.")

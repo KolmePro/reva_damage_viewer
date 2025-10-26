@@ -25,7 +25,7 @@ def load_ui(ui_path):
 
 
 def setup_font(app):
-    table = app.window.findChild(QTableView, "damage_table_view")
+    table = app.window.ui.damage_table_view
     font_id = QFontDatabase.addApplicationFont(str(RESOURCE_PATH / "roboto.ttf"))
     if font_id != -1:
         families = QFontDatabase.applicationFontFamilies(font_id)
