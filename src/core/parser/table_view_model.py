@@ -5,7 +5,7 @@ from core.parser.record import DamageRecord
 
 
 class DamageTableModel(QAbstractTableModel):
-    headers = ["", "Время", "Атакующий", "Цель", "Навык", "Урон", "Свойство 1", "Свойство 2"]
+    headers = ["", "Время", "Атакующий", "Цель", "Навык", "Бафы", "Урон", "Свойство 1", "Свойство 2"]
 
     def __init__(self):
         super().__init__()
@@ -22,7 +22,6 @@ class DamageTableModel(QAbstractTableModel):
             "attack_m": True,
             "attack_o": True,
         }
-        self.msg_icon = QIcon.fromTheme("emblem-mail")
 
     def set_records(self, records: list[DamageRecord]):
         self._all_records = records
@@ -43,7 +42,7 @@ class DamageTableModel(QAbstractTableModel):
 
         if role == Qt.DisplayRole:
             if col == 0:
-                return ""  # иконка вместо текста
+                return ""
             elif col == 1:
                 return record.time.strftime("%H:%M:%S")
             elif col == 2:
@@ -53,20 +52,39 @@ class DamageTableModel(QAbstractTableModel):
             elif col == 4:
                 return record.skill
             elif col == 5:
-                return str(record.damage)
+                if record.effects:
+                    return str(len(record.effects))
             elif col == 6:
-                return record.property1
+                return str(record.damage)
             elif col == 7:
+                return record.property1
+            elif col == 8:
                 return record.property2
-        elif role == Qt.DecorationRole and col == 0:
-            return self.msg_icon
-        elif role == Qt.ToolTipRole and col == 0:
-            return record.origin_string
-        elif role == Qt.ForegroundRole and col == 5:
-            if record.property1 == "Сила атаки":
-                return QBrush(QColor("#FF9999"))
-            elif record.property1 == "Сила заклинаний":
-                return QBrush(QColor("#99CCFF"))
+
+        elif role == Qt.DecorationRole:
+            if col == 0:
+                return QIcon.fromTheme("emblem-mail")
+            elif col == 5:
+                if record.effects:
+                    return QIcon.fromTheme("dialog-information")
+
+        elif role == Qt.ToolTipRole:
+            if col == 0:
+                return record.origin_string
+            elif col == 5:
+                if record.effects:
+                    return "\n".join(record.effects)
+                else:
+                    return "Нет бафов."
+
+        elif role == Qt.ForegroundRole and col == 6:  # урон
+            damage_colors = {
+                "Сила атаки": "#FF9999",
+                "Сила заклинаний": "#99CCFF",
+            }
+            color = damage_colors.get(record.property1)
+            if color:
+                return QBrush(QColor(color))
 
         return None
 

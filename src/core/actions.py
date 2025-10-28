@@ -8,7 +8,8 @@ from core.parser.event_log import EventLog
 def connect_actions(app):
     window = app.window
     ui = window.ui
-    model = ui.damage_table_view.model()
+    table = ui.damage_table_view
+    model = table.model()
 
     ui.action_set_game_folder.triggered.connect(window.action_set_game_folder)
     ui.action_load_last_log.triggered.connect(window.action_load_last_log)
@@ -43,3 +44,5 @@ def connect_actions(app):
     ui.cb_attack_o.toggled.connect(
         lambda checked: model.set_filter("attack_o", checked)
     )
+
+    table.selectionModel().selectionChanged.connect(window.refresh_damage_summary)

@@ -1,5 +1,7 @@
 from pathlib import Path
+from statistics import median
 
+from PySide6.QtCore import QItemSelection, Qt
 from PySide6.QtWidgets import QMainWindow, QFileDialog, QMessageBox, QAbstractItemView, QTableView
 
 from core.parser.event_log import EventLog
@@ -78,3 +80,30 @@ class MainWindow(QMainWindow):
     def action_clear_selection(self):
         """Снять выделение со всех строчек урона."""
         self.ui.damage_table_view.clearSelection()
+
+    def refresh_damage_summary(self, selected: QItemSelection, deselected: QItemSelection):
+        """Отобразить сводную информацию о выделенных записях."""
+        indexes = self.ui.damage_table_view.selectionModel().selectedRows()  # получаем только строки
+        model = self.ui.damage_table_view.model()
+
+        damages = []
+        for index in indexes:
+            damage_index = model.index(index.row(), 6)  # колонка "Урон"
+            value = model.data(damage_index, role=Qt.DisplayRole)
+            if value is not None:
+                try:
+                    damages.append(int(value))
+                except ValueError:
+                    continue
+
+        count = len(damages)
+        avg = round(sum(damages) / count)
+        min_damage = min(damages)
+        max_damage = max(damages)
+        median_damage = round(median(damages))
+
+        self.ui.label_6.setText(f"{avg:,}".replace(",", " "))
+        self.ui.label_10.setText(f"{count:,}".replace(",", " "))
+        self.ui.label_4.setText(f"{min_damage:,}".replace(",", " "))
+        self.ui.label_2.setText(f"{max_damage:,}".replace(",", " "))
+        self.ui.label_8.setText(f"{median_damage:,}".replace(",", " "))
