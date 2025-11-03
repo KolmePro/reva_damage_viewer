@@ -52,6 +52,7 @@ class MainWindow(QMainWindow):
         table.setSelectionBehavior(QAbstractItemView.SelectRows)
         table.model().set_records(combat_log)
         table.verticalHeader().setVisible(False)
+        self.apply_row_spans()
         self.auto_resize_columns()
 
     def auto_resize_columns(self):
@@ -76,6 +77,24 @@ class MainWindow(QMainWindow):
                 table.setColumnWidth(col, table.columnWidth(col) + extra_per_col)
 
         header.setStretchLastSection(True)
+
+    def apply_row_spans(self):
+        """Объединяет ячейки для записей с эффектами."""
+        table: QTableView = self.ui.damage_table_view
+        model = table.model()
+        if not model:
+            return
+
+        # Сброс всех объединений (если модель обновилась)
+        for row in range(model.rowCount()):
+            for col in range(model.columnCount()):
+                table.setSpan(row, col, 1, 1)
+
+        # Объединяем строки с эффектами
+        for row in range(model.rowCount()):
+            record = model._filtered_records[row]
+            if record.type in ("effect_applied", "effect_removed"):
+                table.setSpan(row, 0, 1, model.columnCount())
 
     def action_clear_selection(self):
         """Снять выделение со всех строчек урона."""

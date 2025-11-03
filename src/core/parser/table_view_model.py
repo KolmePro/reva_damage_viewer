@@ -40,6 +40,39 @@ class DamageTableModel(QAbstractTableModel):
         record = self._filtered_records[index.row()]
         col = index.column()
 
+        # --- Цвет фона для эффектов ---
+        if role == Qt.ForegroundRole and record.type in ("effect_applied", "effect_removed"):
+            color = QColor("#AAFFAA") if record.type == "effect_applied" else QColor("#FFAAAA")
+            return QBrush(color)
+
+        # --- Обработка строк с эффектами ---
+        if record.type in ("effect_applied", "effect_removed"):
+            # Текст в первой колонке
+            if role == Qt.DisplayRole and col == 0:
+                action = "действует" if record.type == "effect_applied" else "перестал действовать"
+                return f"Эффект '{record.skill}' {action} на цель {record.target}"
+
+            # Иконка в первой колонке
+            if role == Qt.DecorationRole and col == 0:
+                return QIcon.fromTheme("emblem-mail")
+
+            # Tooltip с исходной строкой лога
+            if role == Qt.ToolTipRole and col == 0:
+                return record.origin_string
+
+            # Центрирование и жирный шрифт
+            # if role == Qt.TextAlignmentRole:
+            #     return Qt.AlignCenter
+            # if role == Qt.FontRole:
+            #     from PySide6.QtGui import QFont
+            #     font = QFont()
+            #     font.setBold(True)
+            #     return font
+
+            # Остальные ячейки — пустые
+            return None
+
+        # --- Обычные записи урона ---
         if role == Qt.DisplayRole:
             if col == 0:
                 return ""
@@ -64,20 +97,16 @@ class DamageTableModel(QAbstractTableModel):
         elif role == Qt.DecorationRole:
             if col == 0:
                 return QIcon.fromTheme("emblem-mail")
-            elif col == 5:
-                if record.effects:
-                    return QIcon.fromTheme("dialog-information")
+            elif col == 5 and record.effects:
+                return QIcon.fromTheme("dialog-information")
 
         elif role == Qt.ToolTipRole:
             if col == 0:
                 return record.origin_string
             elif col == 5:
-                if record.effects:
-                    return "\n".join(record.effects)
-                else:
-                    return "Нет бафов."
+                return "\n".join(record.effects) if record.effects else "Нет бафов."
 
-        elif role == Qt.ForegroundRole and col == 6:  # урон
+        elif role == Qt.ForegroundRole and col == 6:
             damage_colors = {
                 "Сила атаки": "#FF9999",
                 "Сила заклинаний": "#99CCFF",
@@ -87,7 +116,6 @@ class DamageTableModel(QAbstractTableModel):
                 return QBrush(QColor(color))
 
         return None
-
 
     def headerData(self, section, orientation, role=Qt.DisplayRole):
         if role != Qt.DisplayRole:

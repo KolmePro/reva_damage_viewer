@@ -23,8 +23,8 @@ RECORD_TYPES = {
         r"(?P<damage>\d+)Очко.*?\("
         r"(?P<property1>.*?)\)\s*Урон\s*\((?P<property2>.*?)\)"
     ),
-    # "effect_applied": re.compile(r"(?P<target>.*?): действует эффект (?P<skill>.*?)\."),
-    # "effect_removed": re.compile(r"Эффект \[(?P<skill>.*?)\] больше не действует на объект \"(?P<target>.*?)\"\."),
+    "effect_applied": re.compile(r"(?P<target>.*?): действует эффект (?P<skill>.*?)\."),
+    "effect_removed": re.compile(r"Эффект \[(?P<skill>.*?)\] больше не действует на объект \"(?P<target>.*?)\"\."),
 }
 
 
