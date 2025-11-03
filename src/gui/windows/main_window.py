@@ -14,7 +14,9 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        self.ui.damage_table_view.setModel(DamageTableModel())
+        damage_model = DamageTableModel()
+        self.ui.damage_table_view.setModel(damage_model)
+        damage_model.data_refreshed.connect(self.refresh_table)
         self.settings = app.settings
 
     def action_set_game_folder(self):
@@ -52,6 +54,9 @@ class MainWindow(QMainWindow):
         table.setSelectionBehavior(QAbstractItemView.SelectRows)
         table.model().set_records(combat_log)
         table.verticalHeader().setVisible(False)
+        self.refresh_table()
+
+    def refresh_table(self):
         self.apply_row_spans()
         self.auto_resize_columns()
 

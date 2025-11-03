@@ -23,7 +23,7 @@ def connect_actions(app):
     )
 
     ui.cb_attack_common.toggled.connect(
-        lambda checked: model.set_filter("cattack_common", checked)
+        lambda checked: model.set_filter("attack_common", checked)
     )
     ui.cb_attack_critical.toggled.connect(
         lambda checked: model.set_filter("attack_critical", checked)

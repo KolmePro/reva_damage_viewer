@@ -1,10 +1,11 @@
-from PySide6.QtCore import QAbstractTableModel, Qt
+from PySide6.QtCore import QAbstractTableModel, Qt, Signal
 from PySide6.QtGui import QBrush, QColor, QIcon
 
 from core.parser.record import DamageRecord
 
 
 class DamageTableModel(QAbstractTableModel):
+    data_refreshed = Signal()
     headers = ["", "Время", "Атакующий", "Цель", "Навык", "Бафы", "Урон", "Свойство 1", "Свойство 2"]
 
     def __init__(self):
@@ -14,7 +15,7 @@ class DamageTableModel(QAbstractTableModel):
         self.filters = {
             "outgoing_spirit_damage": True,
             "incoming_spirit_damage": True,
-            "cattack_common": True,
+            "attack_common": True,
             "attack_critical": True,
             "attack_block": True,
             "attack_combo": True,
@@ -59,15 +60,6 @@ class DamageTableModel(QAbstractTableModel):
             # Tooltip с исходной строкой лога
             if role == Qt.ToolTipRole and col == 0:
                 return record.origin_string
-
-            # Центрирование и жирный шрифт
-            # if role == Qt.TextAlignmentRole:
-            #     return Qt.AlignCenter
-            # if role == Qt.FontRole:
-            #     from PySide6.QtGui import QFont
-            #     font = QFont()
-            #     font.setBold(True)
-            #     return font
 
             # Остальные ячейки — пустые
             return None
@@ -130,25 +122,29 @@ class DamageTableModel(QAbstractTableModel):
 
     def apply_filters(self):
         self.beginResetModel()
-        filtered = self._all_records
-        if not self.filters.get("outgoing_spirit_damage"):
-            filtered = [r for r in filtered if not r.is_attacker_spirit]
-        if not self.filters.get("incoming_spirit_damage"):
-            filtered = [r for r in filtered if not r.is_target_spirit]
-        if not self.filters.get("cattack_common"):
-            filtered = [r for r in filtered if r.property2 != "Обычный"]
-        if not self.filters.get("attack_critical"):
-            filtered = [r for r in filtered if r.property2 != "Критический удар"]
-        if not self.filters.get("attack_block"):
-            filtered = [r for r in filtered if r.property2 != "Блокирование"]
-        if not self.filters.get("attack_combo"):
-            filtered = [r for r in filtered if r.property2 != "Комбо-удар"]
-        if not self.filters.get("attack_p"):
-            filtered = [r for r in filtered if r.property1 != "Сила атаки"]
-        if not self.filters.get("attack_m"):
-            filtered = [r for r in filtered if r.property1 != "Сила заклинаний"]
-        if not self.filters.get("attack_o"):
-            filtered = [r for r in filtered if r.property1 != "Обычный"]
-
+        filtered = [r for r in self._all_records if self._record_allowed(r)]
         self._filtered_records = filtered
         self.endResetModel()
+
+        self.data_refreshed.emit()
+
+    def _record_allowed(self, r):
+        if not self.filters.get("outgoing_spirit_damage") and r.is_attacker_spirit:
+            return False
+        if not self.filters.get("incoming_spirit_damage") and r.is_target_spirit:
+            return False
+        if not self.filters.get("attack_common") and r.property2 == "Обычный":
+            return False
+        if not self.filters.get("attack_critical") and r.property2 == "Критический удар":
+            return False
+        if not self.filters.get("attack_block") and r.property2 == "Блокирование":
+            return False
+        if not self.filters.get("attack_combo") and r.property2 == "Комбо-удар":
+            return False
+        if not self.filters.get("attack_p") and r.property1 == "Сила атаки":
+            return False
+        if not self.filters.get("attack_m") and r.property1 == "Сила заклинаний":
+            return False
+        if not self.filters.get("attack_o") and r.property1 == "Обычный":
+            return False
+        return True
