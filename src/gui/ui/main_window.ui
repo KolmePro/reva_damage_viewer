@@ -69,54 +69,17 @@
           <string>Фильтры</string>
          </property>
          <layout class="QGridLayout" name="gridLayout">
-          <item row="6" column="0">
-           <widget class="QCheckBox" name="cb_attack_o">
+          <item row="9" column="0">
+           <widget class="QCheckBox" name="cb_your_effects">
             <property name="text">
-             <string>Обычный</string>
+             <string>Эффекты на вас</string>
             </property>
             <property name="checked">
              <bool>true</bool>
             </property>
            </widget>
           </item>
-          <item row="5" column="0">
-           <widget class="QCheckBox" name="cb_attack_p">
-            <property name="text">
-             <string>Сила атаки</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="0">
-           <widget class="QCheckBox" name="cb_attack_block">
-            <property name="text">
-             <string>Блокирования</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0" colspan="2">
-           <widget class="Line" name="line_2">
-            <property name="orientation">
-             <enum>Qt::Orientation::Horizontal</enum>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0">
-           <widget class="QCheckBox" name="cb_outgoing_spirit_damage">
-            <property name="text">
-             <string>Урон от духов</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="5" column="1">
+          <item row="14" column="1">
            <widget class="QCheckBox" name="cb_attack_m">
             <property name="text">
              <string>Сила заклинаний</string>
@@ -126,20 +89,78 @@
             </property>
            </widget>
           </item>
-          <item row="2" column="0">
-           <widget class="QCheckBox" name="cb_attack_common">
+          <item row="9" column="1">
+           <widget class="QCheckBox" name="cb_not_your_effects">
             <property name="text">
-             <string>Обычные атаки</string>
+             <string>Эффекты на других</string>
             </property>
             <property name="checked">
              <bool>true</bool>
             </property>
            </widget>
           </item>
-          <item row="3" column="1">
-           <widget class="QCheckBox" name="cb_attack_combo">
+          <item row="10" column="0" colspan="2">
+           <widget class="Line" name="line_4">
+            <property name="orientation">
+             <enum>Qt::Orientation::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0" colspan="2">
+           <widget class="Line" name="line_7">
+            <property name="orientation">
+             <enum>Qt::Orientation::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item row="15" column="0">
+           <widget class="QCheckBox" name="cb_attack_o">
             <property name="text">
-             <string>Комбо-удары</string>
+             <string>Обычный</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_11">
+            <property name="text">
+             <string>Ваш никнейм</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLineEdit" name="le_your_nickname">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="toolTip">
+             <string>Для фильтрации входящего и исходящего урона.</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_20">
+            <property name="text">
+             <string>Атакующий</string>
+            </property>
+           </widget>
+          </item>
+          <item row="8" column="0" colspan="2">
+           <widget class="Line" name="line_2">
+            <property name="orientation">
+             <enum>Qt::Orientation::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="0">
+           <widget class="QCheckBox" name="cb_outgoing_your_damage">
+            <property name="text">
+             <string>Урон от вас</string>
             </property>
             <property name="checked">
              <bool>true</bool>
@@ -147,6 +168,19 @@
            </widget>
           </item>
           <item row="2" column="1">
+           <widget class="QLineEdit" name="le_attacker_name">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="toolTip">
+             <string>Отфильтровать записи по имени атакующего.</string>
+            </property>
+           </widget>
+          </item>
+          <item row="11" column="1">
            <widget class="QCheckBox" name="cb_attack_critical">
             <property name="text">
              <string>Критические удары</string>
@@ -156,7 +190,7 @@
             </property>
            </widget>
           </item>
-          <item row="0" column="1">
+          <item row="7" column="1">
            <widget class="QCheckBox" name="cb_incoming_spirit_damage">
             <property name="text">
              <string>Урон по духам</string>
@@ -166,10 +200,117 @@
             </property>
            </widget>
           </item>
-          <item row="4" column="0" colspan="2">
+          <item row="14" column="0">
+           <widget class="QCheckBox" name="cb_attack_p">
+            <property name="text">
+             <string>Сила атаки</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="13" column="0" colspan="2">
            <widget class="Line" name="line_3">
             <property name="orientation">
              <enum>Qt::Orientation::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="1">
+           <widget class="QCheckBox" name="cb_incoming_your_damage">
+            <property name="text">
+             <string>Урон по вам</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="7" column="0">
+           <widget class="QCheckBox" name="cb_outgoing_spirit_damage">
+            <property name="text">
+             <string>Урон от духов</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="12" column="0">
+           <widget class="QCheckBox" name="cb_attack_block">
+            <property name="text">
+             <string>Блокирования</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="0" colspan="2">
+           <widget class="Line" name="line_8">
+            <property name="orientation">
+             <enum>Qt::Orientation::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QLineEdit" name="le_target_name">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="toolTip">
+             <string>Отфильтровать записи по имени цели.</string>
+            </property>
+           </widget>
+          </item>
+          <item row="11" column="0">
+           <widget class="QCheckBox" name="cb_attack_common">
+            <property name="text">
+             <string>Обычные атаки</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="12" column="1">
+           <widget class="QCheckBox" name="cb_attack_combo">
+            <property name="text">
+             <string>Комбо-удары</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="label_21">
+            <property name="text">
+             <string>Цель</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0">
+           <widget class="QLabel" name="label_22">
+            <property name="text">
+             <string>Умение</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1">
+           <widget class="QLineEdit" name="le_skill_name">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="toolTip">
+             <string>Отфильтровать записи по названию умения.</string>
             </property>
            </widget>
           </item>
@@ -195,15 +336,43 @@
           <string>Статистика</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_2" columnstretch="0,0,0,0,0">
-          <item row="0" column="1">
-           <widget class="QLabel" name="label_9">
+          <item row="3" column="1">
+           <widget class="QLabel" name="label_14">
             <property name="text">
-             <string>Количество</string>
+             <string>Физический</string>
             </property>
            </widget>
           </item>
-          <item row="2" column="2">
+          <item row="6" column="1">
+           <widget class="QLabel" name="label">
+            <property name="text">
+             <string>Минимальный</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="1" colspan="4">
+           <widget class="Line" name="line_6">
+            <property name="orientation">
+             <enum>Qt::Orientation::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item row="7" column="2">
            <widget class="QLabel" name="label_6">
+            <property name="text">
+             <string>n/a</string>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="2">
+           <widget class="QLabel" name="label_4">
+            <property name="text">
+             <string>n/a</string>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="4">
+           <widget class="QLabel" name="label_2">
             <property name="text">
              <string>n/a</string>
             </property>
@@ -216,52 +385,108 @@
             </property>
            </widget>
           </item>
-          <item row="1" column="3">
+          <item row="7" column="3">
+           <widget class="QLabel" name="label_7">
+            <property name="text">
+             <string>Медианный</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="2">
+           <widget class="QLabel" name="label_15">
+            <property name="text">
+             <string>n/a</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1" colspan="4">
+           <widget class="Line" name="line_5">
+            <property name="orientation">
+             <enum>Qt::Orientation::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1">
+           <widget class="QLabel" name="label_17">
+            <property name="text">
+             <string>Обычный</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="2">
+           <widget class="QLabel" name="label_19">
+            <property name="text">
+             <string>n/a</string>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="3">
            <widget class="QLabel" name="label_3">
             <property name="text">
              <string>Максимальный</string>
             </property>
            </widget>
           </item>
-          <item row="1" column="1">
-           <widget class="QLabel" name="label">
-            <property name="text">
-             <string>Минимальный</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="2">
-           <widget class="QLabel" name="label_4">
-            <property name="text">
-             <string>n/a</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1">
+          <item row="7" column="1">
            <widget class="QLabel" name="label_5">
             <property name="text">
              <string>Средний</string>
             </property>
            </widget>
           </item>
-          <item row="1" column="4">
-           <widget class="QLabel" name="label_2">
-            <property name="text">
-             <string>n/a</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="4">
+          <item row="7" column="4">
            <widget class="QLabel" name="label_8">
             <property name="text">
              <string>n/a</string>
             </property>
            </widget>
           </item>
-          <item row="2" column="3">
-           <widget class="QLabel" name="label_7">
+          <item row="3" column="4">
+           <widget class="QLabel" name="label_18">
             <property name="text">
-             <string>Медианный</string>
+             <string>n/a</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="3">
+           <widget class="QLabel" name="label_12">
+            <property name="text">
+             <string>Урон</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLabel" name="label_9">
+            <property name="text">
+             <string>Атак всего</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="4">
+           <widget class="QLabel" name="label_13">
+            <property name="text">
+             <string>n/a</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="3">
+           <widget class="QLabel" name="label_16">
+            <property name="text">
+             <string>Магический</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLabel" name="label_23">
+            <property name="text">
+             <string>Криты</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="2">
+           <widget class="QLabel" name="label_24">
+            <property name="text">
+             <string>n/a</string>
             </property>
            </widget>
           </item>

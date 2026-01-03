@@ -13,8 +13,14 @@ class DamageTableModel(QAbstractTableModel):
         self._all_records = []
         self._filtered_records = []
         self.filters = {
+            "outgoing_your_damage": True,
+            "incoming_your_damage": True,
             "outgoing_spirit_damage": True,
             "incoming_spirit_damage": True,
+
+            "your_effects": True,
+            "not_your_effects": True,
+
             "attack_common": True,
             "attack_critical": True,
             "attack_block": True,
@@ -23,6 +29,10 @@ class DamageTableModel(QAbstractTableModel):
             "attack_m": True,
             "attack_o": True,
         }
+        self.player_name = ""
+        self.attacker_name = ""
+        self.target_name = ""
+        self.skill_name = ""
 
     def set_records(self, records: list[DamageRecord]):
         self._all_records = records
@@ -128,11 +138,44 @@ class DamageTableModel(QAbstractTableModel):
 
         self.data_refreshed.emit()
 
-    def _record_allowed(self, r):
+    def _match_text(self, query, text):
+        invert = query.startswith('-')
+        if invert:
+            query = query[1:]
+        text = text.lower()
+        result = all(part in text for part in query.lower().split())
+        return not result if invert else result
+
+    def _record_allowed(self, r: DamageRecord):
+        if not self.filters.get("outgoing_your_damage") and r.attacker == "Вы":
+            return False
+        if not self.filters.get("incoming_your_damage") and r.target == "Вы":
+            return False
         if not self.filters.get("outgoing_spirit_damage") and r.is_attacker_spirit:
             return False
         if not self.filters.get("incoming_spirit_damage") and r.is_target_spirit:
             return False
+
+        if (
+                not self.filters.get("your_effects")
+                and r.type in ("effect_applied", "effect_removed")
+                and r.target == self.player_name
+        ):
+            return False
+        if (
+                not self.filters.get("not_your_effects")
+                and r.type in ("effect_applied", "effect_removed")
+                and r.target != self.player_name
+        ):
+            return False
+
+        if not self._match_text(self.attacker_name, r.attacker):
+            return False
+        if not self._match_text(self.target_name, r.target):
+            return False
+        if not self._match_text(self.skill_name, r.skill):
+            return False
+
         if not self.filters.get("attack_common") and r.property2 == "Обычный":
             return False
         if not self.filters.get("attack_critical") and r.property2 == "Критический удар":

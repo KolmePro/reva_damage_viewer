@@ -19,6 +19,11 @@ class MainWindow(QMainWindow):
         damage_model.data_refreshed.connect(self.refresh_table)
         self.settings = app.settings
 
+        # Установка имени игрока
+        player_name = self.settings.value("player_name", "")
+        self.ui.le_your_nickname.setText(player_name)
+        damage_model.player_name = player_name
+
     def action_set_game_folder(self):
         """Выбор папки с игрой."""
         start_dir = self.settings.value("game_folder", "")
@@ -56,9 +61,26 @@ class MainWindow(QMainWindow):
         table.verticalHeader().setVisible(False)
         self.refresh_table()
 
+    def on_player_name_changed(self, new_player_name):
+        self.ui.damage_table_view.model().player_name = new_player_name
+        self.settings.setValue("player_name", new_player_name)
+
+    def on_attacker_name_changed(self, new_attacker_name):
+        self.ui.damage_table_view.model().attacker_name = new_attacker_name
+        self.ui.damage_table_view.model().apply_filters()
+
+    def on_target_name_changed(self, new_target_name):
+        self.ui.damage_table_view.model().target_name = new_target_name
+        self.ui.damage_table_view.model().apply_filters()
+
+    def on_skill_name_changed(self, new_skill_name):
+        self.ui.damage_table_view.model().skill_name = new_skill_name
+        self.ui.damage_table_view.model().apply_filters()
+
     def refresh_table(self):
         self.apply_row_spans()
         self.auto_resize_columns()
+        self.refresh_damage_summary()
 
     def auto_resize_columns(self):
         table = self.ui.damage_table_view
@@ -105,29 +127,59 @@ class MainWindow(QMainWindow):
         """Снять выделение со всех строчек урона."""
         self.ui.damage_table_view.clearSelection()
 
-    def refresh_damage_summary(self, selected: QItemSelection, deselected: QItemSelection):
-        """Отобразить сводную информацию о выделенных записях."""
-        indexes = self.ui.damage_table_view.selectionModel().selectedRows()  # получаем только строки
-        model = self.ui.damage_table_view.model()
+    def refresh_damage_summary(self):
+        """Отобразить сводную информацию по выделенным или всем записям, если ничего не выделено."""
+        table = self.ui.damage_table_view
+        model = table.model()
+
+        indexes = table.selectionModel().selectedRows()  # только строки
+        # Если ничего не выделено — берем все
+        if not indexes:
+            indexes = [model.index(row, 0) for row in range(model.rowCount())]
 
         damages = []
+        p_damages = []
+        m_damages = []
+        common_damages = []
+        crit_damages = []
         for index in indexes:
             damage_index = model.index(index.row(), 6)  # колонка "Урон"
+            property1 = model.index(index.row(), 7)  # колонка "Свойство 1"
+            property2 = model.index(index.row(), 8)  # колонка "Свойство 2"
             value = model.data(damage_index, role=Qt.DisplayRole)
+            damage_type_1 = model.data(property1, role=Qt.DisplayRole)
+            damage_type_2 = model.data(property2, role=Qt.DisplayRole)
             if value is not None:
-                try:
-                    damages.append(int(value))
-                except ValueError:
-                    continue
+                damages.append(int(value))
+                if damage_type_1 == "Сила атаки":
+                    p_damages.append(int(value))
+                elif damage_type_1 == "Сила заклинаний":
+                    m_damages.append(int(value))
+                elif damage_type_1 == "Обычный":
+                    common_damages.append(int(value))
 
-        count = len(damages)
-        avg = round(sum(damages) / count)
-        min_damage = min(damages)
-        max_damage = max(damages)
-        median_damage = round(median(damages))
+                if damage_type_2 == "Критический удар":
+                    crit_damages.append(int(value))
 
-        self.ui.label_6.setText(f"{avg:,}".replace(",", " "))
-        self.ui.label_10.setText(f"{count:,}".replace(",", " "))
+        total_attacks = len(damages)
+        critical_hits = len(crit_damages)
+        crit_chance = (critical_hits / total_attacks * 100) if total_attacks else 0
+        all_damage = sum(damages)
+        avg = round(all_damage / total_attacks) if total_attacks else 0
+        min_damage = min(damages) if damages else 0
+        max_damage = max(damages) if damages else 0
+        median_damage = round(median(damages)) if damages else 0
+
+        self.ui.label_10.setText(f"{total_attacks:,}".replace(",", " "))
+        self.ui.label_24.setText(f"{critical_hits} ({crit_chance:.1f}%)".replace(",", " "))
+        self.ui.label_13.setText(f"{all_damage:,}".replace(",", " "))
+
+        self.ui.label_15.setText(f"{sum(p_damages):,}".replace(",", " "))
+        self.ui.label_18.setText(f"{sum(m_damages):,}".replace(",", " "))
+        self.ui.label_19.setText(f"{sum(common_damages):,}".replace(",", " "))
+
         self.ui.label_4.setText(f"{min_damage:,}".replace(",", " "))
         self.ui.label_2.setText(f"{max_damage:,}".replace(",", " "))
+
+        self.ui.label_6.setText(f"{avg:,}".replace(",", " "))
         self.ui.label_8.setText(f"{median_damage:,}".replace(",", " "))

@@ -15,11 +15,29 @@ def connect_actions(app):
     ui.action_load_last_log.triggered.connect(window.action_load_last_log)
     ui.action_clear_selection.triggered.connect(window.action_clear_selection)
 
+    ui.le_your_nickname.textChanged.connect(window.on_player_name_changed)
+    ui.le_attacker_name.textChanged.connect(window.on_attacker_name_changed)
+    ui.le_target_name.textChanged.connect(window.on_target_name_changed)
+    ui.le_skill_name.textChanged.connect(window.on_skill_name_changed)
+
+    ui.cb_outgoing_your_damage.toggled.connect(
+        lambda checked: model.set_filter("outgoing_your_damage", checked)
+    )
+    ui.cb_incoming_your_damage.toggled.connect(
+        lambda checked: model.set_filter("incoming_your_damage", checked)
+    )
     ui.cb_outgoing_spirit_damage.toggled.connect(
         lambda checked: model.set_filter("outgoing_spirit_damage", checked)
     )
     ui.cb_incoming_spirit_damage.toggled.connect(
         lambda checked: model.set_filter("incoming_spirit_damage", checked)
+    )
+
+    ui.cb_your_effects.toggled.connect(
+        lambda checked: model.set_filter("your_effects", checked)
+    )
+    ui.cb_not_your_effects.toggled.connect(
+        lambda checked: model.set_filter("not_your_effects", checked)
     )
 
     ui.cb_attack_common.toggled.connect(
@@ -45,4 +63,6 @@ def connect_actions(app):
         lambda checked: model.set_filter("attack_o", checked)
     )
 
-    table.selectionModel().selectionChanged.connect(window.refresh_damage_summary)
+    table.selectionModel().selectionChanged.connect(
+        lambda selected, deselected: window.refresh_damage_summary()
+    )
