@@ -124,6 +124,10 @@ class DamageTableModel(QAbstractTableModel):
         self.filters[key] = value
         self.apply_filters()
 
+    def set_filters(self, filters: dict[str, bool]):
+        self.filters.update(filters)
+        self.apply_filters()
+
     def apply_filters(self):
         self.beginResetModel()
         self._filtered_records = [record for record in self._all_records if self._record_allowed(record)]

@@ -1,18 +1,20 @@
 from pathlib import Path
 from statistics import median
 
-from PySide6.QtCore import Qt
+from PySide6.QtCore import QSignalBlocker, Qt
 from PySide6.QtWidgets import (
     QAbstractItemView,
     QCheckBox,
     QFileDialog,
     QFrame,
     QGridLayout,
-    QLabel,
+    QHBoxLayout,
     QMainWindow,
     QMessageBox,
     QSizePolicy,
+    QStyle,
     QTableView,
+    QToolButton,
     QVBoxLayout,
     QWidget,
 )
@@ -53,6 +55,9 @@ class MainWindow(QMainWindow):
         damage_model.data_refreshed.connect(self.refresh_table)
         self.settings = app.settings
         self.filter_checkboxes: dict[str, QCheckBox] = {}
+        self.group_filter_keys: dict[str, list[str]] = {}
+        self.filter_key_to_group: dict[str, str] = {}
+        self.group_filter_checkboxes: dict[str, QCheckBox] = {}
         self._setup_filter_panel(app.filter_definitions)
 
         player_name = self.settings.value("player_name", "")
@@ -118,6 +123,10 @@ class MainWindow(QMainWindow):
 
     def _setup_filter_panel(self, filter_definitions: list[FilterDefinition]):
         filter_layout = self.ui.gridLayout
+        self.filter_checkboxes.clear()
+        self.group_filter_keys.clear()
+        self.filter_key_to_group.clear()
+        self.group_filter_checkboxes.clear()
 
         for widget_name in self.STATIC_FILTER_WIDGETS:
             widget = getattr(self.ui, widget_name, None)
@@ -138,10 +147,41 @@ class MainWindow(QMainWindow):
         for definition in filter_definitions:
             groups.setdefault(definition.group, []).append(definition)
 
+        toolbar_layout = QHBoxLayout()
+        toolbar_layout.setContentsMargins(0, 0, 0, 0)
+        toolbar_layout.setSpacing(4)
+        toolbar_layout.addStretch()
+        toolbar_layout.addWidget(
+            self._create_filter_button(
+                "Включить все группы",
+                lambda: self.set_all_filters(True),
+                QStyle.StandardPixmap.SP_DialogApplyButton,
+            )
+        )
+        toolbar_layout.addWidget(
+            self._create_filter_button(
+                "Выключить все группы",
+                lambda: self.set_all_filters(False),
+                QStyle.StandardPixmap.SP_DialogCancelButton,
+            )
+        )
+        container_layout.addLayout(toolbar_layout)
+
         for group_name, definitions in groups.items():
-            title = QLabel(group_name, container)
-            title.setStyleSheet("font-weight: 600;")
-            container_layout.addWidget(title)
+            self.group_filter_keys[group_name] = [definition.key for definition in definitions]
+            for definition in definitions:
+                self.filter_key_to_group[definition.key] = group_name
+
+            group_header = QHBoxLayout()
+            group_header.setContentsMargins(0, 0, 0, 0)
+            group_header.setSpacing(6)
+
+            group_checkbox = self._create_tristate_filter_checkbox(group_name)
+            group_checkbox.clicked.connect(lambda checked, group=group_name: self.set_filter_group(group, checked))
+            self.group_filter_checkboxes[group_name] = group_checkbox
+            group_header.addWidget(group_checkbox)
+            group_header.addStretch()
+            container_layout.addLayout(group_header)
 
             grid = QGridLayout()
             grid.setContentsMargins(0, 0, 0, 0)
@@ -151,9 +191,7 @@ class MainWindow(QMainWindow):
             for index, definition in enumerate(definitions):
                 checkbox = QCheckBox(definition.label, container)
                 checkbox.setChecked(definition.default_enabled)
-                checkbox.toggled.connect(
-                    lambda checked, key=definition.key: self.ui.damage_table_view.model().set_filter(key, checked)
-                )
+                checkbox.toggled.connect(lambda checked, key=definition.key: self.on_filter_toggled(key, checked))
                 self.filter_checkboxes[definition.key] = checkbox
                 grid.addWidget(checkbox, index // 2, index % 2)
 
@@ -164,12 +202,73 @@ class MainWindow(QMainWindow):
             divider.setFrameShadow(QFrame.Shadow.Sunken)
             container_layout.addWidget(divider)
 
-        if container_layout.count():
+        if groups and container_layout.count():
             last_item = container_layout.takeAt(container_layout.count() - 1)
             if last_item.widget():
                 last_item.widget().deleteLater()
 
         filter_layout.addWidget(container, 6, 0, 10, 2)
+        self.refresh_filter_group_states()
+
+    def _create_tristate_filter_checkbox(self, text: str):
+        checkbox = QCheckBox(text, self.ui.groupBox)
+        checkbox.setTristate(True)
+        checkbox.setStyleSheet("font-weight: 600;")
+        return checkbox
+
+    def _create_filter_button(self, tooltip: str, callback, icon):
+        button = QToolButton(self.ui.groupBox)
+        button.setIcon(self.style().standardIcon(icon))
+        button.setToolTip(tooltip)
+        button.setAutoRaise(True)
+        button.clicked.connect(callback)
+        return button
+
+    def on_filter_toggled(self, key: str, enabled: bool):
+        self.ui.damage_table_view.model().set_filter(key, enabled)
+        self.refresh_filter_group_states(self.filter_key_to_group.get(key))
+
+    def set_all_filters(self, enabled: bool):
+        self._set_filters(list(self.filter_checkboxes), enabled)
+
+    def set_filter_group(self, group_name: str, enabled: bool):
+        self._set_filters(self.group_filter_keys.get(group_name, []), enabled)
+
+    def _set_filters(self, keys: list[str], enabled: bool):
+        if not keys:
+            return
+
+        for key in keys:
+            checkbox = self.filter_checkboxes.get(key)
+            if checkbox is None:
+                continue
+            with QSignalBlocker(checkbox):
+                checkbox.setChecked(enabled)
+
+        self.ui.damage_table_view.model().set_filters({key: enabled for key in keys})
+        self.refresh_filter_group_states()
+
+    def refresh_filter_group_states(self, changed_group_name: str | None = None):
+        group_names = [changed_group_name] if changed_group_name else list(self.group_filter_keys)
+
+        for group_name in group_names:
+            keys = self.group_filter_keys.get(group_name, [])
+            group_checkbox = self.group_filter_checkboxes.get(group_name)
+            if not keys or group_checkbox is None:
+                continue
+            self._set_filter_state_indicator(group_checkbox, keys)
+
+    def _set_filter_state_indicator(self, checkbox: QCheckBox, keys: list[str]):
+        enabled_count = sum(1 for key in keys if self.filter_checkboxes[key].isChecked())
+        if enabled_count == len(keys):
+            state = Qt.CheckState.Checked
+        elif enabled_count == 0:
+            state = Qt.CheckState.Unchecked
+        else:
+            state = Qt.CheckState.PartiallyChecked
+
+        with QSignalBlocker(checkbox):
+            checkbox.setCheckState(state)
 
     def auto_resize_columns(self):
         table = self.ui.damage_table_view
