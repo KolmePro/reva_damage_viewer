@@ -1,4 +1,4 @@
-from PySide6.QtCore import QSettings, QTranslator
+from PySide6.QtCore import QSettings, QTimer, QTranslator
 from PySide6.QtWidgets import QApplication
 
 from core.actions import connect_actions
@@ -49,3 +49,4 @@ class Application(QApplication):
 
         self.logger.info("Отображение главного окна.")
         self.window.showMaximized()
+        QTimer.singleShot(0, self.window.auto_resize_columns)
