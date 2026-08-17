@@ -1,4 +1,5 @@
 from PySide6.QtCore import QSettings, QTimer, QTranslator
+from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QApplication
 
 from core.actions import connect_actions
@@ -39,6 +40,7 @@ class Application(QApplication):
         self.logger.info("Загрузка интерфейса.")
         self.window = MainWindow(self)
         self.window.setWindowTitle("Калькулятор урона")
+        self.window.setWindowIcon(QIcon(str(RESOURCE_PATH / "DamageViewer.ico")))
 
         self.logger.info("Настройка внешнего вида.")
         self.setStyle("Fusion")
