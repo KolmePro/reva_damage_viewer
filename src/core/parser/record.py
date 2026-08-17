@@ -5,6 +5,7 @@ from typing import List, Optional
 
 LINE_REGEX = re.compile(r"\[(?P<time>.*?)\]\s(?P<message>.*)")
 SPIRIT_OWNER_REGEX = re.compile(r"^(?P<owner>.+?):\s*дух\s+(?P<spirit>.+)$")
+COUNTER_ATTACK_SUFFIX_REGEX = re.compile(r"\s+\(Counter-attack \d+ layer\)$")
 
 RECORD_TYPES = {
     "damage_dealt": re.compile(
@@ -55,16 +56,20 @@ class DamageRecord(Record):
 
     type: str
     attacker: str
+    attacker_server: str
     is_attacker_spirit: bool
+    attacker_spirit_owner: str
+    attacker_spirit_owner_server: str
     target: str
+    target_server: str
     is_target_spirit: bool
+    target_spirit_owner: str
+    target_spirit_owner_server: str
     skill: str
     damage: int
     property1: str
     property2: str
     effects: List[str]
-    attacker_spirit_owner: str = ""
-    target_spirit_owner: str = ""
 
     def __repr__(self):
         return (
@@ -86,12 +91,8 @@ class DamageRecord(Record):
                 continue
 
             match_dict = match.groupdict()
-            attacker_name, is_attacker_spirit, attacker_spirit_owner = DamageRecord._parse_actor_name(
-                match_dict.get("attacker", "")
-            )
-            target_name, is_target_spirit, target_spirit_owner = DamageRecord._parse_actor_name(
-                match_dict.get("target", "")
-            )
+            attacker = DamageRecord._parse_actor_name(match_dict.get("attacker", ""))
+            target = DamageRecord._parse_actor_name(match_dict.get("target", ""))
 
             effects = []
             effects_str = match_dict.get("effects", "")
@@ -104,27 +105,66 @@ class DamageRecord(Record):
                 message=record.message,
                 time=record.time,
                 type=record_type,
-                attacker=attacker_name,
-                is_attacker_spirit=is_attacker_spirit,
-                target=target_name,
-                is_target_spirit=is_target_spirit,
+                attacker=attacker["name"],
+                attacker_server=attacker["server"],
+                is_attacker_spirit=attacker["is_spirit"],
+                attacker_spirit_owner=attacker["spirit_owner"],
+                attacker_spirit_owner_server=attacker["spirit_owner_server"],
+                target=target["name"],
+                target_server=target["server"],
+                is_target_spirit=target["is_spirit"],
+                target_spirit_owner=target["spirit_owner"],
+                target_spirit_owner_server=target["spirit_owner_server"],
                 skill=match_dict.get("skill", ""),
                 damage=int(match_dict.get("damage", 0)),
                 property1=match_dict.get("property1", ""),
                 property2=match_dict.get("property2", ""),
                 effects=effects,
-                attacker_spirit_owner=attacker_spirit_owner,
-                target_spirit_owner=target_spirit_owner,
             )
         return None
 
     @staticmethod
-    def _parse_actor_name(raw_name: str) -> tuple[str, bool, str]:
+    def _parse_actor_name(raw_name: str) -> dict[str, str | bool]:
+        empty_result = {
+            "name": "",
+            "server": "",
+            "is_spirit": False,
+            "spirit_owner": "",
+            "spirit_owner_server": "",
+        }
         if not raw_name:
-            return "", False, ""
+            return empty_result
+
+        raw_name = DamageRecord._normalize_actor_name(raw_name)
 
         match = re.match(SPIRIT_OWNER_REGEX, raw_name)
         if match:
-            return match["spirit"], True, match["owner"]
+            spirit_name, spirit_server = DamageRecord._split_name_and_server(match["spirit"])
+            owner_name, owner_server = DamageRecord._split_name_and_server(match["owner"])
+            return {
+                "name": spirit_name,
+                "server": spirit_server,
+                "is_spirit": True,
+                "spirit_owner": owner_name,
+                "spirit_owner_server": owner_server,
+            }
 
-        return raw_name, False, ""
+        name, server = DamageRecord._split_name_and_server(raw_name)
+        return {
+            "name": name,
+            "server": server,
+            "is_spirit": False,
+            "spirit_owner": "",
+            "spirit_owner_server": "",
+        }
+
+    @staticmethod
+    def _split_name_and_server(raw_name: str) -> tuple[str, str]:
+        if "-" not in raw_name:
+            return raw_name, ""
+        name, server = raw_name.rsplit("-", 1)
+        return name, server
+
+    @staticmethod
+    def _normalize_actor_name(raw_name: str) -> str:
+        return re.sub(COUNTER_ATTACK_SUFFIX_REGEX, "", raw_name).strip()

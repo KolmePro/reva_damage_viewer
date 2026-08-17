@@ -48,6 +48,7 @@ class DamageTableModel(QAbstractTableModel):
                     record.target,
                     record.is_target_spirit,
                     record.target_spirit_owner,
+                    self.player_name,
                 )
                 return f"Эффект '{record.skill}' {action} на цель {target_name}"
 
@@ -69,12 +70,14 @@ class DamageTableModel(QAbstractTableModel):
                     record.attacker,
                     record.is_attacker_spirit,
                     record.attacker_spirit_owner,
+                    self.player_name,
                 )
             if col == 3:
                 return self._format_actor_name(
                     record.target,
                     record.is_target_spirit,
                     record.target_spirit_owner,
+                    self.player_name,
                 )
             if col == 4:
                 return record.skill
@@ -173,9 +176,13 @@ class DamageTableModel(QAbstractTableModel):
         return value
 
     @staticmethod
-    def _format_actor_name(name: str, is_spirit: bool, spirit_owner: str = "") -> str:
+    def _format_actor_name(name: str, is_spirit: bool, spirit_owner: str = "", player_name: str = "") -> str:
+        if name == "Вы" and player_name:
+            name = player_name
         if not is_spirit:
             return name
         if spirit_owner:
+            if spirit_owner == "Вы" and player_name:
+                spirit_owner = player_name
             return f"{name} (дух {spirit_owner})"
         return f"{name} (дух)"
