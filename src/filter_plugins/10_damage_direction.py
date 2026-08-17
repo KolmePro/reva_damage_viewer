@@ -2,7 +2,7 @@ FILTERS = [
     {
         "key": "outgoing_your_damage",
         "label": "Урон от вас",
-        "group": "Направление урона",
+        "group": "Урон",
         "match_all": [
             {"field": "attacker", "value": "Вы"},
         ],
@@ -10,7 +10,7 @@ FILTERS = [
     {
         "key": "incoming_your_damage",
         "label": "Урон по вам",
-        "group": "Направление урона",
+        "group": "Урон",
         "match_all": [
             {"field": "target", "value": "Вы"},
         ],
@@ -18,7 +18,7 @@ FILTERS = [
     {
         "key": "outgoing_spirit_damage",
         "label": "Урон от духов",
-        "group": "Направление урона",
+        "group": "Урон",
         "match_all": [
             {"field": "is_attacker_spirit", "value": True},
         ],
@@ -26,7 +26,7 @@ FILTERS = [
     {
         "key": "incoming_spirit_damage",
         "label": "Урон по духам",
-        "group": "Направление урона",
+        "group": "Урон",
         "match_all": [
             {"field": "is_target_spirit", "value": True},
         ],
