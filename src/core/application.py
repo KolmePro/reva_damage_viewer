@@ -17,13 +17,16 @@ from gui.windows.main_window import MainWindow
 
 
 class Application(QApplication):
-    def __init__(self, argv):
+    def __init__(self, argv, debug_mode: bool = False):
         super().__init__(argv)
+        self.debug_mode = debug_mode
 
         self.setOrganizationName(COMPANY_NAME)
         self.setApplicationName(APP_NAME)
 
-        self.logger = setup_logger()
+        self.logger = setup_logger(debug_mode=debug_mode)
+        if self.debug_mode:
+            self.logger.debug("Debug mode enabled.")
 
         self.logger.info("Инициализация настроек.")
         self.settings = QSettings()
@@ -40,6 +43,8 @@ class Application(QApplication):
         self.logger.info("Загрузка интерфейса.")
         self.window = MainWindow(self)
         self.window.setWindowTitle("Калькулятор урона")
+        if self.debug_mode:
+            self.window.setWindowTitle(f"{self.window.windowTitle()} [DEBUG]")
         self.window.setWindowIcon(QIcon(str(RESOURCE_PATH / "DamageViewer.ico")))
 
         self.logger.info("Настройка внешнего вида.")

@@ -2,9 +2,12 @@ from pathlib import Path
 from statistics import median
 
 from PySide6.QtCore import QSignalBlocker, Qt
+from PySide6.QtGui import QAction
 from PySide6.QtWidgets import (
     QAbstractItemView,
     QCheckBox,
+    QDialog,
+    QDialogButtonBox,
     QFileDialog,
     QFrame,
     QGridLayout,
@@ -14,6 +17,7 @@ from PySide6.QtWidgets import (
     QSizePolicy,
     QStyle,
     QTableView,
+    QTextEdit,
     QToolButton,
     QVBoxLayout,
     QWidget,
@@ -54,11 +58,15 @@ class MainWindow(QMainWindow):
         self.ui.damage_table_view.setModel(damage_model)
         damage_model.data_refreshed.connect(self.refresh_table)
         self.settings = app.settings
+        self.logger = app.logger
+        self.debug_mode = app.debug_mode
+        self.last_unparsed_records: list[str] = []
         self.filter_checkboxes: dict[str, QCheckBox] = {}
         self.group_filter_keys: dict[str, list[str]] = {}
         self.filter_key_to_group: dict[str, str] = {}
         self.group_filter_checkboxes: dict[str, QCheckBox] = {}
         self._setup_filter_panel(app.filter_definitions)
+        self._setup_debug_actions()
 
         player_name = self.settings.value("player_name", "")
         self.ui.le_your_nickname.setText(player_name)
@@ -101,12 +109,26 @@ class MainWindow(QMainWindow):
 
         last_log = max(log_files, key=lambda file: file.stat().st_mtime)
 
-        combat_log = EventLog.parse_chat(str(last_log))
+        combat_log = EventLog.parse_chat(str(last_log), collect_unparsed=self.debug_mode)
+        self.last_unparsed_records = combat_log.unparsed_records
+        if self.debug_mode:
+            self.action_show_unparsed_log.setEnabled(bool(self.last_unparsed_records))
+            self.logger.debug(
+                "Loaded %s parsed and %s unparsed combat records from %s",
+                len(combat_log),
+                len(self.last_unparsed_records),
+                last_log,
+            )
         table = self.ui.damage_table_view
         table.setSelectionBehavior(QAbstractItemView.SelectRows)
         table.model().set_records(combat_log)
         table.verticalHeader().setVisible(False)
         self.refresh_table()
+        if self.debug_mode:
+            self.ui.statusbar.showMessage(
+                f"Загружено: {len(combat_log)}; не распарсено: {len(self.last_unparsed_records)}",
+                5000,
+            )
 
     def on_player_name_changed(self, new_player_name):
         self.ui.damage_table_view.model().player_name = new_player_name
@@ -132,6 +154,38 @@ class MainWindow(QMainWindow):
         self.apply_row_spans()
         self.auto_resize_columns()
         self.refresh_damage_summary()
+
+    def _setup_debug_actions(self):
+        if not self.debug_mode:
+            return
+
+        self.action_show_unparsed_log = QAction("Нераспарсенные записи", self)
+        self.action_show_unparsed_log.setToolTip("Показать записи боевого лога, которые не удалось распарсить")
+        self.action_show_unparsed_log.setEnabled(False)
+        self.action_show_unparsed_log.triggered.connect(self.show_unparsed_log_records)
+        self.ui.toolbar.addAction(self.action_show_unparsed_log)
+
+    def show_unparsed_log_records(self):
+        if not self.last_unparsed_records:
+            QMessageBox.information(self, "Debug", "Нераспарсенных записей нет.")
+            return
+
+        dialog = QDialog(self)
+        dialog.setWindowTitle("Нераспарсенные записи боевого лога")
+        dialog.resize(900, 600)
+
+        layout = QVBoxLayout(dialog)
+        text_edit = QTextEdit(dialog)
+        text_edit.setReadOnly(True)
+        text_edit.setLineWrapMode(QTextEdit.LineWrapMode.NoWrap)
+        text_edit.setPlainText("\n\n".join(self.last_unparsed_records))
+        layout.addWidget(text_edit)
+
+        buttons = QDialogButtonBox(QDialogButtonBox.StandardButton.Close, dialog)
+        buttons.rejected.connect(dialog.reject)
+        layout.addWidget(buttons)
+
+        dialog.exec()
 
     def _setup_filter_panel(self, filter_definitions: list[FilterDefinition]):
         filter_layout = self.ui.gridLayout

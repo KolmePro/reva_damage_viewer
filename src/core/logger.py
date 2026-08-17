@@ -23,7 +23,7 @@ def qt_message_handler(mode, context, message):
         logger.critical(message)
 
 
-def setup_logger():
+def setup_logger(debug_mode: bool = False):
     # Каталог приложения по стандартам ОС
     app_dir = Path(
         QStandardPaths.writableLocation(QStandardPaths.AppDataLocation)
@@ -33,7 +33,7 @@ def setup_logger():
 
     file_path = log_dir / "app.log"
 
-    logger.setLevel(logging.INFO)
+    logger.setLevel(logging.DEBUG if debug_mode else logging.INFO)
 
     if not logger.handlers:
         # Ротация файла (5 МБ, 3 бэкапа)
@@ -50,6 +50,9 @@ def setup_logger():
         console_handler = logging.StreamHandler()
         console_handler.setFormatter(logging.Formatter('%(asctime)s [%(levelname)s] %(message)s'))
         logger.addHandler(console_handler)
+
+    for handler in logger.handlers:
+        handler.setLevel(logging.DEBUG if debug_mode else logging.INFO)
 
     # qInstallMessageHandler(qt_message_handler)
 

@@ -15,15 +15,16 @@ class EventLog(UserList):
     LOG_MARKER = '<font color = "#FF0000" [Бой]: </font>'
     CHAT_ENCODINGS = ("utf-8", "utf-8-sig", "cp1251")
 
-    def __init__(self, log: List[DamageRecord]):
+    def __init__(self, log: List[DamageRecord], unparsed_records: List[str] | None = None):
         super().__init__()
         self.data: List[DamageRecord] = log.copy()
+        self.unparsed_records: List[str] = (unparsed_records or []).copy()
 
     def __iter__(self) -> Iterator[DamageRecord]:
         return iter(self.data)
 
     @staticmethod
-    def parse_chat(log_path: str) -> "EventLog":
+    def parse_chat(log_path: str, collect_unparsed: bool = False) -> "EventLog":
         """
         Парсит файл по заданному пути, возвращая лог событий.
         """
@@ -33,13 +34,19 @@ class EventLog(UserList):
         combat_log = re.findall(line_regex, log_file)
 
         events = []
+        unparsed_records = []
         for string in combat_log:
-            damage_record = DamageRecord.try_to_parse(string)
+            try:
+                damage_record = DamageRecord.try_to_parse(string)
+            except (AttributeError, KeyError, ValueError):
+                damage_record = None
             if not damage_record:
+                if collect_unparsed:
+                    unparsed_records.append(string)
                 continue
             events.append(damage_record)
 
-        return EventLog(events)
+        return EventLog(events, unparsed_records)
 
     @staticmethod
     def _read_chat_text(log_path: Path) -> str:
@@ -71,7 +78,7 @@ class EventLog(UserList):
             if start <= event.time <= end:
                 filtered_events.append(event)
 
-        return EventLog(filtered_events)
+        return EventLog(filtered_events, self.unparsed_records)
 
     def filter(
         self,
@@ -107,4 +114,4 @@ class EventLog(UserList):
                 continue
             filtered_events.append(event)
 
-        return EventLog(filtered_events)
+        return EventLog(filtered_events, self.unparsed_records)
