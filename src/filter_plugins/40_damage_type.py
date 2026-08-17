@@ -4,7 +4,7 @@ FILTERS = [
         "label": "Сила атаки",
         "group": "Тип урона",
         "match_all": [
-            {"field": "property1", "value": "РЎРёР»Р° Р°С‚Р°РєРё"},
+            {"field": "property1", "value": "Сила атаки"},
         ],
     },
     {
@@ -12,7 +12,7 @@ FILTERS = [
         "label": "Сила заклинаний",
         "group": "Тип урона",
         "match_all": [
-            {"field": "property1", "value": "РЎРёР»Р° Р·Р°РєР»РёРЅР°РЅРёР№"},
+            {"field": "property1", "value": "Сила заклинаний"},
         ],
     },
     {
@@ -20,7 +20,7 @@ FILTERS = [
         "label": "Обычный",
         "group": "Тип урона",
         "match_all": [
-            {"field": "property1", "value": "РћР±С‹С‡РЅС‹Р№"},
+            {"field": "property1", "value": "Обычный"},
         ],
     },
 ]

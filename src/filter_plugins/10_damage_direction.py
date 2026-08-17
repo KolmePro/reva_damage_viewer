@@ -4,7 +4,7 @@ FILTERS = [
         "label": "Урон от вас",
         "group": "Направление урона",
         "match_all": [
-            {"field": "attacker", "value": "Р’С‹"},
+            {"field": "attacker", "value": "Вы"},
         ],
     },
     {
@@ -12,7 +12,7 @@ FILTERS = [
         "label": "Урон по вам",
         "group": "Направление урона",
         "match_all": [
-            {"field": "target", "value": "Р’С‹"},
+            {"field": "target", "value": "Вы"},
         ],
     },
     {

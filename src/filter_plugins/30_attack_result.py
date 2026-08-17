@@ -4,7 +4,7 @@ FILTERS = [
         "label": "Обычные атаки",
         "group": "Результат удара",
         "match_all": [
-            {"field": "property2", "value": "РћР±С‹С‡РЅС‹Р№"},
+            {"field": "property2", "value": "Обычный"},
         ],
     },
     {
@@ -12,7 +12,7 @@ FILTERS = [
         "label": "Критические удары",
         "group": "Результат удара",
         "match_all": [
-            {"field": "property2", "value": "РљСЂРёС‚РёС‡РµСЃРєРёР№ СѓРґР°СЂ"},
+            {"field": "property2", "value": "Критический удар"},
         ],
     },
     {
@@ -20,7 +20,7 @@ FILTERS = [
         "label": "Блокирования",
         "group": "Результат удара",
         "match_all": [
-            {"field": "property2", "value": "Р‘Р»РѕРєРёСЂРѕРІР°РЅРёРµ"},
+            {"field": "property2", "value": "Блокирование"},
         ],
     },
     {
@@ -28,7 +28,7 @@ FILTERS = [
         "label": "Комбо-удары",
         "group": "Результат удара",
         "match_all": [
-            {"field": "property2", "value": "РљРѕРјР±Рѕ-СѓРґР°СЂ"},
+            {"field": "property2", "value": "Комбо-удар"},
         ],
     },
 ]
