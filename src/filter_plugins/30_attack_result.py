@@ -31,4 +31,12 @@ FILTERS = [
             {"field": "property2", "value": "Комбо-удар"},
         ],
     },
+    {
+        "key": "attack_dodge",
+        "label": "Уклонения",
+        "group": "Результат удара",
+        "match_all": [
+            {"field": "property2", "operator": "startswith", "value": "Вероятность уклонения"},
+        ],
+    },
 ]

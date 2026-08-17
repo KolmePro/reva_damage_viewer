@@ -172,6 +172,10 @@ class DamageTableModel(QAbstractTableModel):
             return left_value in right_value
         if condition.operator == "not_in":
             return left_value not in right_value
+        if condition.operator == "startswith":
+            return str(left_value).startswith(str(right_value))
+        if condition.operator == "not_startswith":
+            return not str(left_value).startswith(str(right_value))
         return False
 
     def _resolve_condition_value(self, value):

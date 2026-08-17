@@ -99,6 +99,6 @@ def _normalize_condition(raw_condition: dict[str, Any]) -> FilterCondition:
     field = raw_condition["field"]
     operator = raw_condition.get("operator", "eq")
     value = raw_condition.get("value")
-    if operator not in {"eq", "ne", "in", "not_in"}:
+    if operator not in {"eq", "ne", "in", "not_in", "startswith", "not_startswith"}:
         raise ValueError(f"Unsupported operator: {operator}")
     return FilterCondition(field=field, operator=operator, value=value)
