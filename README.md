@@ -16,6 +16,5 @@
 
 ## Сборка exe
 ```text
-cd /src
-pyinstaller --onefile --noconsole --add-data "resources;resources" --add-data "filter_plugins;filter_plugins" main.pyw
+pyinstaller main.spec
 ```
