@@ -1,12 +1,11 @@
 import re
 from dataclasses import dataclass
-from datetime import time, datetime
-from typing import Optional, List
+from datetime import datetime, time
+from typing import List, Optional
 
 LINE_REGEX = re.compile(r"\[(?P<time>.*?)\]\s(?P<message>.*)")
-DAMAGE_DEALT_REGEX = re.compile(
-    r"(?P<attacker>.*?):?(?! дух ) (использует|использовано) умение:? \[?(?P<skill>.*?)\]?\. (?P<target>.*?):(?! дух ) получено (?P<damage>\d*) ед\. урона \((?P<property1>.*), (?P<property2>.*)\)\."
-)
+SPIRIT_OWNER_REGEX = re.compile(r"^(?P<owner>.+?):\s*дух\s+(?P<spirit>.+)$")
+
 RECORD_TYPES = {
     "damage_dealt": re.compile(
         r"(?P<attacker>.*?):?(?! дух ) (использует|использовано) "
@@ -33,6 +32,7 @@ class Record:
     """
     Класс представляет запись в боевом логе.
     """
+
     origin_string: str
     message: str
     time: time
@@ -50,8 +50,9 @@ class Record:
 @dataclass
 class DamageRecord(Record):
     """
-    Класс представляет запись в боевом логе (Нанесение урона).
+    Класс представляет запись в боевом логе (нанесение урона / эффекты).
     """
+
     type: str
     attacker: str
     is_attacker_spirit: bool
@@ -62,16 +63,22 @@ class DamageRecord(Record):
     property1: str
     property2: str
     effects: List[str]
+    attacker_spirit_owner: str = ""
+    target_spirit_owner: str = ""
 
     def __repr__(self):
-        return f"[{self.time}: {self.attacker} наносит {self.target} {self.damage} урона ({self.skill}, {self.property1}, {self.property2})]"
+        return (
+            f"[{self.time}: {self.attacker} наносит {self.target} "
+            f"{self.damage} урона ({self.skill}, {self.property1}, {self.property2})]"
+        )
 
     @staticmethod
     def try_to_parse(string: str) -> Optional["DamageRecord"]:
         """
-        Пытается распарсить строку в запись Нанесение урона.
+        Пытается распарсить строку в запись нанесения урона.
         Если не получается, возвращает None.
         """
+
         record = Record.from_string(string)
         for record_type, regex in RECORD_TYPES.items():
             match = re.search(regex, record.message)
@@ -79,17 +86,12 @@ class DamageRecord(Record):
                 continue
 
             match_dict = match.groupdict()
-            is_attacker_spirit = False
-            attacker_name = match_dict.get("attacker", "")
-            if attacker_name.startswith("Вы: дух "):
-                is_attacker_spirit = True
-                attacker_name = attacker_name.replace("Вы: дух ", "")
-
-            is_target_spirit = False
-            target_name = match_dict.get("target", "")
-            if target_name.startswith("Вы: дух "):
-                is_target_spirit = True
-                target_name = target_name.replace("Вы: дух ", "")
+            attacker_name, is_attacker_spirit, attacker_spirit_owner = DamageRecord._parse_actor_name(
+                match_dict.get("attacker", "")
+            )
+            target_name, is_target_spirit, target_spirit_owner = DamageRecord._parse_actor_name(
+                match_dict.get("target", "")
+            )
 
             effects = []
             effects_str = match_dict.get("effects", "")
@@ -111,5 +113,18 @@ class DamageRecord(Record):
                 property1=match_dict.get("property1", ""),
                 property2=match_dict.get("property2", ""),
                 effects=effects,
+                attacker_spirit_owner=attacker_spirit_owner,
+                target_spirit_owner=target_spirit_owner,
             )
         return None
+
+    @staticmethod
+    def _parse_actor_name(raw_name: str) -> tuple[str, bool, str]:
+        if not raw_name:
+            return "", False, ""
+
+        match = re.match(SPIRIT_OWNER_REGEX, raw_name)
+        if match:
+            return match["spirit"], True, match["owner"]
+
+        return raw_name, False, ""

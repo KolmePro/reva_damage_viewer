@@ -44,7 +44,12 @@ class DamageTableModel(QAbstractTableModel):
         if record.type in ("effect_applied", "effect_removed"):
             if role == Qt.DisplayRole and col == 0:
                 action = "действует" if record.type == "effect_applied" else "перестал действовать"
-                return f"Эффект '{record.skill}' {action} на цель {record.target}"
+                target_name = self._format_actor_name(
+                    record.target,
+                    record.is_target_spirit,
+                    record.target_spirit_owner,
+                )
+                return f"Эффект '{record.skill}' {action} на цель {target_name}"
 
             if role == Qt.DecorationRole and col == 0:
                 return QIcon.fromTheme("emblem-mail")
@@ -60,9 +65,17 @@ class DamageTableModel(QAbstractTableModel):
             if col == 1:
                 return record.time.strftime("%H:%M:%S")
             if col == 2:
-                return record.attacker
+                return self._format_actor_name(
+                    record.attacker,
+                    record.is_attacker_spirit,
+                    record.attacker_spirit_owner,
+                )
             if col == 3:
-                return record.target
+                return self._format_actor_name(
+                    record.target,
+                    record.is_target_spirit,
+                    record.target_spirit_owner,
+                )
             if col == 4:
                 return record.skill
             if col == 5 and record.effects:
@@ -158,3 +171,11 @@ class DamageTableModel(QAbstractTableModel):
         if isinstance(value, str) and value.startswith("$"):
             return getattr(self, value[1:], "")
         return value
+
+    @staticmethod
+    def _format_actor_name(name: str, is_spirit: bool, spirit_owner: str = "") -> str:
+        if not is_spirit:
+            return name
+        if spirit_owner:
+            return f"{name} (дух {spirit_owner})"
+        return f"{name} (дух)"
