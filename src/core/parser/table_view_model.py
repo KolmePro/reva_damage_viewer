@@ -1,6 +1,7 @@
 from PySide6.QtCore import QAbstractTableModel, Qt, Signal
 from PySide6.QtGui import QBrush, QColor, QIcon
 
+from core.filter_plugins import FilterCondition, FilterDefinition
 from core.parser.record import DamageRecord
 
 
@@ -8,27 +9,12 @@ class DamageTableModel(QAbstractTableModel):
     data_refreshed = Signal()
     headers = ["", "Время", "Атакующий", "Цель", "Навык", "Бафы", "Урон", "Свойство 1", "Свойство 2"]
 
-    def __init__(self):
+    def __init__(self, filter_definitions: list[FilterDefinition] | None = None):
         super().__init__()
         self._all_records = []
         self._filtered_records = []
-        self.filters = {
-            "outgoing_your_damage": True,
-            "incoming_your_damage": True,
-            "outgoing_spirit_damage": True,
-            "incoming_spirit_damage": True,
-
-            "your_effects": True,
-            "not_your_effects": True,
-
-            "attack_common": True,
-            "attack_critical": True,
-            "attack_block": True,
-            "attack_combo": True,
-            "attack_p": True,
-            "attack_m": True,
-            "attack_o": True,
-        }
+        self.filter_definitions = filter_definitions or []
+        self.filters = {definition.key: definition.default_enabled for definition in self.filter_definitions}
         self.player_name = ""
         self.attacker_name = ""
         self.target_name = ""
@@ -51,64 +37,56 @@ class DamageTableModel(QAbstractTableModel):
         record = self._filtered_records[index.row()]
         col = index.column()
 
-        # --- Цвет фона для эффектов ---
         if role == Qt.ForegroundRole and record.type in ("effect_applied", "effect_removed"):
             color = QColor("#AAFFAA") if record.type == "effect_applied" else QColor("#FFAAAA")
             return QBrush(color)
 
-        # --- Обработка строк с эффектами ---
         if record.type in ("effect_applied", "effect_removed"):
-            # Текст в первой колонке
             if role == Qt.DisplayRole and col == 0:
                 action = "действует" if record.type == "effect_applied" else "перестал действовать"
                 return f"Эффект '{record.skill}' {action} на цель {record.target}"
 
-            # Иконка в первой колонке
             if role == Qt.DecorationRole and col == 0:
                 return QIcon.fromTheme("emblem-mail")
 
-            # Tooltip с исходной строкой лога
             if role == Qt.ToolTipRole and col == 0:
                 return record.origin_string
 
-            # Остальные ячейки — пустые
             return None
 
-        # --- Обычные записи урона ---
         if role == Qt.DisplayRole:
             if col == 0:
                 return ""
-            elif col == 1:
+            if col == 1:
                 return record.time.strftime("%H:%M:%S")
-            elif col == 2:
+            if col == 2:
                 return record.attacker
-            elif col == 3:
+            if col == 3:
                 return record.target
-            elif col == 4:
+            if col == 4:
                 return record.skill
-            elif col == 5:
-                if record.effects:
-                    return str(len(record.effects))
-            elif col == 6:
+            if col == 5 and record.effects:
+                return str(len(record.effects))
+            if col == 6:
                 return str(record.damage)
-            elif col == 7:
+            if col == 7:
                 return record.property1
-            elif col == 8:
+            if col == 8:
                 return record.property2
 
-        elif role == Qt.DecorationRole:
+        if role == Qt.DecorationRole:
             if col == 0:
                 return QIcon.fromTheme("emblem-mail")
-            elif col == 5 and record.effects:
+            if col == 5 and record.effects:
                 return QIcon.fromTheme("dialog-information")
 
-        elif role == Qt.ToolTipRole:
+        if role == Qt.ToolTipRole:
             if col == 0:
                 return record.origin_string
-            elif col == 5:
+            if col == 5:
                 return "\n".join(record.effects) if record.effects else "Нет бафов."
 
-        elif role == Qt.ForegroundRole and col == 6:
+        if role == Qt.ForegroundRole and col == 6:
             damage_colors = {
                 "Сила атаки": "#FF9999",
                 "Сила заклинаний": "#99CCFF",
@@ -132,62 +110,51 @@ class DamageTableModel(QAbstractTableModel):
 
     def apply_filters(self):
         self.beginResetModel()
-        filtered = [r for r in self._all_records if self._record_allowed(r)]
-        self._filtered_records = filtered
+        self._filtered_records = [record for record in self._all_records if self._record_allowed(record)]
         self.endResetModel()
-
         self.data_refreshed.emit()
 
     def _match_text(self, query, text):
-        invert = query.startswith('-')
+        invert = query.startswith("-")
         if invert:
             query = query[1:]
         text = text.lower()
         result = all(part in text for part in query.lower().split())
         return not result if invert else result
 
-    def _record_allowed(self, r: DamageRecord):
-        if not self.filters.get("outgoing_your_damage") and r.attacker == "Вы":
-            return False
-        if not self.filters.get("incoming_your_damage") and r.target == "Вы":
-            return False
-        if not self.filters.get("outgoing_spirit_damage") and r.is_attacker_spirit:
-            return False
-        if not self.filters.get("incoming_spirit_damage") and r.is_target_spirit:
-            return False
+    def _record_allowed(self, record: DamageRecord):
+        for definition in self.filter_definitions:
+            if self.filters.get(definition.key, True):
+                continue
+            if self._record_matches_definition(record, definition):
+                return False
 
-        if (
-                not self.filters.get("your_effects")
-                and r.type in ("effect_applied", "effect_removed")
-                and r.target == self.player_name
-        ):
+        if not self._match_text(self.attacker_name, record.attacker):
             return False
-        if (
-                not self.filters.get("not_your_effects")
-                and r.type in ("effect_applied", "effect_removed")
-                and r.target != self.player_name
-        ):
+        if not self._match_text(self.target_name, record.target):
             return False
-
-        if not self._match_text(self.attacker_name, r.attacker):
-            return False
-        if not self._match_text(self.target_name, r.target):
-            return False
-        if not self._match_text(self.skill_name, r.skill):
-            return False
-
-        if not self.filters.get("attack_common") and r.property2 == "Обычный":
-            return False
-        if not self.filters.get("attack_critical") and r.property2 == "Критический удар":
-            return False
-        if not self.filters.get("attack_block") and r.property2 == "Блокирование":
-            return False
-        if not self.filters.get("attack_combo") and r.property2 == "Комбо-удар":
-            return False
-        if not self.filters.get("attack_p") and r.property1 == "Сила атаки":
-            return False
-        if not self.filters.get("attack_m") and r.property1 == "Сила заклинаний":
-            return False
-        if not self.filters.get("attack_o") and r.property1 == "Обычный":
+        if not self._match_text(self.skill_name, record.skill):
             return False
         return True
+
+    def _record_matches_definition(self, record: DamageRecord, definition: FilterDefinition):
+        return all(self._match_condition(record, condition) for condition in definition.conditions)
+
+    def _match_condition(self, record: DamageRecord, condition: FilterCondition):
+        left_value = getattr(record, condition.field)
+        right_value = self._resolve_condition_value(condition.value)
+
+        if condition.operator == "eq":
+            return left_value == right_value
+        if condition.operator == "ne":
+            return left_value != right_value
+        if condition.operator == "in":
+            return left_value in right_value
+        if condition.operator == "not_in":
+            return left_value not in right_value
+        return False
+
+    def _resolve_condition_value(self, value):
+        if isinstance(value, str) and value.startswith("$"):
+            return getattr(self, value[1:], "")
+        return value

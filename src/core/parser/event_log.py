@@ -1,8 +1,8 @@
-import codecs
 import re
 from collections import UserList
 from datetime import time
-from typing import List, Iterator
+from pathlib import Path
+from typing import Iterator, List
 
 from .record import DamageRecord
 
@@ -11,6 +11,9 @@ class EventLog(UserList):
     """
     Лог событий.
     """
+
+    LOG_MARKER = '<font color = "#FF0000" [Бой]: </font>'
+    CHAT_ENCODINGS = ("utf-8", "utf-8-sig", "cp1251")
 
     def __init__(self, log: List[DamageRecord]):
         super().__init__()
@@ -26,17 +29,38 @@ class EventLog(UserList):
         """
         line_regex = r'<font color = "#FF0000" \[Бой\]: </font>(.*?)<br>'
 
+        log_file = EventLog._read_chat_text(Path(log_path))
+        combat_log = re.findall(line_regex, log_file)
+
         events = []
-        with codecs.open(log_path, "r", encoding="utf-8", errors="ignore") as file:
-            log_file = file.read()
-            combat_log = re.findall(line_regex, log_file)
-            for string in combat_log:
-                damage_record = DamageRecord.try_to_parse(string)
-                if not damage_record:
-                    continue
-                events.append(damage_record)
+        for string in combat_log:
+            damage_record = DamageRecord.try_to_parse(string)
+            if not damage_record:
+                continue
+            events.append(damage_record)
 
         return EventLog(events)
+
+    @staticmethod
+    def _read_chat_text(log_path: Path) -> str:
+        raw_bytes = log_path.read_bytes()
+
+        for encoding in EventLog.CHAT_ENCODINGS:
+            try:
+                text = raw_bytes.decode(encoding)
+            except UnicodeDecodeError:
+                continue
+
+            if EventLog.LOG_MARKER in text:
+                return text
+
+        for encoding in EventLog.CHAT_ENCODINGS:
+            try:
+                return raw_bytes.decode(encoding)
+            except UnicodeDecodeError:
+                continue
+
+        return raw_bytes.decode("utf-8", errors="replace")
 
     def get_time_slice(self, start: time, end: time) -> "EventLog":
         """
@@ -50,15 +74,15 @@ class EventLog(UserList):
         return EventLog(filtered_events)
 
     def filter(
-            self,
-            attacker: str = None,
-            is_attacker_spirit: bool = None,
-            target: str = None,
-            is_target_spirit: bool = None,
-            skill: str = None,
-            damage: int = None,
-            property1: str = None,
-            property2: str = None,
+        self,
+        attacker: str = None,
+        is_attacker_spirit: bool = None,
+        target: str = None,
+        is_target_spirit: bool = None,
+        skill: str = None,
+        damage: int = None,
+        property1: str = None,
+        property2: str = None,
     ) -> "EventLog":
         """
         Отфильтровывает из списка события по условию.

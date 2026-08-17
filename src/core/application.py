@@ -2,7 +2,14 @@ from PySide6.QtCore import QSettings, QTranslator
 from PySide6.QtWidgets import QApplication
 
 from core.actions import connect_actions
-from core.config import APP_NAME, COMPANY_NAME, RESOURCE_PATH
+from core.config import (
+    APP_NAME,
+    COMPANY_NAME,
+    DEFAULT_FILTER_PLUGIN_PATH,
+    FILTER_PLUGIN_PATH,
+    RESOURCE_PATH,
+)
+from core.filter_plugins import ensure_filter_plugin_dir, load_filter_definitions
 from core.logger import setup_logger
 from core.ui import setup_font
 from gui.windows.main_window import MainWindow
@@ -19,6 +26,10 @@ class Application(QApplication):
 
         self.logger.info("Инициализация настроек.")
         self.settings = QSettings()
+
+        self.logger.info("Загрузка фильтр-плагинов.")
+        ensure_filter_plugin_dir(FILTER_PLUGIN_PATH, DEFAULT_FILTER_PLUGIN_PATH)
+        self.filter_definitions = load_filter_definitions(FILTER_PLUGIN_PATH, self.logger)
 
         self.logger.info("Инициализация перевода.")
         translator = QTranslator()
