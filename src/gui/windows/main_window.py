@@ -63,6 +63,15 @@ class MainWindow(QMainWindow):
         player_name = self.settings.value("player_name", "")
         self.ui.le_your_nickname.setText(player_name)
         damage_model.player_name = player_name
+        attacker_name = self.settings.value("attacker_name", "")
+        target_name = self.settings.value("target_name", "")
+        skill_name = self.settings.value("skill_name", "")
+        self.ui.le_attacker_name.setText(attacker_name)
+        self.ui.le_target_name.setText(target_name)
+        self.ui.le_skill_name.setText(skill_name)
+        damage_model.attacker_name = attacker_name
+        damage_model.target_name = target_name
+        damage_model.skill_name = skill_name
 
     def action_set_game_folder(self):
         start_dir = self.settings.value("game_folder", "")
@@ -106,14 +115,17 @@ class MainWindow(QMainWindow):
 
     def on_attacker_name_changed(self, new_attacker_name):
         self.ui.damage_table_view.model().attacker_name = new_attacker_name
+        self.settings.setValue("attacker_name", new_attacker_name)
         self.ui.damage_table_view.model().apply_filters()
 
     def on_target_name_changed(self, new_target_name):
         self.ui.damage_table_view.model().target_name = new_target_name
+        self.settings.setValue("target_name", new_target_name)
         self.ui.damage_table_view.model().apply_filters()
 
     def on_skill_name_changed(self, new_skill_name):
         self.ui.damage_table_view.model().skill_name = new_skill_name
+        self.settings.setValue("skill_name", new_skill_name)
         self.ui.damage_table_view.model().apply_filters()
 
     def refresh_table(self):
@@ -146,6 +158,8 @@ class MainWindow(QMainWindow):
         groups: dict[str, list[FilterDefinition]] = {}
         for definition in filter_definitions:
             groups.setdefault(definition.group, []).append(definition)
+
+        saved_filter_states: dict[str, bool] = {}
 
         toolbar_layout = QHBoxLayout()
         toolbar_layout.setContentsMargins(0, 0, 0, 0)
@@ -190,7 +204,9 @@ class MainWindow(QMainWindow):
 
             for index, definition in enumerate(definitions):
                 checkbox = QCheckBox(definition.label, container)
-                checkbox.setChecked(definition.default_enabled)
+                enabled = self._load_filter_enabled(definition)
+                saved_filter_states[definition.key] = enabled
+                checkbox.setChecked(enabled)
                 checkbox.toggled.connect(lambda checked, key=definition.key: self.on_filter_toggled(key, checked))
                 self.filter_checkboxes[definition.key] = checkbox
                 grid.addWidget(checkbox, index // 2, index % 2)
@@ -208,6 +224,7 @@ class MainWindow(QMainWindow):
                 last_item.widget().deleteLater()
 
         filter_layout.addWidget(container, 6, 0, 10, 2)
+        self.ui.damage_table_view.model().set_filters(saved_filter_states)
         self.refresh_filter_group_states()
 
     def _create_tristate_filter_checkbox(self, text: str):
@@ -225,6 +242,7 @@ class MainWindow(QMainWindow):
         return button
 
     def on_filter_toggled(self, key: str, enabled: bool):
+        self._save_filter_enabled(key, enabled)
         self.ui.damage_table_view.model().set_filter(key, enabled)
         self.refresh_filter_group_states(self.filter_key_to_group.get(key))
 
@@ -246,7 +264,23 @@ class MainWindow(QMainWindow):
                 checkbox.setChecked(enabled)
 
         self.ui.damage_table_view.model().set_filters({key: enabled for key in keys})
+        for key in keys:
+            self._save_filter_enabled(key, enabled)
         self.refresh_filter_group_states()
+
+    def _filter_settings_key(self, key: str):
+        return f"filters/{key}/enabled"
+
+    def _load_filter_enabled(self, definition: FilterDefinition):
+        value = self.settings.value(self._filter_settings_key(definition.key), definition.default_enabled)
+        if isinstance(value, bool):
+            return value
+        if isinstance(value, str):
+            return value.lower() in {"1", "true", "yes", "on"}
+        return bool(value)
+
+    def _save_filter_enabled(self, key: str, enabled: bool):
+        self.settings.setValue(self._filter_settings_key(key), enabled)
 
     def refresh_filter_group_states(self, changed_group_name: str | None = None):
         group_names = [changed_group_name] if changed_group_name else list(self.group_filter_keys)
