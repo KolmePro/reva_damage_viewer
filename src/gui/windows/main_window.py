@@ -2,7 +2,16 @@ from pathlib import Path
 from statistics import median
 
 from PySide6.QtCore import QSignalBlocker, Qt
-from PySide6.QtGui import QAction, QIntValidator
+from PySide6.QtGui import (
+    QAction,
+    QIcon,
+    QIntValidator,
+    QPainter,
+    QPainterPath,
+    QPalette,
+    QPen,
+    QPixmap,
+)
 from PySide6.QtWidgets import (
     QAbstractItemView,
     QCheckBox,
@@ -58,6 +67,7 @@ class MainWindow(QMainWindow):
         self.ui.btn_reset_damage_range.setIcon(
             self.style().standardIcon(QStyle.StandardPixmap.SP_DialogCancelButton)
         )
+        self.ui.action_load_log_file.setIcon(self._create_open_log_icon())
         self.damage_value_validator = QIntValidator(0, 999_999_999, self)
         self.ui.le_minimum_damage.setValidator(self.damage_value_validator)
         self.ui.le_maximum_damage.setValidator(self.damage_value_validator)
@@ -121,8 +131,79 @@ class MainWindow(QMainWindow):
             return
 
         last_log = max(log_files, key=lambda file: file.stat().st_mtime)
+        self._load_combat_log(last_log)
 
-        combat_log = EventLog.parse_chat(str(last_log), collect_unparsed=self.debug_mode)
+    def action_load_log_file(self):
+        log_path, _ = QFileDialog.getOpenFileName(
+            self,
+            "Выберите лог боя",
+            self._log_dialog_start_dir(),
+            "Логи боя Revelation Online (chat_*.html);;HTML-файлы (*.html);;Все файлы (*.*)",
+        )
+        if not log_path:
+            return
+
+        self._load_combat_log(Path(log_path))
+
+    def _log_dialog_start_dir(self):
+        game_folder = Path(self.settings.value("game_folder", ""))
+        chat_path = game_folder / "game" / "chat"
+        if chat_path.is_dir():
+            return str(chat_path)
+
+        last_log_folder = Path(self.settings.value("last_log_folder", ""))
+        if last_log_folder.is_dir():
+            return str(last_log_folder)
+        if game_folder.is_dir():
+            return str(game_folder)
+        return ""
+
+    def _create_open_log_icon(self):
+        themed_icon = QIcon.fromTheme("document-open")
+        if not themed_icon.isNull():
+            return themed_icon
+
+        pixmap = QPixmap(24, 24)
+        pixmap.fill(Qt.GlobalColor.transparent)
+
+        painter = QPainter(pixmap)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+        pen = QPen(self.palette().color(QPalette.ColorRole.ButtonText))
+        pen.setWidthF(1.7)
+        pen.setCapStyle(Qt.PenCapStyle.RoundCap)
+        pen.setJoinStyle(Qt.PenJoinStyle.RoundJoin)
+        painter.setPen(pen)
+        painter.setBrush(Qt.BrushStyle.NoBrush)
+
+        folder_back = QPainterPath()
+        folder_back.moveTo(3, 18)
+        folder_back.lineTo(3, 7)
+        folder_back.lineTo(9, 7)
+        folder_back.lineTo(11, 10)
+        folder_back.lineTo(20, 10)
+        folder_back.lineTo(20, 12)
+        painter.drawPath(folder_back)
+
+        folder_front = QPainterPath()
+        folder_front.moveTo(3, 18)
+        folder_front.lineTo(6, 12)
+        folder_front.lineTo(22, 12)
+        folder_front.lineTo(19, 18)
+        folder_front.closeSubpath()
+        painter.drawPath(folder_front)
+        painter.end()
+
+        return QIcon(pixmap)
+
+    def _load_combat_log(self, log_path: Path):
+        try:
+            combat_log = EventLog.parse_chat(str(log_path), collect_unparsed=self.debug_mode)
+        except OSError as exc:
+            self.logger.exception("Не удалось прочитать лог боя %s", log_path)
+            QMessageBox.warning(self, "Ошибка", f"Не удалось прочитать лог боя:\n{exc}")
+            return
+
+        self.settings.setValue("last_log_folder", str(log_path.parent))
         self.last_unparsed_records = combat_log.unparsed_records
         if self.debug_mode:
             self.action_show_unparsed_log.setEnabled(bool(self.last_unparsed_records))
@@ -130,18 +211,17 @@ class MainWindow(QMainWindow):
                 "Loaded %s parsed and %s unparsed combat records from %s",
                 len(combat_log),
                 len(self.last_unparsed_records),
-                last_log,
+                log_path,
             )
         table = self.ui.damage_table_view
         table.setSelectionBehavior(QAbstractItemView.SelectRows)
         table.model().set_records(combat_log)
         table.verticalHeader().setVisible(False)
         self.refresh_table()
+        status_message = f"Загружен {log_path.name}: {len(combat_log)} записей"
         if self.debug_mode:
-            self.ui.statusbar.showMessage(
-                f"Загружено: {len(combat_log)}; не распарсено: {len(self.last_unparsed_records)}",
-                5000,
-            )
+            status_message += f"; не распарсено: {len(self.last_unparsed_records)}"
+        self.ui.statusbar.showMessage(status_message, 5000)
 
     def on_player_name_changed(self, new_player_name):
         self.ui.damage_table_view.model().player_name = new_player_name

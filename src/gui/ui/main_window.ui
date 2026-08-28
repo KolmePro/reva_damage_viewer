@@ -595,6 +595,7 @@
     <bool>false</bool>
    </attribute>
    <addaction name="action_load_last_log"/>
+   <addaction name="action_load_log_file"/>
    <addaction name="action_set_game_folder"/>
    <addaction name="action_clear_selection"/>
   </widget>
@@ -634,6 +635,20 @@
    </property>
    <property name="shortcut">
     <string>F5</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="action_load_log_file">
+   <property name="text">
+    <string>&amp;Выбрать лог...</string>
+   </property>
+   <property name="toolTip">
+    <string>Выбрать и загрузить лог боя</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
    </property>
    <property name="menuRole">
     <enum>QAction::MenuRole::NoRole</enum>

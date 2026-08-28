@@ -5,6 +5,7 @@ def connect_actions(app):
 
     ui.action_set_game_folder.triggered.connect(window.action_set_game_folder)
     ui.action_load_last_log.triggered.connect(window.action_load_last_log)
+    ui.action_load_log_file.triggered.connect(window.action_load_log_file)
     ui.action_clear_selection.triggered.connect(window.action_clear_selection)
 
     ui.le_your_nickname.textChanged.connect(window.on_player_name_changed)
