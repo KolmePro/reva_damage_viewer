@@ -199,7 +199,6 @@ class Ui_MainWindow(object):
 
         self.damage_range_group = QGroupBox(self.groupBox)
         self.damage_range_group.setObjectName(u"damage_range_group")
-        self.damage_range_group.setMinimumSize(QSize(0, 91))
         self.damage_range_layout = QGridLayout(self.damage_range_group)
         self.damage_range_layout.setObjectName(u"damage_range_layout")
         self.label_minimum_damage = QLabel(self.damage_range_group)
@@ -210,28 +209,28 @@ class Ui_MainWindow(object):
         self.label_maximum_damage = QLabel(self.damage_range_group)
         self.label_maximum_damage.setObjectName(u"label_maximum_damage")
 
-        self.damage_range_layout.addWidget(self.label_maximum_damage, 0, 1, 1, 1)
+        self.damage_range_layout.addWidget(self.label_maximum_damage, 0, 2, 1, 1)
 
         self.le_minimum_damage = QLineEdit(self.damage_range_group)
         self.le_minimum_damage.setObjectName(u"le_minimum_damage")
         self.le_minimum_damage.setMaxLength(9)
 
-        self.damage_range_layout.addWidget(self.le_minimum_damage, 1, 0, 1, 1)
+        self.damage_range_layout.addWidget(self.le_minimum_damage, 0, 1, 1, 1)
 
         self.le_maximum_damage = QLineEdit(self.damage_range_group)
         self.le_maximum_damage.setObjectName(u"le_maximum_damage")
         self.le_maximum_damage.setMaxLength(9)
 
-        self.damage_range_layout.addWidget(self.le_maximum_damage, 1, 1, 1, 1)
+        self.damage_range_layout.addWidget(self.le_maximum_damage, 0, 3, 1, 1)
 
         self.btn_reset_damage_range = QToolButton(self.damage_range_group)
         self.btn_reset_damage_range.setObjectName(u"btn_reset_damage_range")
         self.btn_reset_damage_range.setAutoRaise(True)
 
-        self.damage_range_layout.addWidget(self.btn_reset_damage_range, 1, 2, 1, 1)
+        self.damage_range_layout.addWidget(self.btn_reset_damage_range, 0, 4, 1, 1)
 
-        self.damage_range_layout.setColumnStretch(0, 1)
         self.damage_range_layout.setColumnStretch(1, 1)
+        self.damage_range_layout.setColumnStretch(3, 1)
 
         self.gridLayout.addWidget(self.damage_range_group, 6, 0, 1, 2)
 

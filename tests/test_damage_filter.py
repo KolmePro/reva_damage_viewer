@@ -78,6 +78,19 @@ class DamageFilterTest(unittest.TestCase):
         self.assertEqual(ui.label_maximum_damage.text(), "До")
         self.assertEqual(ui.le_minimum_damage.text(), "")
         self.assertEqual(ui.le_maximum_damage.text(), "")
+
+        controls = (
+            ui.label_minimum_damage,
+            ui.le_minimum_damage,
+            ui.label_maximum_damage,
+            ui.le_maximum_damage,
+            ui.btn_reset_damage_range,
+        )
+        positions = [
+            ui.damage_range_layout.getItemPosition(ui.damage_range_layout.indexOf(control))[:2]
+            for control in controls
+        ]
+        self.assertEqual(positions, [(0, 0), (0, 1), (0, 2), (0, 3), (0, 4)])
         self.assertEqual(ui.damage_range_group.title(), "Диапазон урона")
 
     def test_damage_controls_are_not_collapsed_by_plugin_filters(self):
