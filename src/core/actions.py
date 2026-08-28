@@ -11,6 +11,9 @@ def connect_actions(app):
     ui.le_attacker_name.textChanged.connect(window.on_attacker_name_changed)
     ui.le_target_name.textChanged.connect(window.on_target_name_changed)
     ui.le_skill_name.textChanged.connect(window.on_skill_name_changed)
+    ui.le_minimum_damage.textChanged.connect(window.on_minimum_damage_changed)
+    ui.le_maximum_damage.textChanged.connect(window.on_maximum_damage_changed)
+    ui.btn_reset_damage_range.clicked.connect(window.reset_damage_range)
 
     table.selectionModel().selectionChanged.connect(
         lambda selected, deselected: window.refresh_damage_summary()

@@ -2,7 +2,7 @@ from pathlib import Path
 from statistics import median
 
 from PySide6.QtCore import QSignalBlocker, Qt
-from PySide6.QtGui import QAction
+from PySide6.QtGui import QAction, QIntValidator
 from PySide6.QtWidgets import (
     QAbstractItemView,
     QCheckBox,
@@ -14,6 +14,7 @@ from PySide6.QtWidgets import (
     QHBoxLayout,
     QMainWindow,
     QMessageBox,
+    QScrollArea,
     QSizePolicy,
     QStyle,
     QTableView,
@@ -54,6 +55,12 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+        self.ui.btn_reset_damage_range.setIcon(
+            self.style().standardIcon(QStyle.StandardPixmap.SP_DialogCancelButton)
+        )
+        self.damage_value_validator = QIntValidator(0, 999_999_999, self)
+        self.ui.le_minimum_damage.setValidator(self.damage_value_validator)
+        self.ui.le_maximum_damage.setValidator(self.damage_value_validator)
         damage_model = DamageTableModel(app.filter_definitions)
         self.ui.damage_table_view.setModel(damage_model)
         damage_model.data_refreshed.connect(self.refresh_table)
@@ -74,12 +81,18 @@ class MainWindow(QMainWindow):
         attacker_name = self.settings.value("attacker_name", "")
         target_name = self.settings.value("target_name", "")
         skill_name = self.settings.value("skill_name", "")
+        minimum_damage = self.settings.value("minimum_damage", 0, type=int)
+        maximum_damage = self.settings.value("maximum_damage", 0, type=int)
         self.ui.le_attacker_name.setText(attacker_name)
         self.ui.le_target_name.setText(target_name)
         self.ui.le_skill_name.setText(skill_name)
+        self.ui.le_minimum_damage.setText(str(minimum_damage) if minimum_damage else "")
+        self.ui.le_maximum_damage.setText(str(maximum_damage) if maximum_damage else "")
         damage_model.attacker_name = attacker_name
         damage_model.target_name = target_name
         damage_model.skill_name = skill_name
+        damage_model.minimum_damage = minimum_damage
+        damage_model.maximum_damage = maximum_damage
 
     def action_set_game_folder(self):
         start_dir = self.settings.value("game_folder", "")
@@ -149,6 +162,31 @@ class MainWindow(QMainWindow):
         self.ui.damage_table_view.model().skill_name = new_skill_name
         self.settings.setValue("skill_name", new_skill_name)
         self.ui.damage_table_view.model().apply_filters()
+
+    def on_minimum_damage_changed(self, text):
+        minimum_damage = int(text) if text else 0
+        self.ui.damage_table_view.model().minimum_damage = minimum_damage
+        self.settings.setValue("minimum_damage", minimum_damage)
+        self.ui.damage_table_view.model().apply_filters()
+
+    def on_maximum_damage_changed(self, text):
+        maximum_damage = int(text) if text else 0
+        self.ui.damage_table_view.model().maximum_damage = maximum_damage
+        self.settings.setValue("maximum_damage", maximum_damage)
+        self.ui.damage_table_view.model().apply_filters()
+
+    def reset_damage_range(self):
+        with QSignalBlocker(self.ui.le_minimum_damage):
+            self.ui.le_minimum_damage.clear()
+        with QSignalBlocker(self.ui.le_maximum_damage):
+            self.ui.le_maximum_damage.clear()
+
+        model = self.ui.damage_table_view.model()
+        model.minimum_damage = 0
+        model.maximum_damage = 0
+        self.settings.setValue("minimum_damage", 0)
+        self.settings.setValue("maximum_damage", 0)
+        model.apply_filters()
 
     def refresh_table(self):
         self.apply_row_spans()
@@ -277,7 +315,17 @@ class MainWindow(QMainWindow):
             if last_item.widget():
                 last_item.widget().deleteLater()
 
-        filter_layout.addWidget(container, 6, 0, 10, 2)
+        scroll_area = QScrollArea(self.ui.groupBox)
+        scroll_area.setObjectName("dynamic_filters_scroll_area")
+        scroll_area.setWidgetResizable(True)
+        scroll_area.setFrameShape(QFrame.Shape.NoFrame)
+        scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        scroll_area.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Expanding)
+        scroll_area.setWidget(container)
+
+        self.ui.damage_range_group.setMinimumHeight(self.ui.damage_range_group.sizeHint().height())
+        filter_layout.addWidget(scroll_area, 7, 0, 1, 2)
+        filter_layout.setRowStretch(7, 1)
         self.ui.damage_table_view.model().set_filters(saved_filter_states)
         self.refresh_filter_group_states()
 

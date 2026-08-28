@@ -19,6 +19,8 @@ class DamageTableModel(QAbstractTableModel):
         self.attacker_name = ""
         self.target_name = ""
         self.skill_name = ""
+        self.minimum_damage = 0
+        self.maximum_damage = 0
 
     def set_records(self, records: list[DamageRecord]):
         self._all_records = records
@@ -154,6 +156,15 @@ class DamageTableModel(QAbstractTableModel):
         if not self._match_text(self.target_name, record.target):
             return False
         if not self._match_text(self.skill_name, record.skill):
+            return False
+        if (
+            (self.minimum_damage or self.maximum_damage)
+            and record.type in ("effect_applied", "effect_removed")
+        ):
+            return False
+        if self.minimum_damage and record.damage <= self.minimum_damage:
+            return False
+        if self.maximum_damage and record.damage >= self.maximum_damage:
             return False
         return True
 

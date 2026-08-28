@@ -20,7 +20,7 @@ from PySide6.QtWidgets import (QApplication, QCheckBox, QFrame, QGridLayout,
     QGroupBox, QHBoxLayout, QHeaderView, QLabel,
     QLineEdit, QMainWindow, QMenuBar, QSizePolicy,
     QSpacerItem, QStatusBar, QTableView, QToolBar,
-    QVBoxLayout, QWidget)
+    QToolButton, QVBoxLayout, QWidget)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -187,12 +187,50 @@ class Ui_MainWindow(object):
 
         self.gridLayout.addWidget(self.cb_attack_block, 12, 0, 1, 1)
 
-        self.line_8 = QFrame(self.groupBox)
-        self.line_8.setObjectName(u"line_8")
-        self.line_8.setFrameShape(QFrame.Shape.HLine)
-        self.line_8.setFrameShadow(QFrame.Shadow.Sunken)
+        self.line_damage_range = QFrame(self.groupBox)
+        self.line_damage_range.setObjectName(u"line_damage_range")
+        self.line_damage_range.setFrameShape(QFrame.Shape.HLine)
+        self.line_damage_range.setFrameShadow(QFrame.Shadow.Sunken)
 
-        self.gridLayout.addWidget(self.line_8, 5, 0, 1, 2)
+        self.gridLayout.addWidget(self.line_damage_range, 5, 0, 1, 2)
+
+        self.damage_range_group = QGroupBox(self.groupBox)
+        self.damage_range_group.setObjectName(u"damage_range_group")
+        self.damage_range_group.setMinimumSize(QSize(0, 91))
+        self.damage_range_layout = QGridLayout(self.damage_range_group)
+        self.damage_range_layout.setObjectName(u"damage_range_layout")
+        self.label_minimum_damage = QLabel(self.damage_range_group)
+        self.label_minimum_damage.setObjectName(u"label_minimum_damage")
+
+        self.damage_range_layout.addWidget(self.label_minimum_damage, 0, 0, 1, 1)
+
+        self.label_maximum_damage = QLabel(self.damage_range_group)
+        self.label_maximum_damage.setObjectName(u"label_maximum_damage")
+
+        self.damage_range_layout.addWidget(self.label_maximum_damage, 0, 1, 1, 1)
+
+        self.le_minimum_damage = QLineEdit(self.damage_range_group)
+        self.le_minimum_damage.setObjectName(u"le_minimum_damage")
+        self.le_minimum_damage.setMaxLength(9)
+
+        self.damage_range_layout.addWidget(self.le_minimum_damage, 1, 0, 1, 1)
+
+        self.le_maximum_damage = QLineEdit(self.damage_range_group)
+        self.le_maximum_damage.setObjectName(u"le_maximum_damage")
+        self.le_maximum_damage.setMaxLength(9)
+
+        self.damage_range_layout.addWidget(self.le_maximum_damage, 1, 1, 1, 1)
+
+        self.btn_reset_damage_range = QToolButton(self.damage_range_group)
+        self.btn_reset_damage_range.setObjectName(u"btn_reset_damage_range")
+        self.btn_reset_damage_range.setAutoRaise(True)
+
+        self.damage_range_layout.addWidget(self.btn_reset_damage_range, 1, 2, 1, 1)
+
+        self.damage_range_layout.setColumnStretch(0, 1)
+        self.damage_range_layout.setColumnStretch(1, 1)
+
+        self.gridLayout.addWidget(self.damage_range_group, 6, 0, 1, 2)
 
         self.le_target_name = QLineEdit(self.groupBox)
         self.le_target_name.setObjectName(u"le_target_name")
@@ -441,6 +479,19 @@ class Ui_MainWindow(object):
         self.cb_incoming_your_damage.setText(QCoreApplication.translate("MainWindow", u"\u0423\u0440\u043e\u043d \u043f\u043e \u0432\u0430\u043c", None))
         self.cb_outgoing_spirit_damage.setText(QCoreApplication.translate("MainWindow", u"\u0423\u0440\u043e\u043d \u043e\u0442 \u0434\u0443\u0445\u043e\u0432", None))
         self.cb_attack_block.setText(QCoreApplication.translate("MainWindow", u"\u0411\u043b\u043e\u043a\u0438\u0440\u043e\u0432\u0430\u043d\u0438\u044f", None))
+        self.damage_range_group.setTitle(QCoreApplication.translate("MainWindow", u"\u0414\u0438\u0430\u043f\u0430\u0437\u043e\u043d \u0443\u0440\u043e\u043d\u0430", None))
+        self.label_minimum_damage.setText(QCoreApplication.translate("MainWindow", u"\u041e\u0442", None))
+        self.label_maximum_damage.setText(QCoreApplication.translate("MainWindow", u"\u0414\u043e", None))
+#if QT_CONFIG(tooltip)
+        self.le_minimum_damage.setToolTip(QCoreApplication.translate("MainWindow", u"\u041f\u043e\u043a\u0430\u0437\u044b\u0432\u0430\u0442\u044c \u0442\u043e\u043b\u044c\u043a\u043e \u0430\u0442\u0430\u043a\u0438 \u0441 \u0443\u0440\u043e\u043d\u043e\u043c \u0441\u0442\u0440\u043e\u0433\u043e \u0431\u043e\u043b\u044c\u0448\u0435 \u0443\u043a\u0430\u0437\u0430\u043d\u043d\u043e\u0433\u043e \u0437\u043d\u0430\u0447\u0435\u043d\u0438\u044f.", None))
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(tooltip)
+        self.le_maximum_damage.setToolTip(QCoreApplication.translate("MainWindow", u"\u041f\u043e\u043a\u0430\u0437\u044b\u0432\u0430\u0442\u044c \u0442\u043e\u043b\u044c\u043a\u043e \u0430\u0442\u0430\u043a\u0438 \u0441 \u0443\u0440\u043e\u043d\u043e\u043c \u0441\u0442\u0440\u043e\u0433\u043e \u043c\u0435\u043d\u044c\u0448\u0435 \u0443\u043a\u0430\u0437\u0430\u043d\u043d\u043e\u0433\u043e \u0437\u043d\u0430\u0447\u0435\u043d\u0438\u044f.", None))
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(tooltip)
+        self.btn_reset_damage_range.setToolTip(QCoreApplication.translate("MainWindow", u"\u0421\u0431\u0440\u043e\u0441\u0438\u0442\u044c \u0434\u0438\u0430\u043f\u0430\u0437\u043e\u043d \u0443\u0440\u043e\u043d\u0430", None))
+#endif // QT_CONFIG(tooltip)
+        self.btn_reset_damage_range.setText("")
 #if QT_CONFIG(tooltip)
         self.le_target_name.setToolTip(QCoreApplication.translate("MainWindow", u"\u041e\u0442\u0444\u0438\u043b\u044c\u0442\u0440\u043e\u0432\u0430\u0442\u044c \u0437\u0430\u043f\u0438\u0441\u0438 \u043f\u043e \u0438\u043c\u0435\u043d\u0438 \u0446\u0435\u043b\u0438.", None))
 #endif // QT_CONFIG(tooltip)
