@@ -1,5 +1,5 @@
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime, time
 from typing import List, Optional
 
@@ -70,6 +70,7 @@ class DamageRecord(Record):
     property1: str
     property2: str
     effects: List[str]
+    timestamp: datetime | None = field(default=None, compare=False)
 
     def __repr__(self):
         return (

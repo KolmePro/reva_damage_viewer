@@ -37,9 +37,11 @@ from core.filter_plugins import FilterDefinition
 from core.parser.event_log import EventLog
 from core.parser.table_view_model import DamageTableModel
 from gui.compiled_ui.ui_main_window import Ui_MainWindow
+from gui.widgets.combat_timeline import CombatTimeline, TimelineSection
 
 
 class MainWindow(QMainWindow):
+    TIME_RANGE_GROUP_TITLE = "Временной отрезок"
     STATIC_FILTER_WIDGETS = [
         "cb_outgoing_your_damage",
         "cb_incoming_your_damage",
@@ -67,21 +69,37 @@ class MainWindow(QMainWindow):
         self.ui.btn_reset_damage_range.setIcon(
             self.style().standardIcon(QStyle.StandardPixmap.SP_DialogCancelButton)
         )
+        self.ui.btn_reset_time_range.setIcon(
+            self.style().standardIcon(QStyle.StandardPixmap.SP_DialogCancelButton)
+        )
+        self.ui.action_clear_timeline_selection.setIcon(
+            self.ui.btn_reset_damage_range.icon()
+        )
         self.ui.action_load_log_file.setIcon(self._create_open_log_icon())
+        add_log_icon = QIcon.fromTheme("list-add")
+        if add_log_icon.isNull():
+            add_log_icon = self.style().standardIcon(QStyle.StandardPixmap.SP_FileDialogNewFolder)
+        self.ui.action_append_last_log.setIcon(add_log_icon)
         self.damage_value_validator = QIntValidator(0, 999_999_999, self)
         self.ui.le_minimum_damage.setValidator(self.damage_value_validator)
         self.ui.le_maximum_damage.setValidator(self.damage_value_validator)
         damage_model = DamageTableModel(app.filter_definitions)
         self.ui.damage_table_view.setModel(damage_model)
+        self.ui.damage_table_view.setSelectionBehavior(
+            QAbstractItemView.SelectionBehavior.SelectRows
+        )
         damage_model.data_refreshed.connect(self.refresh_table)
         self.settings = app.settings
         self.logger = app.logger
         self.debug_mode = app.debug_mode
+        self.combat_log = EventLog([])
+        self.loaded_log_paths: list[Path] = []
         self.last_unparsed_records: list[str] = []
         self.filter_checkboxes: dict[str, QCheckBox] = {}
         self.group_filter_keys: dict[str, list[str]] = {}
         self.filter_key_to_group: dict[str, str] = {}
         self.group_filter_checkboxes: dict[str, QCheckBox] = {}
+        self._setup_combat_timeline()
         self._setup_filter_panel(app.filter_definitions)
         self._setup_debug_actions()
 
@@ -104,6 +122,51 @@ class MainWindow(QMainWindow):
         damage_model.minimum_damage = minimum_damage
         damage_model.maximum_damage = maximum_damage
 
+    def _setup_combat_timeline(self):
+        self.combat_timeline_container = QWidget(self.ui.central_widget)
+        self.combat_timeline_container.setObjectName("combat_timeline_container")
+        timeline_layout = QHBoxLayout(self.combat_timeline_container)
+        timeline_layout.setContentsMargins(0, 0, 0, 0)
+        timeline_layout.setSpacing(4)
+
+        self.combat_timeline = CombatTimeline(self.combat_timeline_container)
+        self.combat_timeline.selection_changed.connect(self.filter_timeline_sections)
+
+        self.combat_timeline_scroll_area = QScrollArea(self.combat_timeline_container)
+        self.combat_timeline_scroll_area.setObjectName("combat_timeline_scroll_area")
+        self.combat_timeline_scroll_area.setWidgetResizable(True)
+        self.combat_timeline_scroll_area.setHorizontalScrollBarPolicy(
+            Qt.ScrollBarPolicy.ScrollBarAsNeeded
+        )
+        self.combat_timeline_scroll_area.setVerticalScrollBarPolicy(
+            Qt.ScrollBarPolicy.ScrollBarAlwaysOff
+        )
+        self.combat_timeline_scroll_area.setFrameShape(QFrame.Shape.StyledPanel)
+        self.combat_timeline_scroll_area.setSizePolicy(
+            QSizePolicy.Policy.Expanding,
+            QSizePolicy.Policy.Fixed,
+        )
+        self.combat_timeline_scroll_area.setFixedHeight(102)
+        self.combat_timeline_scroll_area.setWidget(self.combat_timeline)
+
+        self.timeline_reset_button = QToolButton(self.combat_timeline_container)
+        self.timeline_reset_button.setObjectName("btn_clear_timeline_selection")
+        self.timeline_reset_button.setDefaultAction(
+            self.ui.action_clear_timeline_selection
+        )
+        self.timeline_reset_button.setAutoRaise(True)
+        self.timeline_reset_button.setToolButtonStyle(
+            Qt.ToolButtonStyle.ToolButtonIconOnly
+        )
+
+        timeline_layout.addWidget(self.combat_timeline_scroll_area)
+        timeline_layout.addWidget(
+            self.timeline_reset_button,
+            0,
+            Qt.AlignmentFlag.AlignVCenter,
+        )
+        self.ui.central_layout.insertWidget(0, self.combat_timeline_container)
+
     def action_set_game_folder(self):
         start_dir = self.settings.value("game_folder", "")
 
@@ -118,32 +181,43 @@ class MainWindow(QMainWindow):
             self.ui.statusbar.showMessage(f"Папка игры установлена: {folder}", 5000)
 
     def action_load_last_log(self):
+        last_log = self._find_latest_log()
+        if last_log is not None:
+            self._load_combat_log(last_log)
+
+    def action_append_last_log(self):
+        last_log = self._find_latest_log()
+        if last_log is not None:
+            self._append_combat_logs([last_log])
+
+    def _find_latest_log(self):
         game_folder = self.settings.value("game_folder", "")
         chat_path = Path(game_folder) / "game" / "chat"
 
         if not chat_path.exists() or not chat_path.is_dir():
             QMessageBox.warning(self, "Ошибка", "Папка с игрой не выбрана или в ней нет логов!")
-            return
+            return None
 
         log_files = list(chat_path.glob("chat_*.html"))
         if not log_files:
             QMessageBox.warning(self, "Ошибка", "В папке с игрой нет логов боя!")
-            return
+            return None
 
-        last_log = max(log_files, key=lambda file: file.stat().st_mtime)
-        self._load_combat_log(last_log)
+        return max(log_files, key=lambda file: file.stat().st_mtime)
 
     def action_load_log_file(self):
-        log_path, _ = QFileDialog.getOpenFileName(
+        log_paths = self._choose_log_files("Выберите один или несколько логов боя")
+        if log_paths:
+            self._load_combat_logs(log_paths)
+
+    def _choose_log_files(self, title: str):
+        log_paths, _ = QFileDialog.getOpenFileNames(
             self,
-            "Выберите лог боя",
+            title,
             self._log_dialog_start_dir(),
             "Логи боя Revelation Online (chat_*.html);;HTML-файлы (*.html);;Все файлы (*.*)",
         )
-        if not log_path:
-            return
-
-        self._load_combat_log(Path(log_path))
+        return [Path(log_path) for log_path in log_paths]
 
     def _log_dialog_start_dir(self):
         game_folder = Path(self.settings.value("game_folder", ""))
@@ -196,29 +270,64 @@ class MainWindow(QMainWindow):
         return QIcon(pixmap)
 
     def _load_combat_log(self, log_path: Path):
+        self._load_combat_logs([log_path])
+
+    def _append_combat_logs(self, log_paths: list[Path]):
+        self._load_combat_logs(log_paths, append=True)
+
+    def _load_combat_logs(self, log_paths: list[Path], append: bool = False):
+        log_paths = list(dict.fromkeys(Path(log_path) for log_path in log_paths))
+        if not log_paths:
+            return
+
+        parsed_logs = []
+        current_log_path = log_paths[0]
         try:
-            combat_log = EventLog.parse_chat(str(log_path), collect_unparsed=self.debug_mode)
+            for log_path in log_paths:
+                current_log_path = log_path
+                parsed_logs.append(
+                    EventLog.parse_chat(str(log_path), collect_unparsed=self.debug_mode)
+                )
         except OSError as exc:
-            self.logger.exception("Не удалось прочитать лог боя %s", log_path)
+            self.logger.exception("Не удалось прочитать лог боя %s", current_log_path)
             QMessageBox.warning(self, "Ошибка", f"Не удалось прочитать лог боя:\n{exc}")
             return
 
-        self.settings.setValue("last_log_folder", str(log_path.parent))
+        previous_count = len(self.combat_log)
+        logs_to_merge = ([self.combat_log] if append and self.combat_log else []) + parsed_logs
+        combat_log = EventLog.merge(logs_to_merge)
+        self.combat_log = combat_log
+        if append:
+            self.loaded_log_paths = list(dict.fromkeys([*self.loaded_log_paths, *log_paths]))
+        else:
+            self.loaded_log_paths = log_paths
+
+        self.settings.setValue("last_log_folder", str(log_paths[-1].parent))
         self.last_unparsed_records = combat_log.unparsed_records
         if self.debug_mode:
             self.action_show_unparsed_log.setEnabled(bool(self.last_unparsed_records))
             self.logger.debug(
-                "Loaded %s parsed and %s unparsed combat records from %s",
+                "Загружено записей боя: %s; не распознано: %s; файлов: %s.",
                 len(combat_log),
                 len(self.last_unparsed_records),
-                log_path,
+                len(log_paths),
             )
         table = self.ui.damage_table_view
-        table.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self._clear_time_range(apply_filters=False)
         table.model().set_records(combat_log)
         table.verticalHeader().setVisible(False)
+        self.combat_timeline.set_segments(combat_log.combat_segments())
         self.refresh_table()
-        status_message = f"Загружен {log_path.name}: {len(combat_log)} записей"
+        if append:
+            added_count = max(0, len(combat_log) - previous_count)
+            status_message = (
+                f"Добавлено логов: {len(log_paths)}; новых записей: {added_count}; "
+                f"всего: {len(combat_log)}"
+            )
+        elif len(log_paths) == 1:
+            status_message = f"Загружен {log_paths[0].name}: {len(combat_log)} записей"
+        else:
+            status_message = f"Загружено логов: {len(log_paths)}; записей: {len(combat_log)}"
         if self.debug_mode:
             status_message += f"; не распарсено: {len(self.last_unparsed_records)}"
         self.ui.statusbar.showMessage(status_message, 5000)
@@ -242,6 +351,26 @@ class MainWindow(QMainWindow):
         self.ui.damage_table_view.model().skill_name = new_skill_name
         self.settings.setValue("skill_name", new_skill_name)
         self.ui.damage_table_view.model().apply_filters()
+
+    def on_time_range_changed(self, _value=None):
+        start = self.ui.te_start_time.value()
+        end = self.ui.te_end_time.value()
+        self.combat_timeline.clear_selection()
+        self.ui.time_range_group.setTitle(self.TIME_RANGE_GROUP_TITLE)
+        self.ui.damage_table_view.model().set_time_range(start, end)
+
+    def reset_time_range(self):
+        self._clear_time_range()
+
+    def _clear_time_range(self, apply_filters: bool = True):
+        with QSignalBlocker(self.ui.te_start_time):
+            self.ui.te_start_time.clear()
+        with QSignalBlocker(self.ui.te_end_time):
+            self.ui.te_end_time.clear()
+
+        self.combat_timeline.clear_selection()
+        self.ui.time_range_group.setTitle(self.TIME_RANGE_GROUP_TITLE)
+        self.ui.damage_table_view.model().clear_time_range(apply_filters)
 
     def on_minimum_damage_changed(self, text):
         minimum_damage = int(text) if text else 0
@@ -403,9 +532,10 @@ class MainWindow(QMainWindow):
         scroll_area.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Expanding)
         scroll_area.setWidget(container)
 
+        self.ui.time_range_group.setMinimumHeight(self.ui.time_range_group.sizeHint().height())
         self.ui.damage_range_group.setMinimumHeight(self.ui.damage_range_group.sizeHint().height())
-        filter_layout.addWidget(scroll_area, 7, 0, 1, 2)
-        filter_layout.setRowStretch(7, 1)
+        filter_layout.addWidget(scroll_area, 8, 0, 1, 2)
+        filter_layout.setRowStretch(8, 1)
         self.ui.damage_table_view.model().set_filters(saved_filter_states)
         self.refresh_filter_group_states()
 
@@ -523,6 +653,55 @@ class MainWindow(QMainWindow):
 
     def action_clear_selection(self):
         self.ui.damage_table_view.clearSelection()
+
+    def filter_timeline_sections(self, sections: list[TimelineSection]):
+        model = self.ui.damage_table_view.model()
+        if not sections:
+            with QSignalBlocker(self.ui.te_start_time):
+                self.ui.te_start_time.clear()
+            with QSignalBlocker(self.ui.te_end_time):
+                self.ui.te_end_time.clear()
+            self.ui.time_range_group.setTitle(self.TIME_RANGE_GROUP_TITLE)
+            model.clear_time_range()
+            self.ui.damage_table_view.clearSelection()
+            self.ui.damage_table_view.scrollToTop()
+            self.ui.statusbar.showMessage("Выбор отрезков сброшен", 5000)
+            return
+
+        ranges = []
+        for section in sections:
+            include_boundaries = section.kind == "combat"
+            ranges.append(
+                (
+                    section.start,
+                    section.end,
+                    include_boundaries,
+                    include_boundaries,
+                )
+            )
+
+        if len(sections) == 1:
+            section = sections[0]
+            with QSignalBlocker(self.ui.te_start_time):
+                self.ui.te_start_time.setValue(section.start.time())
+            with QSignalBlocker(self.ui.te_end_time):
+                self.ui.te_end_time.setValue(section.end.time())
+            self.ui.time_range_group.setTitle(self.TIME_RANGE_GROUP_TITLE)
+        else:
+            with QSignalBlocker(self.ui.te_start_time):
+                self.ui.te_start_time.clear()
+            with QSignalBlocker(self.ui.te_end_time):
+                self.ui.te_end_time.clear()
+            self.ui.time_range_group.setTitle(f"Временные отрезки: {len(sections)}")
+
+        model.set_timestamp_ranges(ranges)
+        self.ui.damage_table_view.clearSelection()
+        self.ui.damage_table_view.scrollToTop()
+
+        self.ui.statusbar.showMessage(
+            f"Выбрано отрезков: {len(sections)}; отображается записей: {model.rowCount()}",
+            5000,
+        )
 
     def refresh_damage_summary(self):
         table = self.ui.damage_table_view

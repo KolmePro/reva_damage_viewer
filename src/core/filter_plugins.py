@@ -54,7 +54,7 @@ def load_filter_definitions(plugin_dir: Path, logger: logging.Logger | None = No
             for raw_filter in raw_filters:
                 definition = _normalize_filter_definition(raw_filter, plugin_file.name)
                 if definition.key in seen_keys:
-                    raise ValueError(f"Duplicate filter key: {definition.key}")
+                    raise ValueError(f"Повторяющийся ключ фильтра: {definition.key}")
                 seen_keys.add(definition.key)
                 definitions.append(definition)
         except Exception as exc:
@@ -68,7 +68,7 @@ def _load_module(plugin_file: Path) -> ModuleType:
     module_name = f"filter_plugin_{plugin_file.stem}"
     spec = importlib.util.spec_from_file_location(module_name, plugin_file)
     if spec is None or spec.loader is None:
-        raise ImportError(f"Cannot create import spec for {plugin_file}")
+        raise ImportError(f"Не удалось создать описание импорта для {plugin_file}")
 
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
@@ -82,7 +82,9 @@ def _normalize_filter_definition(raw_filter: dict[str, Any], source_name: str) -
     default_enabled = raw_filter.get("default_enabled", True)
     raw_conditions = raw_filter.get("match_all", [])
     if not raw_conditions:
-        raise ValueError(f"Filter '{key}' in {source_name} has no match_all conditions")
+        raise ValueError(
+            f"У фильтра «{key}» в {source_name} отсутствуют условия match_all"
+        )
 
     conditions = tuple(_normalize_condition(raw_condition) for raw_condition in raw_conditions)
     return FilterDefinition(
@@ -100,5 +102,5 @@ def _normalize_condition(raw_condition: dict[str, Any]) -> FilterCondition:
     operator = raw_condition.get("operator", "eq")
     value = raw_condition.get("value")
     if operator not in {"eq", "ne", "in", "not_in", "startswith", "not_startswith"}:
-        raise ValueError(f"Unsupported operator: {operator}")
+        raise ValueError(f"Неподдерживаемый оператор: {operator}")
     return FilterCondition(field=field, operator=operator, value=value)

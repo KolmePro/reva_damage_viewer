@@ -62,7 +62,10 @@ def setup_logger(debug_mode: bool = False):
             # Позволяем прерывание клавиатурой
             sys.__excepthook__(exc_type, exc_value, exc_traceback)
             return
-        logger.critical("ОШИБКА:", exc_info=(exc_type, exc_value, exc_traceback))
+        logger.critical(
+            "Необработанное исключение.",
+            exc_info=(exc_type, exc_value, exc_traceback),
+        )
 
     sys.excepthook = handle_exception
 

@@ -35,7 +35,7 @@
      <verstretch>1</verstretch>
     </sizepolicy>
    </property>
-   <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="0,0,0">
+   <layout class="QVBoxLayout" name="central_layout">
     <property name="leftMargin">
      <number>10</number>
     </property>
@@ -48,6 +48,8 @@
     <property name="bottomMargin">
      <number>10</number>
     </property>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="0,0,0">
     <item>
      <widget class="QWidget" name="verticalWidget" native="true">
       <property name="minimumSize">
@@ -255,6 +257,62 @@
            </widget>
           </item>
           <item row="6" column="0" colspan="2">
+           <widget class="QGroupBox" name="time_range_group">
+            <property name="title">
+             <string>Временной отрезок</string>
+            </property>
+            <layout class="QGridLayout" name="time_range_layout" columnstretch="0,1,0,1,0">
+             <item row="0" column="0">
+              <widget class="QLabel" name="label_start_time">
+               <property name="text">
+                <string>От</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="NullableTimeEdit" name="te_start_time">
+               <property name="toolTip">
+                <string>Показывать записи не раньше указанного времени.</string>
+               </property>
+               <property name="displayFormat">
+                <string>HH:mm:ss</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="2">
+              <widget class="QLabel" name="label_end_time">
+               <property name="text">
+                <string>До</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="3">
+              <widget class="NullableTimeEdit" name="te_end_time">
+               <property name="toolTip">
+                <string>Показывать записи не позже указанного времени.</string>
+               </property>
+               <property name="displayFormat">
+                <string>HH:mm:ss</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="4">
+              <widget class="QToolButton" name="btn_reset_time_range">
+               <property name="toolTip">
+                <string>Сбросить временной отрезок</string>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="autoRaise">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item row="7" column="0" colspan="2">
            <widget class="QGroupBox" name="damage_range_group">
             <property name="title">
              <string>Диапазон урона</string>
@@ -566,6 +624,8 @@
       </item>
      </layout>
     </item>
+     </layout>
+    </item>
    </layout>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
@@ -589,6 +649,7 @@
     <bool>false</bool>
    </attribute>
    <addaction name="action_load_last_log"/>
+   <addaction name="action_append_last_log"/>
    <addaction name="action_load_log_file"/>
    <addaction name="action_set_game_folder"/>
    <addaction name="action_clear_selection"/>
@@ -636,13 +697,30 @@
   </action>
   <action name="action_load_log_file">
    <property name="text">
-    <string>&amp;Выбрать лог...</string>
+    <string>&amp;Выбрать логи...</string>
    </property>
    <property name="toolTip">
-    <string>Выбрать и загрузить лог боя</string>
+    <string>Выбрать и загрузить один или несколько логов боя</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+O</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="action_append_last_log">
+   <property name="icon">
+    <iconset theme="list-add"/>
+   </property>
+   <property name="text">
+    <string>Добавить последний лог</string>
+   </property>
+   <property name="toolTip">
+    <string>Добавить новые записи из последнего лога к уже загруженным</string>
+   </property>
+   <property name="shortcut">
+    <string>Shift+F5</string>
    </property>
    <property name="menuRole">
     <enum>QAction::MenuRole::NoRole</enum>
@@ -665,7 +743,28 @@
     <enum>QAction::MenuRole::NoRole</enum>
    </property>
   </action>
+  <action name="action_clear_timeline_selection">
+   <property name="icon">
+    <iconset theme="edit-clear"/>
+   </property>
+   <property name="text">
+    <string>Сбросить отрезки</string>
+   </property>
+   <property name="toolTip">
+    <string>Снять выделение со всех отрезков и сбросить временной фильтр</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>NullableTimeEdit</class>
+   <extends>QTimeEdit</extends>
+   <header>gui.widgets.nullable_time_edit</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

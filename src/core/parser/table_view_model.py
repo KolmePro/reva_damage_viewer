@@ -1,3 +1,5 @@
+from datetime import datetime, time
+
 from PySide6.QtCore import QAbstractTableModel, Qt, Signal
 from PySide6.QtGui import QBrush, QColor, QIcon
 
@@ -19,6 +21,13 @@ class DamageTableModel(QAbstractTableModel):
         self.attacker_name = ""
         self.target_name = ""
         self.skill_name = ""
+        self.start_time: time | None = None
+        self.end_time: time | None = None
+        self.start_timestamp: datetime | None = None
+        self.end_timestamp: datetime | None = None
+        self.include_start_timestamp = True
+        self.include_end_timestamp = True
+        self.timestamp_ranges: list[tuple[datetime, datetime, bool, bool]] = []
         self.minimum_damage = 0
         self.maximum_damage = 0
 
@@ -130,6 +139,56 @@ class DamageTableModel(QAbstractTableModel):
         self.filters.update(filters)
         self.apply_filters()
 
+    def set_time_range(self, start: time | None, end: time | None):
+        self.start_time = start
+        self.end_time = end
+        self.start_timestamp = None
+        self.end_timestamp = None
+        self.include_start_timestamp = True
+        self.include_end_timestamp = True
+        self.timestamp_ranges = []
+        self.apply_filters()
+
+    def set_timestamp_range(
+        self,
+        start: datetime,
+        end: datetime,
+        include_start: bool = True,
+        include_end: bool = True,
+    ):
+        self.set_timestamp_ranges([(start, end, include_start, include_end)])
+
+    def set_timestamp_ranges(
+        self,
+        ranges: list[tuple[datetime, datetime, bool, bool]],
+    ):
+        self.start_time = None
+        self.end_time = None
+        self.timestamp_ranges = list(ranges)
+        if len(ranges) == 1:
+            start, end, include_start, include_end = ranges[0]
+            self.start_timestamp = start
+            self.end_timestamp = end
+            self.include_start_timestamp = include_start
+            self.include_end_timestamp = include_end
+        else:
+            self.start_timestamp = None
+            self.end_timestamp = None
+            self.include_start_timestamp = True
+            self.include_end_timestamp = True
+        self.apply_filters()
+
+    def clear_time_range(self, apply_filters: bool = True):
+        self.start_time = None
+        self.end_time = None
+        self.start_timestamp = None
+        self.end_timestamp = None
+        self.include_start_timestamp = True
+        self.include_end_timestamp = True
+        self.timestamp_ranges = []
+        if apply_filters:
+            self.apply_filters()
+
     def apply_filters(self):
         self.beginResetModel()
         self._filtered_records = [record for record in self._all_records if self._record_allowed(record)]
@@ -145,6 +204,9 @@ class DamageTableModel(QAbstractTableModel):
         return not result if invert else result
 
     def _record_allowed(self, record: DamageRecord):
+        if not self._record_in_time_range(record):
+            return False
+
         for definition in self.filter_definitions:
             if self.filters.get(definition.key, True):
                 continue
@@ -165,6 +227,50 @@ class DamageTableModel(QAbstractTableModel):
         if self.minimum_damage and record.damage <= self.minimum_damage:
             return False
         if self.maximum_damage and record.damage >= self.maximum_damage:
+            return False
+        return True
+
+    def _record_in_time_range(self, record: DamageRecord) -> bool:
+        if self.timestamp_ranges:
+            timestamp = getattr(record, "timestamp", None)
+            if not isinstance(timestamp, datetime):
+                return False
+            return any(
+                self._timestamp_in_range(
+                    timestamp,
+                    start,
+                    end,
+                    include_start,
+                    include_end,
+                )
+                for start, end, include_start, include_end in self.timestamp_ranges
+            )
+
+        if self.start_time is None and self.end_time is None:
+            return True
+
+        record_time = record.time
+        if self.start_time is not None and self.end_time is not None:
+            if self.start_time <= self.end_time:
+                return self.start_time <= record_time <= self.end_time
+            return record_time >= self.start_time or record_time <= self.end_time
+        if self.start_time is not None:
+            return record_time >= self.start_time
+        return record_time <= self.end_time
+
+    @staticmethod
+    def _timestamp_in_range(
+        timestamp: datetime,
+        start: datetime,
+        end: datetime,
+        include_start: bool,
+        include_end: bool,
+    ) -> bool:
+        if timestamp < start or timestamp > end:
+            return False
+        if timestamp == start and not include_start:
+            return False
+        if timestamp == end and not include_end:
             return False
         return True
 

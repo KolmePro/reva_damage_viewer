@@ -2,11 +2,12 @@ import sys
 import logging
 import tempfile
 import unittest
+from datetime import datetime, time
 from pathlib import Path
 from types import SimpleNamespace
 
 from PySide6.QtCore import QSettings
-from PySide6.QtWidgets import QApplication, QMainWindow as QtMainWindow
+from PySide6.QtWidgets import QApplication, QMainWindow as QtMainWindow, QTimeEdit
 
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
@@ -18,13 +19,28 @@ from gui.compiled_ui.ui_main_window import Ui_MainWindow
 from gui.windows.main_window import MainWindow
 
 
-def make_record(damage: int, record_type: str = "damage_dealt"):
+def make_record(
+    damage: int,
+    record_type: str = "damage_dealt",
+    record_time: time = time(12, 0, 0),
+    timestamp: datetime | None = None,
+):
     return SimpleNamespace(
         type=record_type,
         attacker="Атакующий",
+        is_attacker_spirit=False,
+        attacker_spirit_owner="",
         target="Цель",
+        is_target_spirit=False,
+        target_spirit_owner="",
         skill="Умение",
+        effects=[],
         damage=damage,
+        property1="Обычный",
+        property2="",
+        origin_string=f"record-{damage}",
+        time=record_time,
+        timestamp=timestamp,
     )
 
 
@@ -69,6 +85,53 @@ class DamageFilterTest(unittest.TestCase):
 
         self.assertEqual(model.rowCount(), 2)
 
+    def test_manual_time_range_supports_interval_across_midnight(self):
+        model = DamageTableModel()
+        model.set_records([
+            make_record(1, record_time=time(22, 0, 0)),
+            make_record(2, record_time=time(23, 30, 0)),
+            make_record(3, record_time=time(0, 30, 0)),
+            make_record(4, record_time=time(2, 0, 0)),
+        ])
+
+        model.set_time_range(time(23, 0, 0), time(1, 0, 0))
+
+        self.assertEqual([record.damage for record in model._filtered_records], [2, 3])
+
+    def test_exact_timestamp_range_can_exclude_pause_boundaries(self):
+        model = DamageTableModel()
+        start = datetime(2026, 8, 29, 12, 0, 0)
+        model.set_records([
+            make_record(1, timestamp=start),
+            make_record(2, timestamp=start.replace(second=10)),
+            make_record(3, timestamp=start.replace(second=20)),
+        ])
+
+        model.set_timestamp_range(
+            start,
+            start.replace(second=20),
+            include_start=False,
+            include_end=False,
+        )
+
+        self.assertEqual([record.damage for record in model._filtered_records], [2])
+
+    def test_multiple_timestamp_ranges_are_combined(self):
+        model = DamageTableModel()
+        start = datetime(2026, 8, 29, 12, 0, 0)
+        model.set_records([
+            make_record(1, timestamp=start),
+            make_record(2, timestamp=start.replace(second=10)),
+            make_record(3, timestamp=start.replace(second=20)),
+        ])
+
+        model.set_timestamp_ranges([
+            (start, start, True, True),
+            (start.replace(second=20), start.replace(second=20), True, True),
+        ])
+
+        self.assertEqual([record.damage for record in model._filtered_records], [1, 3])
+
     def test_damage_filter_control_is_available(self):
         window = QtMainWindow()
         ui = Ui_MainWindow()
@@ -92,6 +155,16 @@ class DamageFilterTest(unittest.TestCase):
         ]
         self.assertEqual(positions, [(0, 0), (0, 1), (0, 2), (0, 3), (0, 4)])
         self.assertEqual(ui.damage_range_group.title(), "Диапазон урона")
+        self.assertEqual(ui.time_range_group.title(), "Временной отрезок")
+        self.assertIsInstance(ui.te_start_time, QTimeEdit)
+        self.assertIsInstance(ui.te_end_time, QTimeEdit)
+        self.assertEqual(ui.te_start_time.displayFormat(), "HH:mm:ss")
+        self.assertEqual(ui.te_end_time.displayFormat(), "HH:mm:ss")
+        self.assertEqual(ui.te_start_time.lineEdit().placeholderText(), "00:00:00")
+        self.assertEqual(ui.te_end_time.lineEdit().placeholderText(), "00:00:00")
+        time_row = ui.gridLayout.getItemPosition(ui.gridLayout.indexOf(ui.time_range_group))[0]
+        damage_row = ui.gridLayout.getItemPosition(ui.gridLayout.indexOf(ui.damage_range_group))[0]
+        self.assertLess(time_row, damage_row)
 
     def test_damage_controls_are_not_collapsed_by_plugin_filters(self):
         definitions = load_filter_definitions(
@@ -121,11 +194,24 @@ class DamageFilterTest(unittest.TestCase):
                 window.ui.le_maximum_damage.height(),
                 window.ui.le_maximum_damage.minimumSizeHint().height(),
             )
+            self.assertGreaterEqual(
+                window.ui.te_start_time.height(),
+                window.ui.te_start_time.minimumSizeHint().height(),
+            )
+            self.assertGreaterEqual(
+                window.ui.te_end_time.height(),
+                window.ui.te_end_time.minimumSizeHint().height(),
+            )
             self.assertIsNotNone(window.ui.le_minimum_damage.validator())
             self.assertIsNotNone(window.ui.le_maximum_damage.validator())
+            self.assertEqual(window.ui.te_start_time.displayFormat(), "HH:mm:ss")
+            self.assertEqual(window.ui.te_end_time.displayFormat(), "HH:mm:ss")
             self.assertTrue(window.ui.btn_reset_damage_range.autoRaise())
             self.assertFalse(window.ui.btn_reset_damage_range.icon().isNull())
             self.assertEqual(window.ui.btn_reset_damage_range.text(), "")
+            self.assertTrue(window.ui.btn_reset_time_range.autoRaise())
+            self.assertFalse(window.ui.btn_reset_time_range.icon().isNull())
+            self.assertEqual(window.ui.btn_reset_time_range.text(), "")
 
             window.ui.le_minimum_damage.setText("10000")
             window.ui.le_maximum_damage.setText("20000")
@@ -138,6 +224,38 @@ class DamageFilterTest(unittest.TestCase):
             self.assertEqual(window.ui.le_maximum_damage.text(), "")
             self.assertEqual(window.ui.damage_table_view.model().minimum_damage, 0)
             self.assertEqual(window.ui.damage_table_view.model().maximum_damage, 0)
+
+            window.ui.te_start_time.setValue(time(12, 0, 0))
+            window.ui.te_end_time.setValue(time(12, 30, 0))
+            self.assertEqual(window.ui.damage_table_view.model().start_time, time(12, 0, 0))
+            self.assertEqual(window.ui.damage_table_view.model().end_time, time(12, 30, 0))
+
+            window.ui.damage_table_view.model().set_records([
+                make_record(1, record_time=time(11, 0, 0)),
+                make_record(2, record_time=time(12, 15, 0)),
+            ])
+            self.assertEqual(window.ui.damage_table_view.model().rowCount(), 1)
+
+            window.ui.btn_reset_time_range.click()
+
+            self.assertEqual(window.ui.te_start_time.text(), "—")
+            self.assertEqual(window.ui.te_end_time.text(), "—")
+            self.assertIsNone(window.ui.te_start_time.value())
+            self.assertIsNone(window.ui.te_end_time.value())
+            self.assertIsNone(window.ui.damage_table_view.model().start_time)
+            self.assertIsNone(window.ui.damage_table_view.model().end_time)
+            self.assertEqual(window.ui.damage_table_view.model().rowCount(), 2)
+
+            window.ui.te_start_time.setValue(time(12, 0, 0))
+            window.ui.action_clear_timeline_selection.trigger()
+
+            self.assertEqual(window.ui.te_start_time.text(), "—")
+            self.assertIsNone(window.ui.te_start_time.value())
+            self.assertIsNone(window.ui.damage_table_view.model().start_time)
+
+            window.ui.te_start_time.setValue(time(0, 0, 0))
+            self.assertEqual(window.ui.te_start_time.value(), time(0, 0, 0))
+            self.assertEqual(window.ui.damage_table_view.model().start_time, time(0, 0, 0))
             window.close()
 
 

@@ -26,7 +26,7 @@ class Application(QApplication):
 
         self.logger = setup_logger(debug_mode=debug_mode)
         if self.debug_mode:
-            self.logger.debug("Debug mode enabled.")
+            self.logger.debug("Режим отладки включён.")
 
         self.logger.info("Инициализация настроек.")
         self.settings = QSettings()

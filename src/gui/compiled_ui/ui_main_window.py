@@ -22,6 +22,8 @@ from PySide6.QtWidgets import (QApplication, QCheckBox, QFrame, QGridLayout,
     QSpacerItem, QStatusBar, QTableView, QToolBar,
     QToolButton, QVBoxLayout, QWidget)
 
+from gui.widgets.nullable_time_edit import NullableTimeEdit
+
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
@@ -44,11 +46,20 @@ class Ui_MainWindow(object):
         self.action_load_log_file = QAction(MainWindow)
         self.action_load_log_file.setObjectName(u"action_load_log_file")
         self.action_load_log_file.setMenuRole(QAction.MenuRole.NoRole)
+        self.action_append_last_log = QAction(MainWindow)
+        self.action_append_last_log.setObjectName(u"action_append_last_log")
+        icon3 = QIcon(QIcon.fromTheme(u"list-add"))
+        self.action_append_last_log.setIcon(icon3)
+        self.action_append_last_log.setMenuRole(QAction.MenuRole.NoRole)
         self.action_clear_selection = QAction(MainWindow)
         self.action_clear_selection.setObjectName(u"action_clear_selection")
-        icon3 = QIcon(QIcon.fromTheme(u"edit-clear"))
-        self.action_clear_selection.setIcon(icon3)
+        icon4 = QIcon(QIcon.fromTheme(u"edit-clear"))
+        self.action_clear_selection.setIcon(icon4)
         self.action_clear_selection.setMenuRole(QAction.MenuRole.NoRole)
+        self.action_clear_timeline_selection = QAction(MainWindow)
+        self.action_clear_timeline_selection.setObjectName(u"action_clear_timeline_selection")
+        self.action_clear_timeline_selection.setIcon(icon4)
+        self.action_clear_timeline_selection.setMenuRole(QAction.MenuRole.NoRole)
         self.central_widget = QWidget(MainWindow)
         self.central_widget.setObjectName(u"central_widget")
         sizePolicy = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
@@ -56,9 +67,11 @@ class Ui_MainWindow(object):
         sizePolicy.setVerticalStretch(1)
         sizePolicy.setHeightForWidth(self.central_widget.sizePolicy().hasHeightForWidth())
         self.central_widget.setSizePolicy(sizePolicy)
-        self.horizontalLayout_4 = QHBoxLayout(self.central_widget)
+        self.central_layout = QVBoxLayout(self.central_widget)
+        self.central_layout.setObjectName(u"central_layout")
+        self.central_layout.setContentsMargins(10, 10, 10, 10)
+        self.horizontalLayout_4 = QHBoxLayout()
         self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
-        self.horizontalLayout_4.setContentsMargins(10, 10, 10, 10)
         self.verticalWidget = QWidget(self.central_widget)
         self.verticalWidget.setObjectName(u"verticalWidget")
         self.verticalWidget.setMinimumSize(QSize(400, 0))
@@ -197,6 +210,41 @@ class Ui_MainWindow(object):
 
         self.gridLayout.addWidget(self.line_damage_range, 5, 0, 1, 2)
 
+        self.time_range_group = QGroupBox(self.groupBox)
+        self.time_range_group.setObjectName(u"time_range_group")
+        self.time_range_layout = QGridLayout(self.time_range_group)
+        self.time_range_layout.setObjectName(u"time_range_layout")
+        self.label_start_time = QLabel(self.time_range_group)
+        self.label_start_time.setObjectName(u"label_start_time")
+
+        self.time_range_layout.addWidget(self.label_start_time, 0, 0, 1, 1)
+
+        self.te_start_time = NullableTimeEdit(self.time_range_group)
+        self.te_start_time.setObjectName(u"te_start_time")
+
+        self.time_range_layout.addWidget(self.te_start_time, 0, 1, 1, 1)
+
+        self.label_end_time = QLabel(self.time_range_group)
+        self.label_end_time.setObjectName(u"label_end_time")
+
+        self.time_range_layout.addWidget(self.label_end_time, 0, 2, 1, 1)
+
+        self.te_end_time = NullableTimeEdit(self.time_range_group)
+        self.te_end_time.setObjectName(u"te_end_time")
+
+        self.time_range_layout.addWidget(self.te_end_time, 0, 3, 1, 1)
+
+        self.btn_reset_time_range = QToolButton(self.time_range_group)
+        self.btn_reset_time_range.setObjectName(u"btn_reset_time_range")
+        self.btn_reset_time_range.setAutoRaise(True)
+
+        self.time_range_layout.addWidget(self.btn_reset_time_range, 0, 4, 1, 1)
+
+        self.time_range_layout.setColumnStretch(1, 1)
+        self.time_range_layout.setColumnStretch(3, 1)
+
+        self.gridLayout.addWidget(self.time_range_group, 6, 0, 1, 2)
+
         self.damage_range_group = QGroupBox(self.groupBox)
         self.damage_range_group.setObjectName(u"damage_range_group")
         self.damage_range_layout = QGridLayout(self.damage_range_group)
@@ -232,7 +280,7 @@ class Ui_MainWindow(object):
         self.damage_range_layout.setColumnStretch(1, 1)
         self.damage_range_layout.setColumnStretch(3, 1)
 
-        self.gridLayout.addWidget(self.damage_range_group, 6, 0, 1, 2)
+        self.gridLayout.addWidget(self.damage_range_group, 7, 0, 1, 2)
 
         self.le_target_name = QLineEdit(self.groupBox)
         self.le_target_name.setObjectName(u"le_target_name")
@@ -418,6 +466,9 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_4.addLayout(self.verticalLayout_2)
 
+
+        self.central_layout.addLayout(self.horizontalLayout_4)
+
         MainWindow.setCentralWidget(self.central_widget)
         self.statusbar = QStatusBar(MainWindow)
         self.statusbar.setObjectName(u"statusbar")
@@ -433,6 +484,7 @@ class Ui_MainWindow(object):
         MainWindow.setMenuBar(self.menubar)
 
         self.toolbar.addAction(self.action_load_last_log)
+        self.toolbar.addAction(self.action_append_last_log)
         self.toolbar.addAction(self.action_load_log_file)
         self.toolbar.addAction(self.action_set_game_folder)
         self.toolbar.addAction(self.action_clear_selection)
@@ -455,12 +507,19 @@ class Ui_MainWindow(object):
 #if QT_CONFIG(shortcut)
         self.action_load_last_log.setShortcut(QCoreApplication.translate("MainWindow", u"F5", None))
 #endif // QT_CONFIG(shortcut)
-        self.action_load_log_file.setText(QCoreApplication.translate("MainWindow", u"&\u0412\u044b\u0431\u0440\u0430\u0442\u044c \u043b\u043e\u0433...", None))
+        self.action_load_log_file.setText(QCoreApplication.translate("MainWindow", u"&\u0412\u044b\u0431\u0440\u0430\u0442\u044c \u043b\u043e\u0433\u0438...", None))
 #if QT_CONFIG(tooltip)
-        self.action_load_log_file.setToolTip(QCoreApplication.translate("MainWindow", u"\u0412\u044b\u0431\u0440\u0430\u0442\u044c \u0438 \u0437\u0430\u0433\u0440\u0443\u0437\u0438\u0442\u044c \u043b\u043e\u0433 \u0431\u043e\u044f", None))
+        self.action_load_log_file.setToolTip(QCoreApplication.translate("MainWindow", u"\u0412\u044b\u0431\u0440\u0430\u0442\u044c \u0438 \u0437\u0430\u0433\u0440\u0443\u0437\u0438\u0442\u044c \u043e\u0434\u0438\u043d \u0438\u043b\u0438 \u043d\u0435\u0441\u043a\u043e\u043b\u044c\u043a\u043e \u043b\u043e\u0433\u043e\u0432 \u0431\u043e\u044f", None))
 #endif // QT_CONFIG(tooltip)
 #if QT_CONFIG(shortcut)
         self.action_load_log_file.setShortcut(QCoreApplication.translate("MainWindow", u"Ctrl+O", None))
+#endif // QT_CONFIG(shortcut)
+        self.action_append_last_log.setText(QCoreApplication.translate("MainWindow", u"\u0414\u043e\u0431\u0430\u0432\u0438\u0442\u044c \u043f\u043e\u0441\u043b\u0435\u0434\u043d\u0438\u0439 \u043b\u043e\u0433", None))
+#if QT_CONFIG(tooltip)
+        self.action_append_last_log.setToolTip(QCoreApplication.translate("MainWindow", u"\u0414\u043e\u0431\u0430\u0432\u0438\u0442\u044c \u043d\u043e\u0432\u044b\u0435 \u0437\u0430\u043f\u0438\u0441\u0438 \u0438\u0437 \u043f\u043e\u0441\u043b\u0435\u0434\u043d\u0435\u0433\u043e \u043b\u043e\u0433\u0430 \u043a \u0443\u0436\u0435 \u0437\u0430\u0433\u0440\u0443\u0436\u0435\u043d\u043d\u044b\u043c", None))
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(shortcut)
+        self.action_append_last_log.setShortcut(QCoreApplication.translate("MainWindow", u"Shift+F5", None))
 #endif // QT_CONFIG(shortcut)
         self.action_clear_selection.setText(QCoreApplication.translate("MainWindow", u"&\u0421\u043d\u044f\u0442\u044c \u0432\u044b\u0434\u0435\u043b\u0435\u043d\u0438\u0435", None))
 #if QT_CONFIG(tooltip)
@@ -469,6 +528,10 @@ class Ui_MainWindow(object):
 #if QT_CONFIG(shortcut)
         self.action_clear_selection.setShortcut(QCoreApplication.translate("MainWindow", u"Esc", None))
 #endif // QT_CONFIG(shortcut)
+        self.action_clear_timeline_selection.setText(QCoreApplication.translate("MainWindow", u"\u0421\u0431\u0440\u043e\u0441\u0438\u0442\u044c \u043e\u0442\u0440\u0435\u0437\u043a\u0438", None))
+#if QT_CONFIG(tooltip)
+        self.action_clear_timeline_selection.setToolTip(QCoreApplication.translate("MainWindow", u"\u0421\u043d\u044f\u0442\u044c \u0432\u044b\u0434\u0435\u043b\u0435\u043d\u0438\u0435 \u0441\u043e \u0432\u0441\u0435\u0445 \u043e\u0442\u0440\u0435\u0437\u043a\u043e\u0432 \u0438 \u0441\u0431\u0440\u043e\u0441\u0438\u0442\u044c \u0432\u0440\u0435\u043c\u0435\u043d\u043d\u043e\u0439 \u0444\u0438\u043b\u044c\u0442\u0440", None))
+#endif // QT_CONFIG(tooltip)
         self.groupBox.setTitle(QCoreApplication.translate("MainWindow", u"\u0424\u0438\u043b\u044c\u0442\u0440\u044b", None))
         self.cb_your_effects.setText(QCoreApplication.translate("MainWindow", u"\u042d\u0444\u0444\u0435\u043a\u0442\u044b \u043d\u0430 \u0432\u0430\u0441", None))
         self.cb_attack_m.setText(QCoreApplication.translate("MainWindow", u"\u0421\u0438\u043b\u0430 \u0437\u0430\u043a\u043b\u0438\u043d\u0430\u043d\u0438\u0439", None))
@@ -489,6 +552,21 @@ class Ui_MainWindow(object):
         self.cb_incoming_your_damage.setText(QCoreApplication.translate("MainWindow", u"\u0423\u0440\u043e\u043d \u043f\u043e \u0432\u0430\u043c", None))
         self.cb_outgoing_spirit_damage.setText(QCoreApplication.translate("MainWindow", u"\u0423\u0440\u043e\u043d \u043e\u0442 \u0434\u0443\u0445\u043e\u0432", None))
         self.cb_attack_block.setText(QCoreApplication.translate("MainWindow", u"\u0411\u043b\u043e\u043a\u0438\u0440\u043e\u0432\u0430\u043d\u0438\u044f", None))
+        self.time_range_group.setTitle(QCoreApplication.translate("MainWindow", u"\u0412\u0440\u0435\u043c\u0435\u043d\u043d\u043e\u0439 \u043e\u0442\u0440\u0435\u0437\u043e\u043a", None))
+        self.label_start_time.setText(QCoreApplication.translate("MainWindow", u"\u041e\u0442", None))
+#if QT_CONFIG(tooltip)
+        self.te_start_time.setToolTip(QCoreApplication.translate("MainWindow", u"\u041f\u043e\u043a\u0430\u0437\u044b\u0432\u0430\u0442\u044c \u0437\u0430\u043f\u0438\u0441\u0438 \u043d\u0435 \u0440\u0430\u043d\u044c\u0448\u0435 \u0443\u043a\u0430\u0437\u0430\u043d\u043d\u043e\u0433\u043e \u0432\u0440\u0435\u043c\u0435\u043d\u0438.", None))
+#endif // QT_CONFIG(tooltip)
+        self.te_start_time.setDisplayFormat(QCoreApplication.translate("MainWindow", u"HH:mm:ss", None))
+        self.label_end_time.setText(QCoreApplication.translate("MainWindow", u"\u0414\u043e", None))
+#if QT_CONFIG(tooltip)
+        self.te_end_time.setToolTip(QCoreApplication.translate("MainWindow", u"\u041f\u043e\u043a\u0430\u0437\u044b\u0432\u0430\u0442\u044c \u0437\u0430\u043f\u0438\u0441\u0438 \u043d\u0435 \u043f\u043e\u0437\u0436\u0435 \u0443\u043a\u0430\u0437\u0430\u043d\u043d\u043e\u0433\u043e \u0432\u0440\u0435\u043c\u0435\u043d\u0438.", None))
+#endif // QT_CONFIG(tooltip)
+        self.te_end_time.setDisplayFormat(QCoreApplication.translate("MainWindow", u"HH:mm:ss", None))
+#if QT_CONFIG(tooltip)
+        self.btn_reset_time_range.setToolTip(QCoreApplication.translate("MainWindow", u"\u0421\u0431\u0440\u043e\u0441\u0438\u0442\u044c \u0432\u0440\u0435\u043c\u0435\u043d\u043d\u043e\u0439 \u043e\u0442\u0440\u0435\u0437\u043e\u043a", None))
+#endif // QT_CONFIG(tooltip)
+        self.btn_reset_time_range.setText("")
         self.damage_range_group.setTitle(QCoreApplication.translate("MainWindow", u"\u0414\u0438\u0430\u043f\u0430\u0437\u043e\u043d \u0443\u0440\u043e\u043d\u0430", None))
         self.label_minimum_damage.setText(QCoreApplication.translate("MainWindow", u"\u041e\u0442", None))
         self.label_maximum_damage.setText(QCoreApplication.translate("MainWindow", u"\u0414\u043e", None))
