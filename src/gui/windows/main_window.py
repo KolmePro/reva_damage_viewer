@@ -22,6 +22,7 @@ from PySide6.QtWidgets import (
     QFrame,
     QGridLayout,
     QHBoxLayout,
+    QInputDialog,
     QMainWindow,
     QMessageBox,
     QScrollArea,
@@ -102,6 +103,10 @@ class MainWindow(QMainWindow):
         self.group_filter_checkboxes: dict[str, QCheckBox] = {}
         self._setup_combat_timeline()
         self._setup_filter_panel(app.filter_definitions)
+        self.ui.menu_view.insertAction(
+            self.ui.action_show_statusbar, self.ui.toolbar.toggleViewAction()
+        )
+        self.ui.action_set_combat_pause.setIcon(self._create_combat_pause_icon())
         self._setup_debug_actions()
 
         default_pause = int(EventLog.DEFAULT_INTERRUPTION_THRESHOLD.total_seconds())
@@ -201,6 +206,47 @@ class MainWindow(QMainWindow):
         painter.drawLine(12, 14, 15, 16)
         painter.end()
         return QIcon(pixmap)
+
+    def action_set_combat_pause(self):
+        spin = self.ui.sb_combat_pause
+        seconds, accepted = QInputDialog.getInt(
+            self,
+            "Пауза между боями",
+            "Новый бой начинается, если пауза между ударами\n"
+            "больше указанного значения.\n\n"
+            "Пауза, секунд:",
+            spin.value(),
+            spin.minimum(),
+            spin.maximum(),
+        )
+        if accepted:
+            spin.setValue(seconds)
+
+    def show_quick_help(self):
+        QMessageBox.information(
+            self,
+            "Как пользоваться программой",
+            "1. Откройте один или несколько HTML-логов через «Файл → Открыть логи» (Ctrl+O).\n"
+            "Для загрузки последнего лога выберите папку с игрой в меню «Настройки», "
+            "затем нажмите F5. Shift+F5 добавляет новые записи к загруженным.\n\n"
+            "2. Укажите свой никнейм и настройте фильтры слева. "
+            "Статистика рассчитывается по отображаемым атакам; "
+            "если выделены строки — только по ним.\n\n"
+            "3. Нажимайте на бои и паузы на временной шкале, чтобы выбрать отрезки. "
+            "Повторное нажатие снимает выбор. Кнопка сброса рядом со шкалой "
+            "очищает выбор отрезков и временной фильтр.\n\n"
+            "4. Порог паузы между боями можно изменить рядом со шкалой "
+            "или в меню «Настройки». Значение сохраняется автоматически.",
+        )
+
+    def show_about(self):
+        QMessageBox.about(
+            self,
+            "О программе",
+            "<b>DamageViewer — Калькулятор урона</b><br><br>"
+            "Анализ боевых HTML-логов Revelation Online: "
+            "объединение логов, временная шкала, фильтры и статистика атак.",
+        )
 
     def action_set_game_folder(self):
         start_dir = self.settings.value("game_folder", "")
@@ -456,6 +502,8 @@ class MainWindow(QMainWindow):
         self.action_show_unparsed_log.setEnabled(False)
         self.action_show_unparsed_log.triggered.connect(self.show_unparsed_log_records)
         self.ui.toolbar.addAction(self.action_show_unparsed_log)
+        self.ui.menu_help.addSeparator()
+        self.ui.menu_help.addAction(self.action_show_unparsed_log)
 
     def show_unparsed_log_records(self):
         if not self.last_unparsed_records:
