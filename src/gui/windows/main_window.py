@@ -761,6 +761,8 @@ class MainWindow(QMainWindow):
         m_damages = []
         common_damages = []
         crit_damages = []
+        blocked_hits = 0
+        dodged_hits = 0
         for index in indexes:
             damage_index = model.index(index.row(), 6)
             property1 = model.index(index.row(), 7)
@@ -779,10 +781,16 @@ class MainWindow(QMainWindow):
 
                 if damage_type_2 == "Критический удар":
                     crit_damages.append(int(value))
+                elif damage_type_2 == "Блокирование":
+                    blocked_hits += 1
+                elif damage_type_2 and damage_type_2.startswith("Вероятность уклонения"):
+                    dodged_hits += 1
 
         total_attacks = len(damages)
         critical_hits = len(crit_damages)
         crit_chance = (critical_hits / total_attacks * 100) if total_attacks else 0
+        block_chance = (blocked_hits / total_attacks * 100) if total_attacks else 0
+        dodge_chance = (dodged_hits / total_attacks * 100) if total_attacks else 0
         all_damage = sum(damages)
         avg = round(all_damage / total_attacks) if total_attacks else 0
         min_damage = min(damages) if damages else 0
@@ -791,6 +799,8 @@ class MainWindow(QMainWindow):
 
         self.ui.label_10.setText(f"{total_attacks:,}".replace(",", " "))
         self.ui.label_24.setText(f"{critical_hits} ({crit_chance:.1f}%)".replace(",", " "))
+        self.ui.block_hits_value.setText(f"{blocked_hits} ({block_chance:.1f}%)")
+        self.ui.dodge_hits_value.setText(f"{dodged_hits} ({dodge_chance:.1f}%)")
         self.ui.label_13.setText(f"{all_damage:,}".replace(",", " "))
 
         self.ui.label_15.setText(f"{sum(p_damages):,}".replace(",", " "))
