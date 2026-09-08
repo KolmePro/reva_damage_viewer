@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <ui version="4.0">
  <class>MainWindow</class>
  <widget class="QMainWindow" name="MainWindow">
@@ -49,57 +49,6 @@
      <number>10</number>
     </property>
     <item>
-     <widget class="QWidget" name="combat_settings_widget" native="true">
-     <layout class="QHBoxLayout" name="combat_settings_layout">
-      <property name="leftMargin"><number>0</number></property>
-      <property name="topMargin"><number>0</number></property>
-      <property name="rightMargin"><number>0</number></property>
-      <property name="bottomMargin"><number>0</number></property>
-      <item>
-       <widget class="QLabel" name="combat_pause_label">
-        <property name="text">
-         <string/>
-        </property>
-        <property name="toolTip">
-         <string>Пауза между боями. Новый бой начинается, если пауза между ударами больше указанного значения в секундах.</string>
-        </property>
-        <property name="accessibleName">
-         <string>Пауза между боями</string>
-        </property>
-        <property name="buddy">
-         <cstring>sb_combat_pause</cstring>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QSpinBox" name="sb_combat_pause">
-        <property name="accessibleName">
-         <string>Пауза между боями в секундах</string>
-        </property>
-        <property name="toolTip">
-         <string>Новый бой начинается, если пауза между ударами больше указанного значения. Шкала обновляется сразу; выбор отрезков сбрасывается.</string>
-        </property>
-        <property name="suffix">
-         <string> с</string>
-        </property>
-        <property name="minimum">
-         <number>1</number>
-        </property>
-        <property name="maximum">
-         <number>3600</number>
-        </property>
-        <property name="value">
-         <number>30</number>
-        </property>
-        <property name="keyboardTracking">
-         <bool>false</bool>
-        </property>
-       </widget>
-      </item>
-     </layout>
-     </widget>
-    </item>
-    <item>
      <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="0,0,0">
     <item>
      <widget class="QWidget" name="verticalWidget" native="true">
@@ -115,7 +64,7 @@
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
-      <layout class="QVBoxLayout" name="verticalLayout">
+      <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0">
        <item>
         <widget class="QGroupBox" name="groupBox">
          <property name="title">
@@ -307,62 +256,6 @@
             </property>
            </widget>
           </item>
-          <item row="6" column="0" colspan="2">
-           <widget class="QGroupBox" name="time_range_group">
-            <property name="title">
-             <string>Временной отрезок</string>
-            </property>
-            <layout class="QGridLayout" name="time_range_layout" columnstretch="0,1,0,1,0">
-             <item row="0" column="0">
-              <widget class="QLabel" name="label_start_time">
-               <property name="text">
-                <string>От</string>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="1">
-              <widget class="NullableTimeEdit" name="te_start_time">
-               <property name="toolTip">
-                <string>Показывать записи не раньше указанного времени.</string>
-               </property>
-               <property name="displayFormat">
-                <string>HH:mm:ss</string>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="2">
-              <widget class="QLabel" name="label_end_time">
-               <property name="text">
-                <string>До</string>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="3">
-              <widget class="NullableTimeEdit" name="te_end_time">
-               <property name="toolTip">
-                <string>Показывать записи не позже указанного времени.</string>
-               </property>
-               <property name="displayFormat">
-                <string>HH:mm:ss</string>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="4">
-              <widget class="QToolButton" name="btn_reset_time_range">
-               <property name="toolTip">
-                <string>Сбросить временной отрезок</string>
-               </property>
-               <property name="text">
-                <string/>
-               </property>
-               <property name="autoRaise">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
           <item row="7" column="0" colspan="2">
            <widget class="QGroupBox" name="damage_range_group">
             <property name="title">
@@ -481,19 +374,6 @@
           </item>
          </layout>
         </widget>
-       </item>
-       <item>
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Orientation::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
        </item>
        <item>
         <widget class="QGroupBox" name="groupBox_2">
@@ -703,7 +583,135 @@
      </widget>
     </item>
     <item>
-     <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0">
+     <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,1">
+      <item>
+       <widget class="QGroupBox" name="time_range_group">
+        <property name="title">
+         <string>Временной отрезок</string>
+        </property>
+        <layout class="QGridLayout" name="time_range_layout" columnstretch="0,0,0,0,0,0,1">
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_start_time">
+           <property name="text">
+            <string>От</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="NullableTimeEdit" name="te_start_time">
+           <property name="toolTip">
+            <string>Показывать записи не раньше указанного времени.</string>
+           </property>
+           <property name="displayFormat">
+            <string>HH:mm:ss</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="2">
+          <widget class="QLabel" name="label_end_time">
+           <property name="text">
+            <string>До</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="3">
+          <widget class="NullableTimeEdit" name="te_end_time">
+           <property name="toolTip">
+            <string>Показывать записи не позже указанного времени.</string>
+           </property>
+           <property name="displayFormat">
+            <string>HH:mm:ss</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="4">
+          <widget class="QToolButton" name="btn_reset_time_range">
+           <property name="toolTip">
+            <string>Сбросить временной отрезок</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="autoRaise">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="5">
+          <widget class="QWidget" name="combat_settings_widget" native="true">
+           <layout class="QHBoxLayout" name="combat_settings_layout">
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QLabel" name="combat_pause_label">
+              <property name="text">
+               <string/>
+              </property>
+              <property name="toolTip">
+               <string>Пауза между боями. Новый бой начинается, если пауза между ударами больше указанного значения в секундах.</string>
+              </property>
+              <property name="accessibleName">
+               <string>Пауза между боями</string>
+              </property>
+              <property name="buddy">
+               <cstring>sb_combat_pause</cstring>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QSpinBox" name="sb_combat_pause">
+              <property name="accessibleName">
+               <string>Пауза между боями в секундах</string>
+              </property>
+              <property name="toolTip">
+               <string>Новый бой начинается, если пауза между ударами больше указанного значения. Шкала обновляется сразу; выбор отрезков сбрасывается.</string>
+              </property>
+              <property name="suffix">
+               <string> с</string>
+              </property>
+              <property name="minimum">
+               <number>1</number>
+              </property>
+              <property name="maximum">
+               <number>3600</number>
+              </property>
+              <property name="value">
+               <number>30</number>
+              </property>
+              <property name="keyboardTracking">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="0" column="6">
+          <spacer name="time_controls_spacer">
+           <property name="orientation">
+            <enum>Qt::Orientation::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>0</width>
+             <height>0</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </widget>
+      </item>
       <item>
        <widget class="QTableView" name="damage_table_view"/>
       </item>

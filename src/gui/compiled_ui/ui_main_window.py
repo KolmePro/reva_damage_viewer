@@ -91,28 +91,6 @@ class Ui_MainWindow(object):
         self.central_layout = QVBoxLayout(self.central_widget)
         self.central_layout.setObjectName(u"central_layout")
         self.central_layout.setContentsMargins(10, 10, 10, 10)
-        self.combat_settings_widget = QWidget(self.central_widget)
-        self.combat_settings_widget.setObjectName(u"combat_settings_widget")
-        self.combat_settings_layout = QHBoxLayout(self.combat_settings_widget)
-        self.combat_settings_layout.setObjectName(u"combat_settings_layout")
-        self.combat_settings_layout.setContentsMargins(0, 0, 0, 0)
-        self.combat_pause_label = QLabel(self.combat_settings_widget)
-        self.combat_pause_label.setObjectName(u"combat_pause_label")
-
-        self.combat_settings_layout.addWidget(self.combat_pause_label)
-
-        self.sb_combat_pause = QSpinBox(self.combat_settings_widget)
-        self.sb_combat_pause.setObjectName(u"sb_combat_pause")
-        self.sb_combat_pause.setMinimum(1)
-        self.sb_combat_pause.setMaximum(3600)
-        self.sb_combat_pause.setValue(30)
-        self.sb_combat_pause.setKeyboardTracking(False)
-
-        self.combat_settings_layout.addWidget(self.sb_combat_pause)
-
-
-        self.central_layout.addWidget(self.combat_settings_widget)
-
         self.horizontalLayout_4 = QHBoxLayout()
         self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
         self.verticalWidget = QWidget(self.central_widget)
@@ -257,41 +235,6 @@ class Ui_MainWindow(object):
 
         self.gridLayout.addWidget(self.line_damage_range, 5, 0, 1, 2)
 
-        self.time_range_group = QGroupBox(self.groupBox)
-        self.time_range_group.setObjectName(u"time_range_group")
-        self.time_range_layout = QGridLayout(self.time_range_group)
-        self.time_range_layout.setObjectName(u"time_range_layout")
-        self.label_start_time = QLabel(self.time_range_group)
-        self.label_start_time.setObjectName(u"label_start_time")
-
-        self.time_range_layout.addWidget(self.label_start_time, 0, 0, 1, 1)
-
-        self.te_start_time = NullableTimeEdit(self.time_range_group)
-        self.te_start_time.setObjectName(u"te_start_time")
-
-        self.time_range_layout.addWidget(self.te_start_time, 0, 1, 1, 1)
-
-        self.label_end_time = QLabel(self.time_range_group)
-        self.label_end_time.setObjectName(u"label_end_time")
-
-        self.time_range_layout.addWidget(self.label_end_time, 0, 2, 1, 1)
-
-        self.te_end_time = NullableTimeEdit(self.time_range_group)
-        self.te_end_time.setObjectName(u"te_end_time")
-
-        self.time_range_layout.addWidget(self.te_end_time, 0, 3, 1, 1)
-
-        self.btn_reset_time_range = QToolButton(self.time_range_group)
-        self.btn_reset_time_range.setObjectName(u"btn_reset_time_range")
-        self.btn_reset_time_range.setAutoRaise(True)
-
-        self.time_range_layout.addWidget(self.btn_reset_time_range, 0, 4, 1, 1)
-
-        self.time_range_layout.setColumnStretch(1, 1)
-        self.time_range_layout.setColumnStretch(3, 1)
-
-        self.gridLayout.addWidget(self.time_range_group, 6, 0, 1, 2)
-
         self.damage_range_group = QGroupBox(self.groupBox)
         self.damage_range_group.setObjectName(u"damage_range_group")
         self.damage_range_layout = QGridLayout(self.damage_range_group)
@@ -367,10 +310,6 @@ class Ui_MainWindow(object):
 
 
         self.verticalLayout.addWidget(self.groupBox)
-
-        self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
-
-        self.verticalLayout.addItem(self.verticalSpacer)
 
         self.groupBox_2 = QGroupBox(self.verticalWidget)
         self.groupBox_2.setObjectName(u"groupBox_2")
@@ -513,6 +452,7 @@ class Ui_MainWindow(object):
 
         self.verticalLayout.addWidget(self.groupBox_2)
 
+        self.verticalLayout.setStretch(0, 1)
 
         self.horizontalLayout_4.addWidget(self.verticalWidget)
 
@@ -525,11 +465,72 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_2 = QVBoxLayout()
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
+        self.time_range_group = QGroupBox(self.central_widget)
+        self.time_range_group.setObjectName(u"time_range_group")
+        self.time_range_layout = QGridLayout(self.time_range_group)
+        self.time_range_layout.setObjectName(u"time_range_layout")
+        self.label_start_time = QLabel(self.time_range_group)
+        self.label_start_time.setObjectName(u"label_start_time")
+
+        self.time_range_layout.addWidget(self.label_start_time, 0, 0, 1, 1)
+
+        self.te_start_time = NullableTimeEdit(self.time_range_group)
+        self.te_start_time.setObjectName(u"te_start_time")
+
+        self.time_range_layout.addWidget(self.te_start_time, 0, 1, 1, 1)
+
+        self.label_end_time = QLabel(self.time_range_group)
+        self.label_end_time.setObjectName(u"label_end_time")
+
+        self.time_range_layout.addWidget(self.label_end_time, 0, 2, 1, 1)
+
+        self.te_end_time = NullableTimeEdit(self.time_range_group)
+        self.te_end_time.setObjectName(u"te_end_time")
+
+        self.time_range_layout.addWidget(self.te_end_time, 0, 3, 1, 1)
+
+        self.btn_reset_time_range = QToolButton(self.time_range_group)
+        self.btn_reset_time_range.setObjectName(u"btn_reset_time_range")
+        self.btn_reset_time_range.setAutoRaise(True)
+
+        self.time_range_layout.addWidget(self.btn_reset_time_range, 0, 4, 1, 1)
+
+        self.combat_settings_widget = QWidget(self.time_range_group)
+        self.combat_settings_widget.setObjectName(u"combat_settings_widget")
+        self.combat_settings_layout = QHBoxLayout(self.combat_settings_widget)
+        self.combat_settings_layout.setObjectName(u"combat_settings_layout")
+        self.combat_settings_layout.setContentsMargins(0, 0, 0, 0)
+        self.combat_pause_label = QLabel(self.combat_settings_widget)
+        self.combat_pause_label.setObjectName(u"combat_pause_label")
+
+        self.combat_settings_layout.addWidget(self.combat_pause_label)
+
+        self.sb_combat_pause = QSpinBox(self.combat_settings_widget)
+        self.sb_combat_pause.setObjectName(u"sb_combat_pause")
+        self.sb_combat_pause.setMinimum(1)
+        self.sb_combat_pause.setMaximum(3600)
+        self.sb_combat_pause.setValue(30)
+        self.sb_combat_pause.setKeyboardTracking(False)
+
+        self.combat_settings_layout.addWidget(self.sb_combat_pause)
+
+
+        self.time_range_layout.addWidget(self.combat_settings_widget, 0, 5, 1, 1)
+
+        self.time_controls_spacer = QSpacerItem(0, 0, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+
+        self.time_range_layout.addItem(self.time_controls_spacer, 0, 6, 1, 1)
+
+        self.time_range_layout.setColumnStretch(6, 1)
+
+        self.verticalLayout_2.addWidget(self.time_range_group)
+
         self.damage_table_view = QTableView(self.central_widget)
         self.damage_table_view.setObjectName(u"damage_table_view")
 
         self.verticalLayout_2.addWidget(self.damage_table_view)
 
+        self.verticalLayout_2.setStretch(1, 1)
 
         self.horizontalLayout_4.addLayout(self.verticalLayout_2)
 
@@ -649,20 +650,6 @@ class Ui_MainWindow(object):
 #if QT_CONFIG(tooltip)
         self.action_clear_timeline_selection.setToolTip(QCoreApplication.translate("MainWindow", u"\u0421\u043d\u044f\u0442\u044c \u0432\u044b\u0434\u0435\u043b\u0435\u043d\u0438\u0435 \u0441\u043e \u0432\u0441\u0435\u0445 \u043e\u0442\u0440\u0435\u0437\u043a\u043e\u0432 \u0438 \u0441\u0431\u0440\u043e\u0441\u0438\u0442\u044c \u0432\u0440\u0435\u043c\u0435\u043d\u043d\u043e\u0439 \u0444\u0438\u043b\u044c\u0442\u0440", None))
 #endif // QT_CONFIG(tooltip)
-        self.combat_pause_label.setText("")
-#if QT_CONFIG(tooltip)
-        self.combat_pause_label.setToolTip(QCoreApplication.translate("MainWindow", u"\u041f\u0430\u0443\u0437\u0430 \u043c\u0435\u0436\u0434\u0443 \u0431\u043e\u044f\u043c\u0438. \u041d\u043e\u0432\u044b\u0439 \u0431\u043e\u0439 \u043d\u0430\u0447\u0438\u043d\u0430\u0435\u0442\u0441\u044f, \u0435\u0441\u043b\u0438 \u043f\u0430\u0443\u0437\u0430 \u043c\u0435\u0436\u0434\u0443 \u0443\u0434\u0430\u0440\u0430\u043c\u0438 \u0431\u043e\u043b\u044c\u0448\u0435 \u0443\u043a\u0430\u0437\u0430\u043d\u043d\u043e\u0433\u043e \u0437\u043d\u0430\u0447\u0435\u043d\u0438\u044f \u0432 \u0441\u0435\u043a\u0443\u043d\u0434\u0430\u0445.", None))
-#endif // QT_CONFIG(tooltip)
-#if QT_CONFIG(accessibility)
-        self.combat_pause_label.setAccessibleName(QCoreApplication.translate("MainWindow", u"\u041f\u0430\u0443\u0437\u0430 \u043c\u0435\u0436\u0434\u0443 \u0431\u043e\u044f\u043c\u0438", None))
-#endif // QT_CONFIG(accessibility)
-#if QT_CONFIG(accessibility)
-        self.sb_combat_pause.setAccessibleName(QCoreApplication.translate("MainWindow", u"\u041f\u0430\u0443\u0437\u0430 \u043c\u0435\u0436\u0434\u0443 \u0431\u043e\u044f\u043c\u0438 \u0432 \u0441\u0435\u043a\u0443\u043d\u0434\u0430\u0445", None))
-#endif // QT_CONFIG(accessibility)
-#if QT_CONFIG(tooltip)
-        self.sb_combat_pause.setToolTip(QCoreApplication.translate("MainWindow", u"\u041d\u043e\u0432\u044b\u0439 \u0431\u043e\u0439 \u043d\u0430\u0447\u0438\u043d\u0430\u0435\u0442\u0441\u044f, \u0435\u0441\u043b\u0438 \u043f\u0430\u0443\u0437\u0430 \u043c\u0435\u0436\u0434\u0443 \u0443\u0434\u0430\u0440\u0430\u043c\u0438 \u0431\u043e\u043b\u044c\u0448\u0435 \u0443\u043a\u0430\u0437\u0430\u043d\u043d\u043e\u0433\u043e \u0437\u043d\u0430\u0447\u0435\u043d\u0438\u044f. \u0428\u043a\u0430\u043b\u0430 \u043e\u0431\u043d\u043e\u0432\u043b\u044f\u0435\u0442\u0441\u044f \u0441\u0440\u0430\u0437\u0443; \u0432\u044b\u0431\u043e\u0440 \u043e\u0442\u0440\u0435\u0437\u043a\u043e\u0432 \u0441\u0431\u0440\u0430\u0441\u044b\u0432\u0430\u0435\u0442\u0441\u044f.", None))
-#endif // QT_CONFIG(tooltip)
-        self.sb_combat_pause.setSuffix(QCoreApplication.translate("MainWindow", u" \u0441", None))
         self.groupBox.setTitle(QCoreApplication.translate("MainWindow", u"\u0424\u0438\u043b\u044c\u0442\u0440\u044b", None))
         self.cb_your_effects.setText(QCoreApplication.translate("MainWindow", u"\u042d\u0444\u0444\u0435\u043a\u0442\u044b \u043d\u0430 \u0432\u0430\u0441", None))
         self.cb_attack_m.setText(QCoreApplication.translate("MainWindow", u"\u0421\u0438\u043b\u0430 \u0437\u0430\u043a\u043b\u0438\u043d\u0430\u043d\u0438\u0439", None))
@@ -683,21 +670,6 @@ class Ui_MainWindow(object):
         self.cb_incoming_your_damage.setText(QCoreApplication.translate("MainWindow", u"\u0423\u0440\u043e\u043d \u043f\u043e \u0432\u0430\u043c", None))
         self.cb_outgoing_spirit_damage.setText(QCoreApplication.translate("MainWindow", u"\u0423\u0440\u043e\u043d \u043e\u0442 \u0434\u0443\u0445\u043e\u0432", None))
         self.cb_attack_block.setText(QCoreApplication.translate("MainWindow", u"\u0411\u043b\u043e\u043a\u0438\u0440\u043e\u0432\u0430\u043d\u0438\u044f", None))
-        self.time_range_group.setTitle(QCoreApplication.translate("MainWindow", u"\u0412\u0440\u0435\u043c\u0435\u043d\u043d\u043e\u0439 \u043e\u0442\u0440\u0435\u0437\u043e\u043a", None))
-        self.label_start_time.setText(QCoreApplication.translate("MainWindow", u"\u041e\u0442", None))
-#if QT_CONFIG(tooltip)
-        self.te_start_time.setToolTip(QCoreApplication.translate("MainWindow", u"\u041f\u043e\u043a\u0430\u0437\u044b\u0432\u0430\u0442\u044c \u0437\u0430\u043f\u0438\u0441\u0438 \u043d\u0435 \u0440\u0430\u043d\u044c\u0448\u0435 \u0443\u043a\u0430\u0437\u0430\u043d\u043d\u043e\u0433\u043e \u0432\u0440\u0435\u043c\u0435\u043d\u0438.", None))
-#endif // QT_CONFIG(tooltip)
-        self.te_start_time.setDisplayFormat(QCoreApplication.translate("MainWindow", u"HH:mm:ss", None))
-        self.label_end_time.setText(QCoreApplication.translate("MainWindow", u"\u0414\u043e", None))
-#if QT_CONFIG(tooltip)
-        self.te_end_time.setToolTip(QCoreApplication.translate("MainWindow", u"\u041f\u043e\u043a\u0430\u0437\u044b\u0432\u0430\u0442\u044c \u0437\u0430\u043f\u0438\u0441\u0438 \u043d\u0435 \u043f\u043e\u0437\u0436\u0435 \u0443\u043a\u0430\u0437\u0430\u043d\u043d\u043e\u0433\u043e \u0432\u0440\u0435\u043c\u0435\u043d\u0438.", None))
-#endif // QT_CONFIG(tooltip)
-        self.te_end_time.setDisplayFormat(QCoreApplication.translate("MainWindow", u"HH:mm:ss", None))
-#if QT_CONFIG(tooltip)
-        self.btn_reset_time_range.setToolTip(QCoreApplication.translate("MainWindow", u"\u0421\u0431\u0440\u043e\u0441\u0438\u0442\u044c \u0432\u0440\u0435\u043c\u0435\u043d\u043d\u043e\u0439 \u043e\u0442\u0440\u0435\u0437\u043e\u043a", None))
-#endif // QT_CONFIG(tooltip)
-        self.btn_reset_time_range.setText("")
         self.damage_range_group.setTitle(QCoreApplication.translate("MainWindow", u"\u0414\u0438\u0430\u043f\u0430\u0437\u043e\u043d \u0443\u0440\u043e\u043d\u0430", None))
         self.label_minimum_damage.setText(QCoreApplication.translate("MainWindow", u"\u041e\u0442", None))
         self.label_maximum_damage.setText(QCoreApplication.translate("MainWindow", u"\u0414\u043e", None))
@@ -752,6 +724,35 @@ class Ui_MainWindow(object):
         self.dodge_hits_label.setToolTip(QCoreApplication.translate("MainWindow", u"\u041a\u043e\u043b\u0438\u0447\u0435\u0441\u0442\u0432\u043e \u0443\u043a\u043b\u043e\u043d\u0435\u043d\u0438\u0439 \u0438 \u043f\u0440\u043e\u0446\u0435\u043d\u0442 \u043e\u0442 \u043e\u0431\u0449\u0435\u0433\u043e \u0447\u0438\u0441\u043b\u0430 \u0430\u0442\u0430\u043a \u0432 \u0442\u0435\u043a\u0443\u0449\u0435\u0439 \u0432\u044b\u0431\u043e\u0440\u043a\u0435.", None))
 #endif // QT_CONFIG(tooltip)
         self.dodge_hits_value.setText(QCoreApplication.translate("MainWindow", u"n/a", None))
+        self.time_range_group.setTitle(QCoreApplication.translate("MainWindow", u"\u0412\u0440\u0435\u043c\u0435\u043d\u043d\u043e\u0439 \u043e\u0442\u0440\u0435\u0437\u043e\u043a", None))
+        self.label_start_time.setText(QCoreApplication.translate("MainWindow", u"\u041e\u0442", None))
+#if QT_CONFIG(tooltip)
+        self.te_start_time.setToolTip(QCoreApplication.translate("MainWindow", u"\u041f\u043e\u043a\u0430\u0437\u044b\u0432\u0430\u0442\u044c \u0437\u0430\u043f\u0438\u0441\u0438 \u043d\u0435 \u0440\u0430\u043d\u044c\u0448\u0435 \u0443\u043a\u0430\u0437\u0430\u043d\u043d\u043e\u0433\u043e \u0432\u0440\u0435\u043c\u0435\u043d\u0438.", None))
+#endif // QT_CONFIG(tooltip)
+        self.te_start_time.setDisplayFormat(QCoreApplication.translate("MainWindow", u"HH:mm:ss", None))
+        self.label_end_time.setText(QCoreApplication.translate("MainWindow", u"\u0414\u043e", None))
+#if QT_CONFIG(tooltip)
+        self.te_end_time.setToolTip(QCoreApplication.translate("MainWindow", u"\u041f\u043e\u043a\u0430\u0437\u044b\u0432\u0430\u0442\u044c \u0437\u0430\u043f\u0438\u0441\u0438 \u043d\u0435 \u043f\u043e\u0437\u0436\u0435 \u0443\u043a\u0430\u0437\u0430\u043d\u043d\u043e\u0433\u043e \u0432\u0440\u0435\u043c\u0435\u043d\u0438.", None))
+#endif // QT_CONFIG(tooltip)
+        self.te_end_time.setDisplayFormat(QCoreApplication.translate("MainWindow", u"HH:mm:ss", None))
+#if QT_CONFIG(tooltip)
+        self.btn_reset_time_range.setToolTip(QCoreApplication.translate("MainWindow", u"\u0421\u0431\u0440\u043e\u0441\u0438\u0442\u044c \u0432\u0440\u0435\u043c\u0435\u043d\u043d\u043e\u0439 \u043e\u0442\u0440\u0435\u0437\u043e\u043a", None))
+#endif // QT_CONFIG(tooltip)
+        self.btn_reset_time_range.setText("")
+        self.combat_pause_label.setText("")
+#if QT_CONFIG(tooltip)
+        self.combat_pause_label.setToolTip(QCoreApplication.translate("MainWindow", u"\u041f\u0430\u0443\u0437\u0430 \u043c\u0435\u0436\u0434\u0443 \u0431\u043e\u044f\u043c\u0438. \u041d\u043e\u0432\u044b\u0439 \u0431\u043e\u0439 \u043d\u0430\u0447\u0438\u043d\u0430\u0435\u0442\u0441\u044f, \u0435\u0441\u043b\u0438 \u043f\u0430\u0443\u0437\u0430 \u043c\u0435\u0436\u0434\u0443 \u0443\u0434\u0430\u0440\u0430\u043c\u0438 \u0431\u043e\u043b\u044c\u0448\u0435 \u0443\u043a\u0430\u0437\u0430\u043d\u043d\u043e\u0433\u043e \u0437\u043d\u0430\u0447\u0435\u043d\u0438\u044f \u0432 \u0441\u0435\u043a\u0443\u043d\u0434\u0430\u0445.", None))
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(accessibility)
+        self.combat_pause_label.setAccessibleName(QCoreApplication.translate("MainWindow", u"\u041f\u0430\u0443\u0437\u0430 \u043c\u0435\u0436\u0434\u0443 \u0431\u043e\u044f\u043c\u0438", None))
+#endif // QT_CONFIG(accessibility)
+#if QT_CONFIG(accessibility)
+        self.sb_combat_pause.setAccessibleName(QCoreApplication.translate("MainWindow", u"\u041f\u0430\u0443\u0437\u0430 \u043c\u0435\u0436\u0434\u0443 \u0431\u043e\u044f\u043c\u0438 \u0432 \u0441\u0435\u043a\u0443\u043d\u0434\u0430\u0445", None))
+#endif // QT_CONFIG(accessibility)
+#if QT_CONFIG(tooltip)
+        self.sb_combat_pause.setToolTip(QCoreApplication.translate("MainWindow", u"\u041d\u043e\u0432\u044b\u0439 \u0431\u043e\u0439 \u043d\u0430\u0447\u0438\u043d\u0430\u0435\u0442\u0441\u044f, \u0435\u0441\u043b\u0438 \u043f\u0430\u0443\u0437\u0430 \u043c\u0435\u0436\u0434\u0443 \u0443\u0434\u0430\u0440\u0430\u043c\u0438 \u0431\u043e\u043b\u044c\u0448\u0435 \u0443\u043a\u0430\u0437\u0430\u043d\u043d\u043e\u0433\u043e \u0437\u043d\u0430\u0447\u0435\u043d\u0438\u044f. \u0428\u043a\u0430\u043b\u0430 \u043e\u0431\u043d\u043e\u0432\u043b\u044f\u0435\u0442\u0441\u044f \u0441\u0440\u0430\u0437\u0443; \u0432\u044b\u0431\u043e\u0440 \u043e\u0442\u0440\u0435\u0437\u043a\u043e\u0432 \u0441\u0431\u0440\u0430\u0441\u044b\u0432\u0430\u0435\u0442\u0441\u044f.", None))
+#endif // QT_CONFIG(tooltip)
+        self.sb_combat_pause.setSuffix(QCoreApplication.translate("MainWindow", u" \u0441", None))
         self.toolbar.setWindowTitle(QCoreApplication.translate("MainWindow", u"\u041f\u0430\u043d\u0435\u043b\u044c \u0438\u043d\u0441\u0442\u0440\u0443\u043c\u0435\u043d\u0442\u043e\u0432", None))
         self.menu_file.setTitle(QCoreApplication.translate("MainWindow", u"&\u0424\u0430\u0439\u043b", None))
         self.menu_view.setTitle(QCoreApplication.translate("MainWindow", u"&\u0412\u0438\u0434", None))

@@ -71,12 +71,10 @@ class MainWindow(QMainWindow):
         self.ui.btn_reset_damage_range.setIcon(
             self.style().standardIcon(QStyle.StandardPixmap.SP_DialogCancelButton)
         )
-        self.ui.btn_reset_time_range.setIcon(
-            self.style().standardIcon(QStyle.StandardPixmap.SP_DialogCancelButton)
-        )
         self.ui.action_clear_timeline_selection.setIcon(
             self.ui.btn_reset_damage_range.icon()
         )
+        self.ui.btn_reset_time_range.setDefaultAction(self.ui.action_clear_timeline_selection)
         self.ui.action_load_log_file.setIcon(self._create_open_log_icon())
         add_log_icon = QIcon.fromTheme("list-add")
         if add_log_icon.isNull():
@@ -164,29 +162,9 @@ class MainWindow(QMainWindow):
         self.combat_timeline_scroll_area.setFixedHeight(102)
         self.combat_timeline_scroll_area.setWidget(self.combat_timeline)
 
-        self.timeline_reset_button = QToolButton(self.combat_timeline_container)
-        self.timeline_reset_button.setObjectName("btn_clear_timeline_selection")
-        self.timeline_reset_button.setDefaultAction(
-            self.ui.action_clear_timeline_selection
-        )
-        self.timeline_reset_button.setAutoRaise(True)
-        self.timeline_reset_button.setToolButtonStyle(
-            Qt.ToolButtonStyle.ToolButtonIconOnly
-        )
-
         self.ui.combat_pause_label.setPixmap(self._create_combat_pause_icon().pixmap(20, 20))
         timeline_layout.addWidget(self.combat_timeline_scroll_area, 1)
-        timeline_layout.addWidget(
-            self.timeline_reset_button,
-            0,
-            Qt.AlignmentFlag.AlignVCenter,
-        )
-        timeline_layout.addWidget(
-            self.ui.combat_settings_widget,
-            0,
-            Qt.AlignmentFlag.AlignVCenter,
-        )
-        self.ui.central_layout.insertWidget(0, self.combat_timeline_container)
+        self.ui.verticalLayout_2.insertWidget(0, self.combat_timeline_container)
 
     def _create_combat_pause_icon(self):
         pixmap = QPixmap(24, 24)
@@ -233,9 +211,9 @@ class MainWindow(QMainWindow):
             "Статистика рассчитывается по отображаемым атакам; "
             "если выделены строки — только по ним.\n\n"
             "3. Нажимайте на бои и паузы на временной шкале, чтобы выбрать отрезки. "
-            "Повторное нажатие снимает выбор. Кнопка сброса рядом со шкалой "
+            "Повторное нажатие снимает выбор. Кнопка сброса под шкалой "
             "очищает выбор отрезков и временной фильтр.\n\n"
-            "4. Порог паузы между боями можно изменить рядом со шкалой "
+            "4. Порог паузы между боями можно изменить под шкалой "
             "или в меню «Настройки». Значение сохраняется автоматически.",
         )
 
@@ -637,7 +615,6 @@ class MainWindow(QMainWindow):
         scroll_area.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Expanding)
         scroll_area.setWidget(container)
 
-        self.ui.time_range_group.setMinimumHeight(self.ui.time_range_group.sizeHint().height())
         self.ui.damage_range_group.setMinimumHeight(self.ui.damage_range_group.sizeHint().height())
         filter_layout.addWidget(scroll_area, 8, 0, 1, 2)
         filter_layout.setRowStretch(8, 1)
