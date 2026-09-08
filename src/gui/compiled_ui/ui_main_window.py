@@ -19,8 +19,8 @@ from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
 from PySide6.QtWidgets import (QApplication, QCheckBox, QFrame, QGridLayout,
     QGroupBox, QHBoxLayout, QHeaderView, QLabel,
     QLineEdit, QMainWindow, QMenuBar, QSizePolicy,
-    QSpacerItem, QStatusBar, QTableView, QToolBar,
-    QToolButton, QVBoxLayout, QWidget)
+    QSpacerItem, QSpinBox, QStatusBar, QTableView,
+    QToolBar, QToolButton, QVBoxLayout, QWidget)
 
 from gui.widgets.nullable_time_edit import NullableTimeEdit
 
@@ -70,6 +70,28 @@ class Ui_MainWindow(object):
         self.central_layout = QVBoxLayout(self.central_widget)
         self.central_layout.setObjectName(u"central_layout")
         self.central_layout.setContentsMargins(10, 10, 10, 10)
+        self.combat_settings_widget = QWidget(self.central_widget)
+        self.combat_settings_widget.setObjectName(u"combat_settings_widget")
+        self.combat_settings_layout = QHBoxLayout(self.combat_settings_widget)
+        self.combat_settings_layout.setObjectName(u"combat_settings_layout")
+        self.combat_settings_layout.setContentsMargins(0, 0, 0, 0)
+        self.combat_pause_label = QLabel(self.combat_settings_widget)
+        self.combat_pause_label.setObjectName(u"combat_pause_label")
+
+        self.combat_settings_layout.addWidget(self.combat_pause_label)
+
+        self.sb_combat_pause = QSpinBox(self.combat_settings_widget)
+        self.sb_combat_pause.setObjectName(u"sb_combat_pause")
+        self.sb_combat_pause.setMinimum(1)
+        self.sb_combat_pause.setMaximum(3600)
+        self.sb_combat_pause.setValue(30)
+        self.sb_combat_pause.setKeyboardTracking(False)
+
+        self.combat_settings_layout.addWidget(self.sb_combat_pause)
+
+
+        self.central_layout.addWidget(self.combat_settings_widget)
+
         self.horizontalLayout_4 = QHBoxLayout()
         self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
         self.verticalWidget = QWidget(self.central_widget)
@@ -482,6 +504,9 @@ class Ui_MainWindow(object):
         self.menubar.setObjectName(u"menubar")
         self.menubar.setGeometry(QRect(0, 0, 1200, 33))
         MainWindow.setMenuBar(self.menubar)
+#if QT_CONFIG(shortcut)
+        self.combat_pause_label.setBuddy(self.sb_combat_pause)
+#endif // QT_CONFIG(shortcut)
 
         self.toolbar.addAction(self.action_load_last_log)
         self.toolbar.addAction(self.action_append_last_log)
@@ -532,6 +557,20 @@ class Ui_MainWindow(object):
 #if QT_CONFIG(tooltip)
         self.action_clear_timeline_selection.setToolTip(QCoreApplication.translate("MainWindow", u"\u0421\u043d\u044f\u0442\u044c \u0432\u044b\u0434\u0435\u043b\u0435\u043d\u0438\u0435 \u0441\u043e \u0432\u0441\u0435\u0445 \u043e\u0442\u0440\u0435\u0437\u043a\u043e\u0432 \u0438 \u0441\u0431\u0440\u043e\u0441\u0438\u0442\u044c \u0432\u0440\u0435\u043c\u0435\u043d\u043d\u043e\u0439 \u0444\u0438\u043b\u044c\u0442\u0440", None))
 #endif // QT_CONFIG(tooltip)
+        self.combat_pause_label.setText("")
+#if QT_CONFIG(tooltip)
+        self.combat_pause_label.setToolTip(QCoreApplication.translate("MainWindow", u"\u041f\u0430\u0443\u0437\u0430 \u043c\u0435\u0436\u0434\u0443 \u0431\u043e\u044f\u043c\u0438. \u041d\u043e\u0432\u044b\u0439 \u0431\u043e\u0439 \u043d\u0430\u0447\u0438\u043d\u0430\u0435\u0442\u0441\u044f, \u0435\u0441\u043b\u0438 \u043f\u0430\u0443\u0437\u0430 \u043c\u0435\u0436\u0434\u0443 \u0443\u0434\u0430\u0440\u0430\u043c\u0438 \u0431\u043e\u043b\u044c\u0448\u0435 \u0443\u043a\u0430\u0437\u0430\u043d\u043d\u043e\u0433\u043e \u0437\u043d\u0430\u0447\u0435\u043d\u0438\u044f \u0432 \u0441\u0435\u043a\u0443\u043d\u0434\u0430\u0445.", None))
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(accessibility)
+        self.combat_pause_label.setAccessibleName(QCoreApplication.translate("MainWindow", u"\u041f\u0430\u0443\u0437\u0430 \u043c\u0435\u0436\u0434\u0443 \u0431\u043e\u044f\u043c\u0438", None))
+#endif // QT_CONFIG(accessibility)
+#if QT_CONFIG(accessibility)
+        self.sb_combat_pause.setAccessibleName(QCoreApplication.translate("MainWindow", u"\u041f\u0430\u0443\u0437\u0430 \u043c\u0435\u0436\u0434\u0443 \u0431\u043e\u044f\u043c\u0438 \u0432 \u0441\u0435\u043a\u0443\u043d\u0434\u0430\u0445", None))
+#endif // QT_CONFIG(accessibility)
+#if QT_CONFIG(tooltip)
+        self.sb_combat_pause.setToolTip(QCoreApplication.translate("MainWindow", u"\u041d\u043e\u0432\u044b\u0439 \u0431\u043e\u0439 \u043d\u0430\u0447\u0438\u043d\u0430\u0435\u0442\u0441\u044f, \u0435\u0441\u043b\u0438 \u043f\u0430\u0443\u0437\u0430 \u043c\u0435\u0436\u0434\u0443 \u0443\u0434\u0430\u0440\u0430\u043c\u0438 \u0431\u043e\u043b\u044c\u0448\u0435 \u0443\u043a\u0430\u0437\u0430\u043d\u043d\u043e\u0433\u043e \u0437\u043d\u0430\u0447\u0435\u043d\u0438\u044f. \u0428\u043a\u0430\u043b\u0430 \u043e\u0431\u043d\u043e\u0432\u043b\u044f\u0435\u0442\u0441\u044f \u0441\u0440\u0430\u0437\u0443; \u0432\u044b\u0431\u043e\u0440 \u043e\u0442\u0440\u0435\u0437\u043a\u043e\u0432 \u0441\u0431\u0440\u0430\u0441\u044b\u0432\u0430\u0435\u0442\u0441\u044f.", None))
+#endif // QT_CONFIG(tooltip)
+        self.sb_combat_pause.setSuffix(QCoreApplication.translate("MainWindow", u" \u0441", None))
         self.groupBox.setTitle(QCoreApplication.translate("MainWindow", u"\u0424\u0438\u043b\u044c\u0442\u0440\u044b", None))
         self.cb_your_effects.setText(QCoreApplication.translate("MainWindow", u"\u042d\u0444\u0444\u0435\u043a\u0442\u044b \u043d\u0430 \u0432\u0430\u0441", None))
         self.cb_attack_m.setText(QCoreApplication.translate("MainWindow", u"\u0421\u0438\u043b\u0430 \u0437\u0430\u043a\u043b\u0438\u043d\u0430\u043d\u0438\u0439", None))
@@ -609,7 +648,7 @@ class Ui_MainWindow(object):
         self.label_9.setText(QCoreApplication.translate("MainWindow", u"\u0410\u0442\u0430\u043a \u0432\u0441\u0435\u0433\u043e", None))
         self.label_13.setText(QCoreApplication.translate("MainWindow", u"n/a", None))
         self.label_16.setText(QCoreApplication.translate("MainWindow", u"\u041c\u0430\u0433\u0438\u0447\u0435\u0441\u043a\u0438\u0439", None))
-        self.label_23.setText(QCoreApplication.translate("MainWindow", u"\u041a\u0440\u0438\u0442\u043e\u0432", None))
+        self.label_23.setText(QCoreApplication.translate("MainWindow", u"\u041a\u0440\u0438\u0442\u044b", None))
         self.label_24.setText(QCoreApplication.translate("MainWindow", u"n/a", None))
         self.toolbar.setWindowTitle(QCoreApplication.translate("MainWindow", u"toolBar", None))
     # retranslateUi

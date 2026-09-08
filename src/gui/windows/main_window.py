@@ -1,3 +1,4 @@
+from datetime import timedelta
 from pathlib import Path
 from statistics import median
 
@@ -103,6 +104,15 @@ class MainWindow(QMainWindow):
         self._setup_filter_panel(app.filter_definitions)
         self._setup_debug_actions()
 
+        default_pause = int(EventLog.DEFAULT_INTERRUPTION_THRESHOLD.total_seconds())
+        try:
+            combat_pause = int(self.settings.value("combat_pause_seconds", default_pause))
+        except (TypeError, ValueError, OverflowError):
+            combat_pause = default_pause
+        if not self.ui.sb_combat_pause.minimum() <= combat_pause <= self.ui.sb_combat_pause.maximum():
+            combat_pause = default_pause
+        self.ui.sb_combat_pause.setValue(combat_pause)
+
         player_name = self.settings.value("player_name", "")
         self.ui.le_your_nickname.setText(player_name)
         damage_model.player_name = player_name
@@ -159,13 +169,38 @@ class MainWindow(QMainWindow):
             Qt.ToolButtonStyle.ToolButtonIconOnly
         )
 
-        timeline_layout.addWidget(self.combat_timeline_scroll_area)
+        self.ui.combat_pause_label.setPixmap(self._create_combat_pause_icon().pixmap(20, 20))
+        timeline_layout.addWidget(self.combat_timeline_scroll_area, 1)
         timeline_layout.addWidget(
             self.timeline_reset_button,
             0,
             Qt.AlignmentFlag.AlignVCenter,
         )
+        timeline_layout.addWidget(
+            self.ui.combat_settings_widget,
+            0,
+            Qt.AlignmentFlag.AlignVCenter,
+        )
         self.ui.central_layout.insertWidget(0, self.combat_timeline_container)
+
+    def _create_combat_pause_icon(self):
+        pixmap = QPixmap(24, 24)
+        pixmap.fill(Qt.GlobalColor.transparent)
+        painter = QPainter(pixmap)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+        pen = QPen(self.palette().color(QPalette.ColorRole.WindowText))
+        pen.setWidthF(1.7)
+        pen.setCapStyle(Qt.PenCapStyle.RoundCap)
+        painter.setPen(pen)
+        painter.setBrush(Qt.BrushStyle.NoBrush)
+        painter.drawEllipse(4, 6, 16, 16)
+        painter.drawLine(9, 2, 15, 2)
+        painter.drawLine(12, 2, 12, 6)
+        painter.drawLine(19, 5, 21, 7)
+        painter.drawLine(12, 10, 12, 14)
+        painter.drawLine(12, 14, 15, 16)
+        painter.end()
+        return QIcon(pixmap)
 
     def action_set_game_folder(self):
         start_dir = self.settings.value("game_folder", "")
@@ -316,7 +351,7 @@ class MainWindow(QMainWindow):
         self._clear_time_range(apply_filters=False)
         table.model().set_records(combat_log)
         table.verticalHeader().setVisible(False)
-        self.combat_timeline.set_segments(combat_log.combat_segments())
+        self._refresh_combat_segments()
         self.refresh_table()
         if append:
             added_count = max(0, len(combat_log) - previous_count)
@@ -331,6 +366,16 @@ class MainWindow(QMainWindow):
         if self.debug_mode:
             status_message += f"; не распарсено: {len(self.last_unparsed_records)}"
         self.ui.statusbar.showMessage(status_message, 5000)
+
+    def _refresh_combat_segments(self):
+        threshold = timedelta(seconds=self.ui.sb_combat_pause.value())
+        self.combat_timeline.set_segments(self.combat_log.combat_segments(threshold))
+
+    def on_combat_pause_changed(self, seconds: int):
+        self.settings.setValue("combat_pause_seconds", seconds)
+        if self.combat_timeline.selected_sections():
+            self._clear_time_range()
+        self._refresh_combat_segments()
 
     def on_player_name_changed(self, new_player_name):
         self.ui.damage_table_view.model().player_name = new_player_name
