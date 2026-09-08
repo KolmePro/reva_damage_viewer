@@ -36,9 +36,12 @@ class Application(QApplication):
         self.filter_definitions = load_filter_definitions(FILTER_PLUGIN_PATH, self.logger)
 
         self.logger.info("Инициализация перевода.")
-        translator = QTranslator()
-        translator.load(str(RESOURCE_PATH / "qtbase_ru.qm"))
-        self.installTranslator(translator)
+        self.translator = QTranslator(self)
+        translation_path = RESOURCE_PATH / "qtbase_ru.qm"
+        if self.translator.load(str(translation_path)):
+            self.installTranslator(self.translator)
+        else:
+            self.logger.warning("Не удалось загрузить перевод Qt: %s", translation_path)
 
         self.logger.info("Загрузка интерфейса.")
         self.window = MainWindow(self)
