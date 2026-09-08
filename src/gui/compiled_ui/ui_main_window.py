@@ -97,7 +97,11 @@ class Ui_MainWindow(object):
         self.verticalWidget = QWidget(self.central_widget)
         self.verticalWidget.setObjectName(u"verticalWidget")
         self.verticalWidget.setMinimumSize(QSize(400, 0))
-        self.verticalWidget.setMaximumSize(QSize(400, 16777215))
+        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Preferred)
+        sizePolicy1.setHorizontalStretch(0)
+        sizePolicy1.setVerticalStretch(0)
+        sizePolicy1.setHeightForWidth(self.verticalWidget.sizePolicy().hasHeightForWidth())
+        self.verticalWidget.setSizePolicy(sizePolicy1)
         self.verticalLayout = QVBoxLayout(self.verticalWidget)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.groupBox = QGroupBox(self.verticalWidget)
@@ -149,11 +153,11 @@ class Ui_MainWindow(object):
 
         self.le_your_nickname = QLineEdit(self.groupBox)
         self.le_your_nickname.setObjectName(u"le_your_nickname")
-        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
-        sizePolicy1.setHorizontalStretch(0)
-        sizePolicy1.setVerticalStretch(0)
-        sizePolicy1.setHeightForWidth(self.le_your_nickname.sizePolicy().hasHeightForWidth())
-        self.le_your_nickname.setSizePolicy(sizePolicy1)
+        sizePolicy2 = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
+        sizePolicy2.setHorizontalStretch(0)
+        sizePolicy2.setVerticalStretch(0)
+        sizePolicy2.setHeightForWidth(self.le_your_nickname.sizePolicy().hasHeightForWidth())
+        self.le_your_nickname.setSizePolicy(sizePolicy2)
 
         self.gridLayout.addWidget(self.le_your_nickname, 0, 1, 1, 1)
 
@@ -177,8 +181,8 @@ class Ui_MainWindow(object):
 
         self.le_attacker_name = QLineEdit(self.groupBox)
         self.le_attacker_name.setObjectName(u"le_attacker_name")
-        sizePolicy1.setHeightForWidth(self.le_attacker_name.sizePolicy().hasHeightForWidth())
-        self.le_attacker_name.setSizePolicy(sizePolicy1)
+        sizePolicy2.setHeightForWidth(self.le_attacker_name.sizePolicy().hasHeightForWidth())
+        self.le_attacker_name.setSizePolicy(sizePolicy2)
 
         self.gridLayout.addWidget(self.le_attacker_name, 2, 1, 1, 1)
 
@@ -306,8 +310,8 @@ class Ui_MainWindow(object):
 
         self.le_target_name = QLineEdit(self.groupBox)
         self.le_target_name.setObjectName(u"le_target_name")
-        sizePolicy1.setHeightForWidth(self.le_target_name.sizePolicy().hasHeightForWidth())
-        self.le_target_name.setSizePolicy(sizePolicy1)
+        sizePolicy2.setHeightForWidth(self.le_target_name.sizePolicy().hasHeightForWidth())
+        self.le_target_name.setSizePolicy(sizePolicy2)
 
         self.gridLayout.addWidget(self.le_target_name, 3, 1, 1, 1)
 
@@ -335,8 +339,8 @@ class Ui_MainWindow(object):
 
         self.le_skill_name = QLineEdit(self.groupBox)
         self.le_skill_name.setObjectName(u"le_skill_name")
-        sizePolicy1.setHeightForWidth(self.le_skill_name.sizePolicy().hasHeightForWidth())
-        self.le_skill_name.setSizePolicy(sizePolicy1)
+        sizePolicy2.setHeightForWidth(self.le_skill_name.sizePolicy().hasHeightForWidth())
+        self.le_skill_name.setSizePolicy(sizePolicy2)
 
         self.gridLayout.addWidget(self.le_skill_name, 4, 1, 1, 1)
 
@@ -354,34 +358,34 @@ class Ui_MainWindow(object):
         self.label_14 = QLabel(self.groupBox_2)
         self.label_14.setObjectName(u"label_14")
 
-        self.gridLayout_2.addWidget(self.label_14, 5, 1, 1, 1)
+        self.gridLayout_2.addWidget(self.label_14, 4, 1, 1, 1)
 
         self.label = QLabel(self.groupBox_2)
         self.label.setObjectName(u"label")
 
-        self.gridLayout_2.addWidget(self.label, 8, 1, 1, 1)
+        self.gridLayout_2.addWidget(self.label, 7, 1, 1, 1)
 
         self.line_6 = QFrame(self.groupBox_2)
         self.line_6.setObjectName(u"line_6")
         self.line_6.setFrameShape(QFrame.Shape.HLine)
         self.line_6.setFrameShadow(QFrame.Shadow.Sunken)
 
-        self.gridLayout_2.addWidget(self.line_6, 7, 1, 1, 4)
+        self.gridLayout_2.addWidget(self.line_6, 6, 1, 1, 4)
 
         self.label_6 = QLabel(self.groupBox_2)
         self.label_6.setObjectName(u"label_6")
 
-        self.gridLayout_2.addWidget(self.label_6, 9, 2, 1, 1)
+        self.gridLayout_2.addWidget(self.label_6, 8, 2, 1, 1)
 
         self.label_4 = QLabel(self.groupBox_2)
         self.label_4.setObjectName(u"label_4")
 
-        self.gridLayout_2.addWidget(self.label_4, 8, 2, 1, 1)
+        self.gridLayout_2.addWidget(self.label_4, 7, 2, 1, 1)
 
         self.label_2 = QLabel(self.groupBox_2)
         self.label_2.setObjectName(u"label_2")
 
-        self.gridLayout_2.addWidget(self.label_2, 8, 4, 1, 1)
+        self.gridLayout_2.addWidget(self.label_2, 7, 4, 1, 1)
 
         self.label_10 = QLabel(self.groupBox_2)
         self.label_10.setObjectName(u"label_10")
@@ -391,49 +395,49 @@ class Ui_MainWindow(object):
         self.label_7 = QLabel(self.groupBox_2)
         self.label_7.setObjectName(u"label_7")
 
-        self.gridLayout_2.addWidget(self.label_7, 9, 3, 1, 1)
+        self.gridLayout_2.addWidget(self.label_7, 8, 3, 1, 1)
 
         self.label_15 = QLabel(self.groupBox_2)
         self.label_15.setObjectName(u"label_15")
 
-        self.gridLayout_2.addWidget(self.label_15, 5, 2, 1, 1)
+        self.gridLayout_2.addWidget(self.label_15, 4, 2, 1, 1)
 
         self.line_5 = QFrame(self.groupBox_2)
         self.line_5.setObjectName(u"line_5")
         self.line_5.setFrameShape(QFrame.Shape.HLine)
         self.line_5.setFrameShadow(QFrame.Shadow.Sunken)
 
-        self.gridLayout_2.addWidget(self.line_5, 4, 1, 1, 4)
+        self.gridLayout_2.addWidget(self.line_5, 3, 1, 1, 4)
 
         self.label_17 = QLabel(self.groupBox_2)
         self.label_17.setObjectName(u"label_17")
 
-        self.gridLayout_2.addWidget(self.label_17, 6, 1, 1, 1)
+        self.gridLayout_2.addWidget(self.label_17, 5, 1, 1, 1)
 
         self.label_19 = QLabel(self.groupBox_2)
         self.label_19.setObjectName(u"label_19")
 
-        self.gridLayout_2.addWidget(self.label_19, 6, 2, 1, 1)
+        self.gridLayout_2.addWidget(self.label_19, 5, 2, 1, 1)
 
         self.label_3 = QLabel(self.groupBox_2)
         self.label_3.setObjectName(u"label_3")
 
-        self.gridLayout_2.addWidget(self.label_3, 8, 3, 1, 1)
+        self.gridLayout_2.addWidget(self.label_3, 7, 3, 1, 1)
 
         self.label_5 = QLabel(self.groupBox_2)
         self.label_5.setObjectName(u"label_5")
 
-        self.gridLayout_2.addWidget(self.label_5, 9, 1, 1, 1)
+        self.gridLayout_2.addWidget(self.label_5, 8, 1, 1, 1)
 
         self.label_8 = QLabel(self.groupBox_2)
         self.label_8.setObjectName(u"label_8")
 
-        self.gridLayout_2.addWidget(self.label_8, 9, 4, 1, 1)
+        self.gridLayout_2.addWidget(self.label_8, 8, 4, 1, 1)
 
         self.label_18 = QLabel(self.groupBox_2)
         self.label_18.setObjectName(u"label_18")
 
-        self.gridLayout_2.addWidget(self.label_18, 5, 4, 1, 1)
+        self.gridLayout_2.addWidget(self.label_18, 4, 4, 1, 1)
 
         self.label_12 = QLabel(self.groupBox_2)
         self.label_12.setObjectName(u"label_12")
@@ -453,7 +457,7 @@ class Ui_MainWindow(object):
         self.label_16 = QLabel(self.groupBox_2)
         self.label_16.setObjectName(u"label_16")
 
-        self.gridLayout_2.addWidget(self.label_16, 5, 3, 1, 1)
+        self.gridLayout_2.addWidget(self.label_16, 4, 3, 1, 1)
 
         self.label_23 = QLabel(self.groupBox_2)
         self.label_23.setObjectName(u"label_23")
@@ -463,27 +467,27 @@ class Ui_MainWindow(object):
         self.label_24 = QLabel(self.groupBox_2)
         self.label_24.setObjectName(u"label_24")
 
-        self.gridLayout_2.addWidget(self.label_24, 1, 2, 1, 3)
+        self.gridLayout_2.addWidget(self.label_24, 1, 2, 1, 1)
 
         self.block_hits_label = QLabel(self.groupBox_2)
         self.block_hits_label.setObjectName(u"block_hits_label")
 
-        self.gridLayout_2.addWidget(self.block_hits_label, 2, 1, 1, 1)
+        self.gridLayout_2.addWidget(self.block_hits_label, 1, 3, 1, 1)
 
         self.block_hits_value = QLabel(self.groupBox_2)
         self.block_hits_value.setObjectName(u"block_hits_value")
 
-        self.gridLayout_2.addWidget(self.block_hits_value, 2, 2, 1, 3)
+        self.gridLayout_2.addWidget(self.block_hits_value, 1, 4, 1, 1)
 
         self.dodge_hits_label = QLabel(self.groupBox_2)
         self.dodge_hits_label.setObjectName(u"dodge_hits_label")
 
-        self.gridLayout_2.addWidget(self.dodge_hits_label, 3, 1, 1, 1)
+        self.gridLayout_2.addWidget(self.dodge_hits_label, 2, 1, 1, 1)
 
         self.dodge_hits_value = QLabel(self.groupBox_2)
         self.dodge_hits_value.setObjectName(u"dodge_hits_value")
 
-        self.gridLayout_2.addWidget(self.dodge_hits_value, 3, 2, 1, 3)
+        self.gridLayout_2.addWidget(self.dodge_hits_value, 2, 2, 1, 3)
 
 
         self.verticalLayout.addWidget(self.groupBox_2)
@@ -670,7 +674,7 @@ class Ui_MainWindow(object):
         self.label_16.setText(QCoreApplication.translate("MainWindow", u"\u041c\u0430\u0433\u0438\u0447\u0435\u0441\u043a\u0438\u0439", None))
         self.label_23.setText(QCoreApplication.translate("MainWindow", u"\u041a\u0440\u0438\u0442\u044b", None))
         self.label_24.setText(QCoreApplication.translate("MainWindow", u"n/a", None))
-        self.block_hits_label.setText(QCoreApplication.translate("MainWindow", u"\u0411\u043b\u043e\u043a\u0438", None))
+        self.block_hits_label.setText(QCoreApplication.translate("MainWindow", u"\u0411\u043b\u043e\u043a\u0438\u0440\u043e\u0432\u0430\u043d\u0438\u0435", None))
 #if QT_CONFIG(tooltip)
         self.block_hits_label.setToolTip(QCoreApplication.translate("MainWindow", u"\u041a\u043e\u043b\u0438\u0447\u0435\u0441\u0442\u0432\u043e \u0431\u043b\u043e\u043a\u0438\u0440\u043e\u0432\u0430\u043d\u0438\u0439 \u0438 \u043f\u0440\u043e\u0446\u0435\u043d\u0442 \u043e\u0442 \u043e\u0431\u0449\u0435\u0433\u043e \u0447\u0438\u0441\u043b\u0430 \u0430\u0442\u0430\u043a \u0432 \u0442\u0435\u043a\u0443\u0449\u0435\u0439 \u0432\u044b\u0431\u043e\u0440\u043a\u0435.", None))
 #endif // QT_CONFIG(tooltip)
