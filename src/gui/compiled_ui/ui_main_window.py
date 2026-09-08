@@ -563,10 +563,10 @@ class Ui_MainWindow(object):
         self.combat_pause_label.setBuddy(self.sb_combat_pause)
 #endif // QT_CONFIG(shortcut)
 
+        MainWindow.addAction(self.action_clear_selection)
         self.toolbar.addAction(self.action_load_last_log)
         self.toolbar.addAction(self.action_append_last_log)
         self.toolbar.addAction(self.action_load_log_file)
-        self.toolbar.addAction(self.action_clear_selection)
         self.menubar.addAction(self.menu_file.menuAction())
         self.menubar.addAction(self.menu_view.menuAction())
         self.menubar.addAction(self.menu_filters.menuAction())

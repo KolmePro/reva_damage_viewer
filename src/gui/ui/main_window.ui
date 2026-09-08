@@ -736,7 +736,6 @@
    <addaction name="action_load_last_log"/>
    <addaction name="action_append_last_log"/>
    <addaction name="action_load_log_file"/>
-   <addaction name="action_clear_selection"/>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -786,6 +785,7 @@
    <addaction name="menu_settings"/>
    <addaction name="menu_help"/>
   </widget>
+  <addaction name="action_clear_selection"/>
   <action name="action_exit">
    <property name="text"><string>В&amp;ыход</string></property>
    <property name="shortcut"><string>Alt+F4</string></property>

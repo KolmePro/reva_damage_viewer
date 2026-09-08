@@ -745,7 +745,8 @@ class MainWindow(QMainWindow):
                 table.setSpan(row, 0, 1, model.columnCount())
 
     def action_clear_selection(self):
-        self.ui.damage_table_view.clearSelection()
+        # Clear both selected rows and the current cell's focus indicator.
+        self.ui.damage_table_view.selectionModel().clear()
 
     def filter_timeline_sections(self, sections: list[TimelineSection]):
         model = self.ui.damage_table_view.model()
@@ -756,7 +757,7 @@ class MainWindow(QMainWindow):
                 self.ui.te_end_time.clear()
             self.ui.time_range_group.setTitle(self.TIME_RANGE_GROUP_TITLE)
             model.clear_time_range()
-            self.ui.damage_table_view.clearSelection()
+            self.action_clear_selection()
             self.ui.damage_table_view.scrollToTop()
             self.ui.statusbar.showMessage("Выбор отрезков сброшен", 5000)
             return
@@ -788,7 +789,7 @@ class MainWindow(QMainWindow):
             self.ui.time_range_group.setTitle(f"Временные отрезки: {len(sections)}")
 
         model.set_timestamp_ranges(ranges)
-        self.ui.damage_table_view.clearSelection()
+        self.action_clear_selection()
         self.ui.damage_table_view.scrollToTop()
 
         self.ui.statusbar.showMessage(
