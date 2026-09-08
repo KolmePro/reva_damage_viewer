@@ -10,7 +10,6 @@ def connect_actions(app):
     ui.action_clear_selection.triggered.connect(window.action_clear_selection)
     ui.action_clear_timeline_selection.triggered.connect(window.reset_time_range)
     ui.action_exit.triggered.connect(window.close)
-    ui.action_select_all_rows.triggered.connect(table.selectAll)
     ui.action_show_statusbar.toggled.connect(ui.statusbar.setVisible)
     ui.action_resize_columns.triggered.connect(window.auto_resize_columns)
     ui.action_enable_filters.triggered.connect(lambda: window.set_all_filters(True))

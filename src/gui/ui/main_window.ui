@@ -736,7 +736,6 @@
    <addaction name="action_load_last_log"/>
    <addaction name="action_append_last_log"/>
    <addaction name="action_load_log_file"/>
-   <addaction name="action_set_game_folder"/>
    <addaction name="action_clear_selection"/>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -755,12 +754,6 @@
     <addaction name="action_append_last_log"/>
     <addaction name="separator"/>
     <addaction name="action_exit"/>
-   </widget>
-   <widget class="QMenu" name="menu_edit">
-    <property name="title"><string>&amp;Правка</string></property>
-    <addaction name="action_select_all_rows"/>
-    <addaction name="action_clear_selection"/>
-    <addaction name="action_clear_timeline_selection"/>
    </widget>
    <widget class="QMenu" name="menu_view">
     <property name="title"><string>&amp;Вид</string></property>
@@ -788,7 +781,6 @@
     <addaction name="action_about"/>
    </widget>
    <addaction name="menu_file"/>
-   <addaction name="menu_edit"/>
    <addaction name="menu_view"/>
    <addaction name="menu_filters"/>
    <addaction name="menu_settings"/>
@@ -797,10 +789,6 @@
   <action name="action_exit">
    <property name="text"><string>В&amp;ыход</string></property>
    <property name="shortcut"><string>Alt+F4</string></property>
-  </action>
-  <action name="action_select_all_rows">
-   <property name="text"><string>Выделить все строки</string></property>
-   <property name="shortcut"><string>Ctrl+Shift+A</string></property>
   </action>
   <action name="action_show_statusbar">
    <property name="checkable"><bool>true</bool></property>
