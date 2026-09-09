@@ -162,6 +162,18 @@ class EventLog(UserList):
             forced_segment_start_record_ids,
         )
 
+    def damage_per_second(self) -> float | None:
+        """DPS по атакам лога; None, если длительность равна нулю."""
+        damage_records = [record for record in self.data if record.type in self.DAMAGE_RECORD_TYPES]
+        if not damage_records:
+            return 0.0
+
+        timestamps = EventLog(damage_records)._resolved_timestamps()
+        duration = (max(timestamps) - min(timestamps)).total_seconds()
+        if duration <= 0:
+            return None
+        return sum(record.damage for record in damage_records) / duration
+
     def combat_segments(
         self,
         interruption_threshold: timedelta | None = None,

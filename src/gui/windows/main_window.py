@@ -68,6 +68,7 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+        self.ui.dps_value.setToolTip(self.ui.dps_label.toolTip())
         self.ui.btn_reset_damage_range.setIcon(
             self.style().standardIcon(QStyle.StandardPixmap.SP_DialogCancelButton)
         )
@@ -794,6 +795,11 @@ class MainWindow(QMainWindow):
         if not indexes:
             indexes = [model.index(row, 0) for row in range(model.rowCount())]
 
+        selected_records = [
+            model._filtered_records[index.row()]
+            for index in sorted(indexes, key=lambda index: index.row())
+        ]
+        dps = EventLog(selected_records).damage_per_second()
         damages = []
         p_damages = []
         m_damages = []
@@ -836,6 +842,7 @@ class MainWindow(QMainWindow):
         median_damage = round(median(damages)) if damages else 0
 
         self.ui.label_10.setText(f"{total_attacks:,}".replace(",", " "))
+        self.ui.dps_value.setText("—" if dps is None else f"{dps:,.1f}".replace(",", " "))
         self.ui.label_24.setText(f"{critical_hits} ({crit_chance:.1f}%)".replace(",", " "))
         self.ui.block_hits_value.setText(f"{blocked_hits} ({block_chance:.1f}%)")
         self.ui.dodge_hits_value.setText(f"{dodged_hits} ({dodge_chance:.1f}%)")
