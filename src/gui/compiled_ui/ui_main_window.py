@@ -432,12 +432,12 @@ class Ui_MainWindow(object):
         self.label_23 = QLabel(self.groupBox_2)
         self.label_23.setObjectName(u"label_23")
 
-        self.gridLayout_2.addWidget(self.label_23, 2, 1, 1, 1)
+        self.gridLayout_2.addWidget(self.label_23, 1, 3, 1, 1)
 
         self.label_24 = QLabel(self.groupBox_2)
         self.label_24.setObjectName(u"label_24")
 
-        self.gridLayout_2.addWidget(self.label_24, 2, 2, 1, 1)
+        self.gridLayout_2.addWidget(self.label_24, 1, 4, 1, 1)
 
         self.block_hits_label = QLabel(self.groupBox_2)
         self.block_hits_label.setObjectName(u"block_hits_label")
