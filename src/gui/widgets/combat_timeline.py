@@ -33,12 +33,14 @@ class CombatTimeline(QWidget):
         self._hit_areas: list[tuple[QRect, int]] = []
         self._selected_section_indexes: set[int] = set()
         self._drag_section_index: int | None = None
+        self._tooltip_section_index: int | None = None
         self.setMouseTracking(True)
         self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         self.setMinimumHeight(82)
         self.setAccessibleName("Временная шкала боя")
 
     def set_segments(self, segments: list[CombatSegment]):
+        self._hide_tooltip()
         self._segments = list(segments)
         self._hit_areas.clear()
         self._drag_section_index = None
@@ -116,7 +118,7 @@ class CombatTimeline(QWidget):
                     if event.modifiers() & Qt.KeyboardModifier.ControlModifier:
                         selection |= self._selected_section_indexes
                     self._set_selection(selection)
-                    QToolTip.hideText()
+                    self._hide_tooltip()
                     event.accept()
                     return
         super().mousePressEvent(event)
@@ -150,7 +152,7 @@ class CombatTimeline(QWidget):
         if self._drag_section_index is not None:
             if event.buttons() & Qt.MouseButton.LeftButton:
                 self._extend_drag_selection(position)
-                QToolTip.hideText()
+                self._hide_tooltip()
                 event.accept()
                 return
             self._drag_section_index = None
@@ -158,6 +160,11 @@ class CombatTimeline(QWidget):
         for rect, section_index in self._hit_areas:
             if not rect.contains(position):
                 continue
+            # Track the requested tooltip, including while its show animation runs.
+            # Checking visibility would allow repeated showText calls during that animation.
+            if self._tooltip_section_index == section_index:
+                return
+            self._tooltip_section_index = section_index
             section = sections[section_index]
             selection_hint = (
                 "Нажмите, чтобы выбрать только этот отрезок\n"
@@ -188,11 +195,15 @@ class CombatTimeline(QWidget):
                 rect,
             )
             return
-        QToolTip.hideText()
+        self._hide_tooltip()
         super().mouseMoveEvent(event)
 
-    def leaveEvent(self, event):
+    def _hide_tooltip(self):
+        self._tooltip_section_index = None
         QToolTip.hideText()
+
+    def leaveEvent(self, event):
+        self._hide_tooltip()
         super().leaveEvent(event)
 
     def _paint_empty_state(self, painter: QPainter):
