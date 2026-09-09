@@ -32,6 +32,7 @@ class CombatTimeline(QWidget):
         self._segments: list[CombatSegment] = []
         self._hit_areas: list[tuple[QRect, int]] = []
         self._selected_section_indexes: set[int] = set()
+        self._drag_section_index: int | None = None
         self.setMouseTracking(True)
         self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         self.setMinimumHeight(82)
@@ -39,6 +40,8 @@ class CombatTimeline(QWidget):
 
     def set_segments(self, segments: list[CombatSegment]):
         self._segments = list(segments)
+        self._hit_areas.clear()
+        self._drag_section_index = None
         self._selected_section_indexes.clear()
         sections = self._sections()
         minimum_width = sum(
@@ -50,6 +53,7 @@ class CombatTimeline(QWidget):
         self.update()
 
     def clear_selection(self):
+        self._drag_section_index = None
         self._selected_section_indexes.clear()
         self.update()
 
@@ -104,26 +108,62 @@ class CombatTimeline(QWidget):
 
     def mousePressEvent(self, event):
         if event.button() == Qt.MouseButton.LeftButton:
+            self._drag_section_index = None
             for rect, section_index in self._hit_areas:
                 if rect.contains(event.position().toPoint()):
-                    if section_index in self._selected_section_indexes:
-                        self._selected_section_indexes.remove(section_index)
-                    else:
-                        self._selected_section_indexes.add(section_index)
-                    self.update()
-                    self.selection_changed.emit(self.selected_sections())
+                    self._drag_section_index = section_index
+                    selection = {section_index}
+                    if event.modifiers() & Qt.KeyboardModifier.ControlModifier:
+                        selection |= self._selected_section_indexes
+                    self._set_selection(selection)
+                    QToolTip.hideText()
+                    event.accept()
                     return
         super().mousePressEvent(event)
 
+    def _set_selection(self, indexes: set[int]):
+        if indexes != self._selected_section_indexes:
+            self._selected_section_indexes = indexes
+            self.update()
+            self.selection_changed.emit(self.selected_sections())
+
+    def _extend_drag_selection(self, position):
+        for rect, section_index in self._hit_areas:
+            if rect.contains(position):
+                first, last = sorted((self._drag_section_index, section_index))
+                self._drag_section_index = section_index
+                self._set_selection(
+                    self._selected_section_indexes | set(range(first, last + 1))
+                )
+                return
+
+    def mouseReleaseEvent(self, event):
+        if event.button() == Qt.MouseButton.LeftButton and self._drag_section_index is not None:
+            self._extend_drag_selection(event.position().toPoint())
+            self._drag_section_index = None
+            event.accept()
+            return
+        super().mouseReleaseEvent(event)
+
     def mouseMoveEvent(self, event):
         position = event.position().toPoint()
+        if self._drag_section_index is not None:
+            if event.buttons() & Qt.MouseButton.LeftButton:
+                self._extend_drag_selection(position)
+                QToolTip.hideText()
+                event.accept()
+                return
+            self._drag_section_index = None
         sections = self._sections()
         for rect, section_index in self._hit_areas:
             if not rect.contains(position):
                 continue
             section = sections[section_index]
-            selected = section_index in self._selected_section_indexes
-            click_action = "убрать из выбора" if selected else "добавить к выбору"
+            selection_hint = (
+                "Нажмите, чтобы выбрать только этот отрезок\n"
+                "Ctrl + щелчок — добавить к выбору\n"
+                "Удерживайте левую кнопку и ведите мышь, чтобы выбрать несколько отрезков"
+            )
             if section.kind == "combat":
                 segment_index = section.segment_index or 0
                 segment = self._segments[segment_index]
@@ -132,14 +172,14 @@ class CombatTimeline(QWidget):
                     f"{section.start:%H:%M:%S} — {section.end:%H:%M:%S}\n"
                     f"Длительность: {self._format_duration(section.duration_seconds)}\n"
                     f"Записей: {segment.end_index - segment.start_index + 1}\n"
-                    f"Нажмите, чтобы {click_action}"
+                    f"{selection_hint}"
                 )
             else:
                 tooltip = (
                     "Пауза\n"
                     f"{section.start:%H:%M:%S} — {section.end:%H:%M:%S}\n"
                     f"Длительность: {self._format_duration(section.duration_seconds)}\n"
-                    f"Нажмите, чтобы {click_action}"
+                    f"{selection_hint}"
                 )
             QToolTip.showText(
                 event.globalPosition().toPoint(),
