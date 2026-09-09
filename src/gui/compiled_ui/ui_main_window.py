@@ -318,12 +318,12 @@ class Ui_MainWindow(object):
         self.label_14 = QLabel(self.groupBox_2)
         self.label_14.setObjectName(u"label_14")
 
-        self.gridLayout_2.addWidget(self.label_14, 4, 1, 1, 1)
+        self.gridLayout_2.addWidget(self.label_14, 7, 1, 1, 1)
 
         self.label = QLabel(self.groupBox_2)
         self.label.setObjectName(u"label")
 
-        self.gridLayout_2.addWidget(self.label, 7, 1, 1, 1)
+        self.gridLayout_2.addWidget(self.label, 4, 1, 1, 1)
 
         self.line_6 = QFrame(self.groupBox_2)
         self.line_6.setObjectName(u"line_6")
@@ -335,17 +335,17 @@ class Ui_MainWindow(object):
         self.label_6 = QLabel(self.groupBox_2)
         self.label_6.setObjectName(u"label_6")
 
-        self.gridLayout_2.addWidget(self.label_6, 8, 2, 1, 1)
+        self.gridLayout_2.addWidget(self.label_6, 5, 2, 1, 1)
 
         self.label_4 = QLabel(self.groupBox_2)
         self.label_4.setObjectName(u"label_4")
 
-        self.gridLayout_2.addWidget(self.label_4, 7, 2, 1, 1)
+        self.gridLayout_2.addWidget(self.label_4, 4, 2, 1, 1)
 
         self.label_2 = QLabel(self.groupBox_2)
         self.label_2.setObjectName(u"label_2")
 
-        self.gridLayout_2.addWidget(self.label_2, 7, 4, 1, 1)
+        self.gridLayout_2.addWidget(self.label_2, 4, 4, 1, 1)
 
         self.label_10 = QLabel(self.groupBox_2)
         self.label_10.setObjectName(u"label_10")
@@ -355,12 +355,12 @@ class Ui_MainWindow(object):
         self.label_7 = QLabel(self.groupBox_2)
         self.label_7.setObjectName(u"label_7")
 
-        self.gridLayout_2.addWidget(self.label_7, 8, 3, 1, 1)
+        self.gridLayout_2.addWidget(self.label_7, 5, 3, 1, 1)
 
         self.label_15 = QLabel(self.groupBox_2)
         self.label_15.setObjectName(u"label_15")
 
-        self.gridLayout_2.addWidget(self.label_15, 4, 2, 1, 1)
+        self.gridLayout_2.addWidget(self.label_15, 7, 2, 1, 1)
 
         self.line_5 = QFrame(self.groupBox_2)
         self.line_5.setObjectName(u"line_5")
@@ -372,32 +372,32 @@ class Ui_MainWindow(object):
         self.label_17 = QLabel(self.groupBox_2)
         self.label_17.setObjectName(u"label_17")
 
-        self.gridLayout_2.addWidget(self.label_17, 5, 1, 1, 1)
+        self.gridLayout_2.addWidget(self.label_17, 8, 1, 1, 1)
 
         self.label_19 = QLabel(self.groupBox_2)
         self.label_19.setObjectName(u"label_19")
 
-        self.gridLayout_2.addWidget(self.label_19, 5, 2, 1, 1)
+        self.gridLayout_2.addWidget(self.label_19, 8, 2, 1, 1)
 
         self.label_3 = QLabel(self.groupBox_2)
         self.label_3.setObjectName(u"label_3")
 
-        self.gridLayout_2.addWidget(self.label_3, 7, 3, 1, 1)
+        self.gridLayout_2.addWidget(self.label_3, 4, 3, 1, 1)
 
         self.label_5 = QLabel(self.groupBox_2)
         self.label_5.setObjectName(u"label_5")
 
-        self.gridLayout_2.addWidget(self.label_5, 8, 1, 1, 1)
+        self.gridLayout_2.addWidget(self.label_5, 5, 1, 1, 1)
 
         self.label_8 = QLabel(self.groupBox_2)
         self.label_8.setObjectName(u"label_8")
 
-        self.gridLayout_2.addWidget(self.label_8, 8, 4, 1, 1)
+        self.gridLayout_2.addWidget(self.label_8, 5, 4, 1, 1)
 
         self.label_18 = QLabel(self.groupBox_2)
         self.label_18.setObjectName(u"label_18")
 
-        self.gridLayout_2.addWidget(self.label_18, 4, 4, 1, 1)
+        self.gridLayout_2.addWidget(self.label_18, 7, 4, 1, 1)
 
         self.label_12 = QLabel(self.groupBox_2)
         self.label_12.setObjectName(u"label_12")
@@ -417,7 +417,7 @@ class Ui_MainWindow(object):
         self.label_16 = QLabel(self.groupBox_2)
         self.label_16.setObjectName(u"label_16")
 
-        self.gridLayout_2.addWidget(self.label_16, 4, 3, 1, 1)
+        self.gridLayout_2.addWidget(self.label_16, 7, 3, 1, 1)
 
         self.label_23 = QLabel(self.groupBox_2)
         self.label_23.setObjectName(u"label_23")
