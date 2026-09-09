@@ -842,7 +842,7 @@ class MainWindow(QMainWindow):
         median_damage = round(median(damages)) if damages else 0
 
         self.ui.label_10.setText(f"{total_attacks:,}".replace(",", " "))
-        self.ui.dps_value.setText("—" if dps is None else f"{dps:,.1f}".replace(",", " "))
+        self.ui.dps_value.setText("—" if dps is None else f"{dps:,.0f}".replace(",", " "))
         self.ui.label_24.setText(f"{critical_hits} ({crit_chance:.1f}%)".replace(",", " "))
         self.ui.block_hits_value.setText(f"{blocked_hits} ({block_chance:.1f}%)")
         self.ui.dodge_hits_value.setText(f"{dodged_hits} ({dodge_chance:.1f}%)")
