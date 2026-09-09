@@ -452,12 +452,12 @@ class Ui_MainWindow(object):
         self.dodge_hits_label = QLabel(self.groupBox_2)
         self.dodge_hits_label.setObjectName(u"dodge_hits_label")
 
-        self.gridLayout_2.addWidget(self.dodge_hits_label, 3, 1, 1, 1)
+        self.gridLayout_2.addWidget(self.dodge_hits_label, 2, 1, 1, 1)
 
         self.dodge_hits_value = QLabel(self.groupBox_2)
         self.dodge_hits_value.setObjectName(u"dodge_hits_value")
 
-        self.gridLayout_2.addWidget(self.dodge_hits_value, 3, 2, 1, 3)
+        self.gridLayout_2.addWidget(self.dodge_hits_value, 2, 2, 1, 1)
 
 
         self.verticalLayout.addWidget(self.groupBox_2)
