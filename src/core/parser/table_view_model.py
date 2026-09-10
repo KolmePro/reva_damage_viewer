@@ -62,9 +62,9 @@ class DamageTableModel(QAbstractTableModel):
         if event_label:
             if role == Qt.ForegroundRole:
                 if record.type in ("damage_absorbed", "resource_restored"):
-                    color = "#CCBBFF"
-                elif record.type in ("self_skill_used", "self_skill_used_targeted"):
                     color = "#99CCFF"
+                elif record.type in ("self_skill_used", "self_skill_used_targeted"):
+                    color = "#CCBBFF"
                 elif record.type in ("effect_applied", "self_effect_applied"):
                     color = "#AAFFAA"
                 else:
