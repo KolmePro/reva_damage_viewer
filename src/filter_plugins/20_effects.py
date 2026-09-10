@@ -4,7 +4,7 @@ FILTERS = [
         "label": "Ваши умения",
         "group": "Эффекты",
         "match_all": [
-            {"field": "type", "value": "self_skill_used"},
+            {"field": "type", "operator": "in", "value": ["self_skill_used", "self_skill_used_targeted"]},
         ],
     },
     {

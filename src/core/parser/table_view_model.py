@@ -48,12 +48,19 @@ class DamageTableModel(QAbstractTableModel):
         record = self._filtered_records[index.row()]
         col = index.column()
 
-        if record.type == "self_skill_used":
+        if record.type in ("self_skill_used", "self_skill_used_targeted"):
             if role == Qt.DisplayRole and col == 0:
                 actor_name = self._format_actor_name(
                     record.attacker, False, player_name=self.player_name,
                 )
-                return f'{actor_name}: использовано умение "{record.skill}"'
+                description = f'{actor_name}: использовано умение "{record.skill}"'
+                if record.target:
+                    target_name = self._format_actor_name(
+                        record.target, record.is_target_spirit,
+                        record.target_spirit_owner, self.player_name,
+                    )
+                    description += f". Цель: {target_name}"
+                return description
             if role == Qt.DecorationRole and col == 0:
                 return QIcon.fromTheme("emblem-mail")
             if role == Qt.ToolTipRole and col == 0:
@@ -236,7 +243,7 @@ class DamageTableModel(QAbstractTableModel):
             return False
         if (
             (self.minimum_damage or self.maximum_damage)
-            and record.type in ("effect_applied", "effect_removed", "self_effect_applied", "self_effect_removed", "self_skill_used")
+            and record.type in ("effect_applied", "effect_removed", "self_effect_applied", "self_effect_removed", "self_skill_used", "self_skill_used_targeted")
         ):
             return False
         if self.minimum_damage and record.damage <= self.minimum_damage:
