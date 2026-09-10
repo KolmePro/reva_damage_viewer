@@ -26,7 +26,7 @@ RECORD_TYPES = {
     "effect_applied": re.compile(r"(?P<target>.*?): действует эффект (?P<skill>.*?)\."),
     "effect_removed": re.compile(r"Эффект \[(?P<skill>.*?)\] больше не действует на объект \"(?P<target>.*?)\"\."),
     "self_effect_applied": re.compile(
-        r"^(?P<skill>[^:\r\n]+? \+\d+(?:\.\d+)?%? ед)\. Действует постоянно\.$"
+        r"^(?P<skill>[^:\r\n]+? \+\d+(?:\.\d+)?%? ед)\. Действует (?:постоянно|\d+ сек)\.$"
     ),
     "self_effect_removed": re.compile(
         r"^(?P<skill>[^:\r\n]+? \+\d+(?:\.\d+)?%?)\. Эффект не действует\.$"
