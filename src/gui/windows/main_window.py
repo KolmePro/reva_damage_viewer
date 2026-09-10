@@ -361,7 +361,7 @@ class MainWindow(QMainWindow):
             for log_path in log_paths:
                 current_log_path = log_path
                 parsed_logs.append(
-                    EventLog.parse_chat(str(log_path), collect_unparsed=self.debug_mode)
+                    EventLog.parse_chat(str(log_path), collect_unparsed=True)
                 )
         except OSError as exc:
             self.logger.exception("Не удалось прочитать лог боя %s", current_log_path)
@@ -483,6 +483,11 @@ class MainWindow(QMainWindow):
     def refresh_table(self):
         self.ui.damage_table_view.clearSpans()
         self.auto_resize_columns()
+        table = self.ui.damage_table_view
+        model = table.model()
+        for row, record in enumerate(model._filtered_records):
+            if record.type == "unparsed":
+                table.setSpan(row, 0, 1, model.columnCount())
         self.refresh_damage_summary()
 
     def _setup_debug_actions(self):

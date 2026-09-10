@@ -65,11 +65,12 @@ class EventLog(UserList):
         for string in combat_log:
             try:
                 damage_record = DamageRecord.try_to_parse(string)
-            except (AttributeError, KeyError, ValueError):
+            except (AttributeError, KeyError, TypeError, ValueError):
                 damage_record = None
             if not damage_record:
                 if collect_unparsed:
                     unparsed_records.append(string)
+                    events.append(DamageRecord.unparsed(string, events[-1].time if events else time.min))
                 continue
             events.append(damage_record)
 

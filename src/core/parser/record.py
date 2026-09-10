@@ -202,6 +202,21 @@ class DamageRecord(Record):
         )
 
     @staticmethod
+    def unparsed(string: str, fallback_time: time = time.min) -> "DamageRecord":
+        try:
+            record = Record.from_string(string)
+        except (TypeError, ValueError, KeyError):
+            record = Record(string, string, fallback_time)
+        return DamageRecord(
+            origin_string=string, message=record.message, time=record.time, type="unparsed",
+            attacker="", attacker_server="", is_attacker_spirit=False,
+            attacker_spirit_owner="", attacker_spirit_owner_server="",
+            target="", target_server="", is_target_spirit=False,
+            target_spirit_owner="", target_spirit_owner_server="",
+            skill="", damage=0, property1="", property2="", effects=[],
+        )
+
+    @staticmethod
     def try_to_parse(string: str) -> Optional["DamageRecord"]:
         """
         Пытается распарсить строку в запись нанесения урона.

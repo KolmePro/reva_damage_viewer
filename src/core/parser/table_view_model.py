@@ -1,6 +1,6 @@
 from datetime import datetime, time
 
-from PySide6.QtCore import QAbstractTableModel, Qt, Signal
+from PySide6.QtCore import QAbstractTableModel, Qt, Signal, QSize
 from PySide6.QtGui import QBrush, QColor, QIcon
 
 from core.filter_plugins import FilterCondition, FilterDefinition
@@ -47,6 +47,17 @@ class DamageTableModel(QAbstractTableModel):
 
         record = self._filtered_records[index.row()]
         col = index.column()
+
+        if record.type == "unparsed":
+            if role == Qt.DisplayRole and col == 0:
+                return record.origin_string
+            if role == Qt.ForegroundRole:
+                return QBrush(QColor("#FFA500"))
+            if role == Qt.ToolTipRole:
+                return record.origin_string
+            if role == Qt.SizeHintRole:
+                return QSize(0, 0)
+            return None
 
         event_labels = {
             "damage_converted_to_healing": "Лечение уроном",
@@ -247,6 +258,8 @@ class DamageTableModel(QAbstractTableModel):
     def _record_allowed(self, record: DamageRecord):
         if not self._record_in_time_range(record):
             return False
+        if record.type == "unparsed":
+            return self.filters.get("show_unparsed", False)
 
         alternative_matches = {}
         for definition in self.filter_definitions:
