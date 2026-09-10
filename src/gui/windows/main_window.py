@@ -783,7 +783,25 @@ class MainWindow(QMainWindow):
             model._filtered_records[index.row()]
             for index in sorted(indexes, key=lambda index: index.row())
         ]
-        dps = EventLog(selected_records).damage_per_second()
+        dps = EventLog(selected_records).amount_per_second()
+        has_damage = any(record.type in EventLog.DAMAGE_RECORD_TYPES for record in selected_records)
+        resources = {record.resource for record in selected_records if record.type == "resource_restored"}
+        if resources:
+            self.ui.label_9.setText("Событий" if has_damage else "Восстановлений")
+            self.ui.label_12.setText("Сумма" if has_damage else "Восстановлено")
+            rate_label = f"{next(iter(resources))}/сек" if len(resources) == 1 and not has_damage else "В секунду"
+            self.ui.dps_label.setText(rate_label)
+        else:
+            self.ui.label_9.setText("Атак всего")
+            self.ui.label_12.setText("Урон")
+            self.ui.dps_label.setText("DPS")
+        rate_tooltip = (
+            "Сумма урона и восстановленных ресурсов / время от первого до последнего "
+            "события урона или восстановления в выборке, включая паузы. "
+            "При нулевой длительности показан прочерк."
+        )
+        self.ui.dps_label.setToolTip(rate_tooltip)
+        self.ui.dps_value.setToolTip(rate_tooltip)
         damages = []
         p_damages = []
         m_damages = []
@@ -792,7 +810,7 @@ class MainWindow(QMainWindow):
         blocked_hits = 0
         dodged_hits = 0
         for index in indexes:
-            if model._filtered_records[index.row()].type not in EventLog.DAMAGE_RECORD_TYPES:
+            if model._filtered_records[index.row()].type not in EventLog.STATISTIC_RECORD_TYPES:
                 continue
             damage_index = model.index(index.row(), 6)
             property1 = model.index(index.row(), 7)

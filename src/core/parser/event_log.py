@@ -28,6 +28,7 @@ class EventLog(UserList):
     LOG_MARKER = '<font color = "#FF0000" [Бой]: </font>'
     CHAT_ENCODINGS = ("utf-8", "utf-8-sig", "cp1251")
     DAMAGE_RECORD_TYPES = ("damage_dealt", "damage_dealt_buffed")
+    STATISTIC_RECORD_TYPES = (*DAMAGE_RECORD_TYPES, "resource_restored")
     DEFAULT_INTERRUPTION_THRESHOLD = timedelta(seconds=30)
     LOG_DATE_REGEX = re.compile(
         r"(?<!\d)(?P<year>20\d{2})[-_.]?(?P<month>\d{1,2})[-_.]?(?P<day>\d{1,2})"
@@ -165,14 +166,22 @@ class EventLog(UserList):
     def damage_per_second(self) -> float | None:
         """DPS по атакам лога; None, если длительность равна нулю."""
         damage_records = [record for record in self.data if record.type in self.DAMAGE_RECORD_TYPES]
-        if not damage_records:
+        return EventLog(damage_records).amount_per_second()
+
+    def amount_per_second(self) -> float | None:
+        """Урон и восстановление в секунду по событиям текущей выборки."""
+        records = [record for record in self.data if record.type in self.STATISTIC_RECORD_TYPES]
+        if not records:
             return 0.0
 
-        timestamps = EventLog(damage_records)._resolved_timestamps()
+        timestamps = EventLog(records)._resolved_timestamps()
         duration = (max(timestamps) - min(timestamps)).total_seconds()
         if duration <= 0:
             return None
-        return sum(record.damage for record in damage_records) / duration
+        return sum(
+            (record.restored_amount or 0) if record.type == "resource_restored" else record.damage
+            for record in records
+        ) / duration
 
     def combat_segments(
         self,

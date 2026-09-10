@@ -125,7 +125,7 @@ class DamageTableModel(QAbstractTableModel):
 
         if role == Qt.ToolTipRole:
             if col == 6 and record.type == "resource_restored":
-                return f"Восстановлено {record.restored_amount} {record.resource}; не учитывается в статистике урона."
+                return f"Восстановлено {record.restored_amount} {record.resource}."
             if col == 6 and record.type == "damage_absorbed":
                 return "Поглощённый урон; не учитывается в статистике нанесённого урона."
             if col == 0:
