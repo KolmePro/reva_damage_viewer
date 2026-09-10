@@ -111,6 +111,7 @@ class DamageRecord(Record):
     absorbed_damage: int | None = None
     restored_amount: int | None = None
     resource: str = ""
+    is_dot: bool = False
 
     def __repr__(self):
         return (
@@ -135,11 +136,14 @@ class DamageRecord(Record):
             attacker = DamageRecord._parse_actor_name(match_dict.get("attacker", ""))
             default_target = "Вы" if record_type in ("self_effect_applied", "self_effect_removed") else ""
             target = DamageRecord._parse_actor_name(match_dict.get("target", default_target))
-            if record_type == "damage_to_spirit":
+            is_dot = record_type == "damage_to_spirit"
+            if is_dot:
                 if match_dict["target"].strip() == "Вы":
                     record_type = "damage_dealt"
                 else:
                     target["is_spirit"] = True
+                    if not target["spirit_owner"]:
+                        target["spirit_owner"] = "Вы"
 
             effects = []
             effects_str = match_dict.get("effects", "")
@@ -152,6 +156,7 @@ class DamageRecord(Record):
                 message=record.message,
                 time=record.time,
                 type=record_type,
+                is_dot=is_dot,
                 attacker=attacker["name"],
                 attacker_server=attacker["server"],
                 is_attacker_spirit=attacker["is_spirit"],

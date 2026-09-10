@@ -589,6 +589,7 @@ class MainWindow(QMainWindow):
 
             for index, definition in enumerate(definitions):
                 checkbox = QCheckBox(definition.label, container)
+                checkbox.setToolTip(definition.description)
                 enabled = self._load_filter_enabled(definition)
                 saved_filter_states[definition.key] = enabled
                 checkbox.setChecked(enabled)
