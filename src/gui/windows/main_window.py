@@ -31,7 +31,6 @@ from PySide6.QtWidgets import (
     QSizePolicy,
     QStyle,
     QTextEdit,
-    QToolButton,
     QVBoxLayout,
     QWidget,
 )
@@ -548,26 +547,6 @@ class MainWindow(QMainWindow):
 
         saved_filter_states: dict[str, bool] = {}
 
-        toolbar_layout = QHBoxLayout()
-        toolbar_layout.setContentsMargins(0, 0, 0, 0)
-        toolbar_layout.setSpacing(4)
-        toolbar_layout.addStretch()
-        toolbar_layout.addWidget(
-            self._create_filter_button(
-                "Включить все группы",
-                lambda: self.set_all_filters(True),
-                QStyle.StandardPixmap.SP_DialogApplyButton,
-            )
-        )
-        toolbar_layout.addWidget(
-            self._create_filter_button(
-                "Выключить все группы",
-                lambda: self.set_all_filters(False),
-                QStyle.StandardPixmap.SP_DialogCancelButton,
-            )
-        )
-        container_layout.addLayout(toolbar_layout)
-
         for group_name, definitions in groups.items():
             self.group_filter_keys[group_name] = [definition.key for definition in definitions]
             for definition in definitions:
@@ -653,14 +632,6 @@ class MainWindow(QMainWindow):
         checkbox.setTristate(True)
         checkbox.setStyleSheet("font-weight: 600;")
         return checkbox
-
-    def _create_filter_button(self, tooltip: str, callback, icon):
-        button = QToolButton(self.ui.groupBox)
-        button.setIcon(self.style().standardIcon(icon))
-        button.setToolTip(tooltip)
-        button.setAutoRaise(True)
-        button.clicked.connect(callback)
-        return button
 
     def on_filter_toggled(self, key: str, enabled: bool):
         self._save_filter_enabled(key, enabled)
