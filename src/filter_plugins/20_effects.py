@@ -92,4 +92,13 @@ FILTERS = [
         "group": "Эффекты",
         "match_all": [{"field": "type", "value": "vampirism"}],
     },
+    {
+        "key": "combat_events",
+        "label": "События боя",
+        "group": "Эффекты",
+        "description": "Смерть, возвращение в бой, убийство игрока и обмен местами.",
+        "match_all": [
+            {"field": "type", "operator": "in", "value": ["player_death", "player_revived", "player_kill", "position_swap"]},
+        ],
+    },
 ]

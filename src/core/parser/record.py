@@ -8,6 +8,16 @@ SPIRIT_OWNER_REGEX = re.compile(r"^(?P<owner>.+?):\s*дух\s+(?P<spirit>.+)$")
 COUNTER_ATTACK_SUFFIX_REGEX = re.compile(r"\s+\(Counter-attack \d+ layer\)$")
 
 RECORD_TYPES = {
+    "player_death": re.compile(r"^(?P<target>Вы) погибаете\.\s*$"),
+    "player_revived": re.compile(r"^(?P<target>Вы) снова в строю\.?\s*$"),
+    "player_kill": re.compile(
+        r"^(?P<attacker>Вы) убиваете игрока: (?P<target>[^\r\n]+?)\.?\s*$"
+    ),
+    "position_swap": re.compile(
+        r'^(?P<attacker>[^\r\n]+?) применяет к цели \((?P<target>[^()\r\n]+)\) '
+        r'умение "(?P<skill>Обмен местами)"\. '
+        r'(?P=attacker) и (?P=target) меняются местами\.\s*$'
+    ),
     "vampirism_skill": re.compile(
         r"^(?P<attacker>[^\r\n]+?) использует: \[(?P<skill>[^\]\r\n]+)\] "
         r"и поглощает у \((?P<target>[^()\r\n]+)\) "

@@ -49,6 +49,10 @@ class DamageTableModel(QAbstractTableModel):
         col = index.column()
 
         event_labels = {
+            "player_death": "Смерть",
+            "player_revived": "Возвращение в бой",
+            "player_kill": "Убийство",
+            "position_swap": "Обмен местами",
             "vampirism": "Вампиризм",
             "resource_restored": "Восстановление ресурса",
             "damage_absorbed": "Поглощение урона",
@@ -64,6 +68,8 @@ class DamageTableModel(QAbstractTableModel):
         event_label = event_labels.get(record.type)
         if event_label:
             if role == Qt.ForegroundRole:
+                if record.type in ("player_death", "player_revived", "player_kill", "position_swap"):
+                    return None
                 if record.type in ("damage_absorbed", "resource_restored", "vampirism"):
                     color = "#99CCFF"
                 elif record.type in ("self_skill_used", "self_skill_used_targeted", "skill_used_targeted"):
@@ -255,7 +261,7 @@ class DamageTableModel(QAbstractTableModel):
             return False
         if (
             (self.minimum_damage or self.maximum_damage)
-            and record.type in ("resource_restored", "vampirism", "damage_absorbed", "effect_applied", "targeted_effect_applied", "effect_removed", "self_effect_applied", "self_effect_removed", "self_skill_used", "self_skill_used_targeted", "skill_used_targeted")
+            and record.type in ("resource_restored", "vampirism", "damage_absorbed", "effect_applied", "targeted_effect_applied", "effect_removed", "self_effect_applied", "self_effect_removed", "self_skill_used", "self_skill_used_targeted", "skill_used_targeted", "player_death", "player_revived", "player_kill", "position_swap")
         ):
             return False
         if self.minimum_damage and record.damage <= self.minimum_damage:
