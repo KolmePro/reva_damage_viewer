@@ -13,5 +13,4 @@ else:
     BASE_PATH = Path(__file__).parent.parent
 
 RESOURCE_PATH = BUNDLED_PATH / "resources"
-FILTER_PLUGIN_PATH = BASE_PATH / "filter_plugins"
-DEFAULT_FILTER_PLUGIN_PATH = BUNDLED_PATH / "filter_plugins"
+FILTER_PLUGIN_PATH = BUNDLED_PATH / "filter_plugins"

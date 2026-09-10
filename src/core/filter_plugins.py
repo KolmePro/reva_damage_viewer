@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import importlib.util
 import logging
-import shutil
 from dataclasses import dataclass
 from pathlib import Path
 from types import ModuleType
@@ -26,17 +25,6 @@ class FilterDefinition:
     source: str
     alternative_group: str = ""
     description: str = ""
-
-
-def ensure_filter_plugin_dir(plugin_dir: Path, default_plugin_dir: Path) -> None:
-    plugin_dir.mkdir(parents=True, exist_ok=True)
-    if not default_plugin_dir.exists():
-        return
-
-    for default_file in default_plugin_dir.glob("*.py"):
-        target_file = plugin_dir / default_file.name
-        if not target_file.exists():
-            shutil.copy2(default_file, target_file)
 
 
 def load_filter_definitions(plugin_dir: Path, logger: logging.Logger | None = None) -> list[FilterDefinition]:
