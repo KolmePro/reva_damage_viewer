@@ -49,7 +49,7 @@ class DamageTableModel(QAbstractTableModel):
         col = index.column()
 
         event_labels = {
-            "damage_converted_to_healing": "Урон → лечение",
+            "damage_converted_to_healing": "Лечение уроном",
             "damage_reflected": "Отражение урона",
             "player_death": "Смерть",
             "player_revived": "Возвращение в бой",
