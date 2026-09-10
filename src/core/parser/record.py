@@ -10,7 +10,7 @@ COUNTER_ATTACK_SUFFIX_REGEX = re.compile(r"\s+\(Counter-attack \d+ layer\)$")
 RECORD_TYPES = {
     "rage_restored": re.compile(
         r"^Уровень ярости повышается на (?P<restored_amount>\d+) ед\. "
-        r"\((?P<skill>[^\r\n]+)\)\.?\s*$"
+        r"\((?P<resource>[^\r\n]+)\)\.?\s*$"
     ),
     "targeted_effect_removed": re.compile(
         r"^(?P<target>[^\r\n]+?): (?P<skill>[^:\r\n]+? \+\d+(?:\.\d+)?%?)\. "
@@ -183,7 +183,6 @@ class DamageRecord(Record):
             if record_type == "rage_restored":
                 record_type = "resource_restored"
                 match_dict["target"] = "Вы"
-                match_dict["resource"] = "Ярость"
             if record_type == "vampirism":
                 match_dict["attacker"] = f"{match_dict['attacker_owner']}: дух {match_dict['attacker']}"
                 match_dict["resource"] = "ОЗ"
