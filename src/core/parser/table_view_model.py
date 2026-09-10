@@ -61,7 +61,10 @@ class DamageTableModel(QAbstractTableModel):
                     record.target_spirit_owner,
                     self.player_name,
                 )
-                return f"Эффект '{record.skill}' {action} на цель {target_name}"
+                description = f"Эффект '{record.skill}' {action} на цель {target_name}"
+                if record.duration_seconds is not None:
+                    description += f" (длительность: {record.duration_seconds} сек.)"
+                return description
 
             if role == Qt.DecorationRole and col == 0:
                 return QIcon.fromTheme("emblem-mail")

@@ -26,7 +26,8 @@ RECORD_TYPES = {
     "effect_applied": re.compile(r"(?P<target>.*?): действует эффект (?P<skill>.*?)\."),
     "effect_removed": re.compile(r"Эффект \[(?P<skill>.*?)\] больше не действует на объект \"(?P<target>.*?)\"\."),
     "self_effect_applied": re.compile(
-        r"^(?P<skill>[^:\r\n]+? \+\d+(?:\.\d+)?%? ед)\. Действует (?:постоянно|\d+ сек)\.$"
+        r"^(?P<skill>[^:\r\n]+? \+\d+(?:\.\d+)?%? ед)\. Действует "
+        r"(?:постоянно|(?P<duration_seconds>\d+) сек)\.$"
     ),
     "self_effect_removed": re.compile(
         r"^(?P<skill>[^:\r\n]+? \+\d+(?:\.\d+)?%?)\. Эффект не действует\.$"
@@ -77,6 +78,7 @@ class DamageRecord(Record):
     property2: str
     effects: List[str]
     timestamp: datetime | None = field(default=None, compare=False)
+    duration_seconds: int | None = None  # Длительность, явно указанная в логе.
 
     def __repr__(self):
         return (
@@ -128,6 +130,11 @@ class DamageRecord(Record):
                 property1=match_dict.get("property1", ""),
                 property2=match_dict.get("property2", ""),
                 effects=effects,
+                duration_seconds=(
+                    int(match_dict["duration_seconds"])
+                    if match_dict.get("duration_seconds") is not None
+                    else None
+                ),
             )
         return None
 
