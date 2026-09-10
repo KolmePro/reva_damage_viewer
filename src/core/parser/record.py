@@ -37,6 +37,13 @@ RECORD_TYPES = {
         r"(?P<damage>\d+)Очко.*?\("
         r"(?P<property1>.*?)\)\s*Урон\s*\((?P<property2>.*?)\)"
     ),
+    "damage_dealt_buffed_localized": re.compile(
+        r"^(?P<attacker>[^\[\r\n]+?)\[(?P<effects>[^\]\r\n]*)\]"
+        r"\s*использовать(?P<skill>[^\r\n]+?)Вызвано\s*"
+        r"(?P<target>[^\r\n]+?)(?P<damage>\d+)Очко\s*"
+        r"\((?P<property1>[^()\r\n]+)\)\s*Урон\s*"
+        r"\((?P<property2>[^()\r\n]+)\)\.?\s*$"
+    ),
     "effect_applied": re.compile(r"(?P<target>.*?): действует эффект (?P<skill>.*?)\."),
     "effect_removed": re.compile(r"Эффект \[(?P<skill>.*?)\] больше не действует на объект \"(?P<target>.*?)\"\."),
     "targeted_effect_applied": re.compile(
@@ -133,6 +140,8 @@ class DamageRecord(Record):
                 continue
 
             match_dict = match.groupdict()
+            if record_type == "damage_dealt_buffed_localized":
+                record_type = "damage_dealt_buffed"
             attacker = DamageRecord._parse_actor_name(match_dict.get("attacker", ""))
             default_target = "Вы" if record_type in ("self_effect_applied", "self_effect_removed") else ""
             target = DamageRecord._parse_actor_name(match_dict.get("target", default_target))
