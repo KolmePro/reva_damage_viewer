@@ -8,6 +8,11 @@ SPIRIT_OWNER_REGEX = re.compile(r"^(?P<owner>.+?):\s*дух\s+(?P<spirit>.+)$")
 COUNTER_ATTACK_SUFFIX_REGEX = re.compile(r"\s+\(Counter-attack \d+ layer\)$")
 
 RECORD_TYPES = {
+    "vampirism_skill": re.compile(
+        r"^(?P<attacker>[^\r\n]+?) использует: \[(?P<skill>[^\]\r\n]+)\] "
+        r"и поглощает у \((?P<target>[^()\r\n]+)\) "
+        r"(?P<restored_amount>\d+) ед\. здоровья\.?\s*$"
+    ),
     "vampirism": re.compile(
         r"^(?P<attacker_owner>\S+) (?P<attacker>[^\r\n]+?) поглощенных "
         r"(?P<restored_amount>\d+) пунктов HP\.\s*$"
@@ -159,6 +164,9 @@ class DamageRecord(Record):
             match_dict = match.groupdict()
             if record_type == "vampirism":
                 match_dict["attacker"] = f"{match_dict['attacker_owner']}: дух {match_dict['attacker']}"
+                match_dict["resource"] = "ОЗ"
+            elif record_type == "vampirism_skill":
+                record_type = "vampirism"
                 match_dict["resource"] = "ОЗ"
             if record_type == "damage_dealt_buffed_localized":
                 record_type = "damage_dealt_buffed"
