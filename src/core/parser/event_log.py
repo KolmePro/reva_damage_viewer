@@ -27,7 +27,7 @@ class EventLog(UserList):
 
     LOG_MARKER = '<font color = "#FF0000" [Бой]: </font>'
     CHAT_ENCODINGS = ("utf-8", "utf-8-sig", "cp1251")
-    DAMAGE_RECORD_TYPES = ("damage_dealt", "damage_dealt_buffed")
+    DAMAGE_RECORD_TYPES = ("damage_dealt", "damage_dealt_buffed", "damage_to_spirit")
     STATISTIC_RECORD_TYPES = (*DAMAGE_RECORD_TYPES, "resource_restored")
     DEFAULT_INTERRUPTION_THRESHOLD = timedelta(seconds=30)
     LOG_DATE_REGEX = re.compile(

@@ -19,10 +19,15 @@ RECORD_TYPES = {
     ),
     "damage_dealt": re.compile(
         r"(?P<attacker>.*?):?(?! дух ) "
-        r"(?:(?:использует|использовано) умение:?|использован прием) \[?(?P<skill>.*?)\]?\. "
+        r"(?:использует|использовано) умение:? \[?(?P<skill>.*?)\]?\. "
         r"(?P<target>.*?):(?! дух ) "
         r"получено (?P<damage>\d*) ед\. урона "
         r"\((?P<property1>.*), (?P<property2>.*)\)\.?\s*$"
+    ),
+    "damage_to_spirit": re.compile(
+        r"^(?P<attacker>[^\r\n]+?): использован прием (?P<skill>[^\r\n]+?)\. "
+        r"(?P<target>[^\r\n]+?): получено (?P<damage>\d+) ед\. урона "
+        r"\((?P<property1>[^,\r\n]+), (?P<property2>[^\r\n]+)\)\.?\s*$"
     ),
     "damage_dealt_buffed": re.compile(
         r"^(?P<attacker>[^\[]*?)"
@@ -130,6 +135,8 @@ class DamageRecord(Record):
             attacker = DamageRecord._parse_actor_name(match_dict.get("attacker", ""))
             default_target = "Вы" if record_type in ("self_effect_applied", "self_effect_removed") else ""
             target = DamageRecord._parse_actor_name(match_dict.get("target", default_target))
+            if record_type == "damage_to_spirit":
+                target["is_spirit"] = True
 
             effects = []
             effects_str = match_dict.get("effects", "")

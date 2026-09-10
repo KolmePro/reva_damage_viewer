@@ -4,7 +4,7 @@ FILTERS = [
         "label": "Урон от вас",
         "group": "Урон",
         "match_all": [
-            {"field": "type", "operator": "in", "value": ["damage_dealt", "damage_dealt_buffed"]},
+            {"field": "type", "operator": "in", "value": ["damage_dealt", "damage_dealt_buffed", "damage_to_spirit"]},
             {"field": "attacker", "value": "Вы"},
         ],
     },
@@ -13,8 +13,9 @@ FILTERS = [
         "label": "Урон по вам",
         "group": "Урон",
         "match_all": [
-            {"field": "type", "operator": "in", "value": ["damage_dealt", "damage_dealt_buffed"]},
+            {"field": "type", "operator": "in", "value": ["damage_dealt", "damage_dealt_buffed", "damage_to_spirit"]},
             {"field": "target", "value": "Вы"},
+            {"field": "is_target_spirit", "value": False},
         ],
     },
     {
@@ -22,7 +23,7 @@ FILTERS = [
         "label": "Урон от духов",
         "group": "Урон",
         "match_all": [
-            {"field": "type", "operator": "in", "value": ["damage_dealt", "damage_dealt_buffed"]},
+            {"field": "type", "operator": "in", "value": ["damage_dealt", "damage_dealt_buffed", "damage_to_spirit"]},
             {"field": "is_attacker_spirit", "value": True},
         ],
     },
@@ -31,7 +32,7 @@ FILTERS = [
         "label": "Урон по духам",
         "group": "Урон",
         "match_all": [
-            {"field": "type", "operator": "in", "value": ["damage_dealt", "damage_dealt_buffed"]},
+            {"field": "type", "operator": "in", "value": ["damage_dealt", "damage_dealt_buffed", "damage_to_spirit"]},
             {"field": "is_target_spirit", "value": True},
         ],
     },
