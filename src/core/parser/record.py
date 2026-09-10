@@ -18,11 +18,11 @@ RECORD_TYPES = {
         r"\((?P<attacker>[^\r\n]+?)\) урона в размере (?P<absorbed_damage>\d+) ед\.\s*$"
     ),
     "damage_dealt": re.compile(
-        r"(?P<attacker>.*?):?(?! дух ) (использует|использовано) "
-        r"умение:? \[?(?P<skill>.*?)\]?\. "
+        r"(?P<attacker>.*?):?(?! дух ) "
+        r"(?:(?:использует|использовано) умение:?|использован прием) \[?(?P<skill>.*?)\]?\. "
         r"(?P<target>.*?):(?! дух ) "
         r"получено (?P<damage>\d*) ед\. урона "
-        r"\((?P<property1>.*), (?P<property2>.*)\)\."
+        r"\((?P<property1>.*), (?P<property2>.*)\)\.?\s*$"
     ),
     "damage_dealt_buffed": re.compile(
         r"^(?P<attacker>[^\[]*?)"
