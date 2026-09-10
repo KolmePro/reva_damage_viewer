@@ -107,4 +107,14 @@ FILTERS = [
         "group": "Эффекты",
         "match_all": [{"field": "type", "value": "damage_reflected"}],
     },
+    {
+        "key": "damage_converted_to_healing",
+        "label": "Урон → лечение",
+        "group": "Эффекты",
+        "description": (
+            "Атаки, превращённые в лечение изменённым эффектом, например призмой. "
+            "Для отдельной статистики выделите эти записи или оставьте только их."
+        ),
+        "match_all": [{"field": "type", "value": "damage_converted_to_healing"}],
+    },
 ]

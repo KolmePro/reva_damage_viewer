@@ -8,6 +8,12 @@ SPIRIT_OWNER_REGEX = re.compile(r"^(?P<owner>.+?):\s*дух\s+(?P<spirit>.+)$")
 COUNTER_ATTACK_SUFFIX_REGEX = re.compile(r"\s+\(Counter-attack \d+ layer\)$")
 
 RECORD_TYPES = {
+    "damage_converted_to_healing": re.compile(
+        r'^Измененный эффект: (?P<attacker>[^\r\n]+?) использует прием '
+        r'"(?P<skill>[^"\r\n]+)" и восстанавливает '
+        r'(?P<target>[^\r\n]+?)(?P<restored_amount>\d+) ед\. (?P<resource>ОЗ) '
+        r'\((?P<property2>Критический удар|Обычный)\)\.?\s*$'
+    ),
     "damage_reflected": re.compile(
         r"^(?P<attacker>\S+) отразили (?P<damage>\d+) пунктов повреждения на "
         r"(?P<target_owner>\S+) (?P<target>[^\r\n]+?)\.\s*$"

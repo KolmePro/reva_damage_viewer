@@ -168,9 +168,10 @@ class EventLog(UserList):
         damage_records = [record for record in self.data if record.type in self.DAMAGE_RECORD_TYPES]
         return EventLog(damage_records).amount_per_second()
 
-    def amount_per_second(self) -> float | None:
+    def amount_per_second(self, *, converted_healing: bool = False) -> float | None:
         """Урон и восстановление в секунду по событиям текущей выборки."""
-        records = [record for record in self.data if record.type in self.STATISTIC_RECORD_TYPES]
+        record_types = ("damage_converted_to_healing",) if converted_healing else self.STATISTIC_RECORD_TYPES
+        records = [record for record in self.data if record.type in record_types]
         if not records:
             return 0.0
 
@@ -179,7 +180,7 @@ class EventLog(UserList):
         if duration <= 0:
             return None
         return sum(
-            (record.restored_amount or 0) if record.type == "resource_restored" else record.damage
+            (record.restored_amount or 0) if record.type in ("resource_restored", "damage_converted_to_healing") else record.damage
             for record in records
         ) / duration
 

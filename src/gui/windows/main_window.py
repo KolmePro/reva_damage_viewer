@@ -787,9 +787,17 @@ class MainWindow(QMainWindow):
             model._filtered_records[index.row()]
             for index in sorted(indexes, key=lambda index: index.row())
         ]
-        dps = EventLog(selected_records).amount_per_second()
+        converted_healing = (
+            any(record.type == "damage_converted_to_healing" for record in selected_records)
+            and not any(record.type in EventLog.STATISTIC_RECORD_TYPES for record in selected_records)
+        )
+        statistic_types = ("damage_converted_to_healing",) if converted_healing else EventLog.STATISTIC_RECORD_TYPES
+        dps = EventLog(selected_records).amount_per_second(converted_healing=converted_healing)
         has_damage = any(record.type in EventLog.DAMAGE_RECORD_TYPES for record in selected_records)
-        resources = {record.resource for record in selected_records if record.type == "resource_restored"}
+        resources = {
+            record.resource for record in selected_records
+            if record.type == ("damage_converted_to_healing" if converted_healing else "resource_restored")
+        }
         if resources:
             self.ui.label_9.setText("Событий" if has_damage else "Восстановлений")
             self.ui.label_12.setText("Сумма" if has_damage else "Восстановлено")
@@ -804,6 +812,12 @@ class MainWindow(QMainWindow):
             "события урона или восстановления в выборке, включая паузы. "
             "При нулевой длительности показан прочерк."
         )
+        if converted_healing:
+            self.ui.label_9.setText("Урон → лечение")
+            rate_tooltip = (
+                "ОЗ, восстановленные изменёнными атаками, / время между первой и последней "
+                "такой записью. При нулевой длительности показан прочерк."
+            )
         self.ui.dps_label.setToolTip(rate_tooltip)
         self.ui.dps_value.setToolTip(rate_tooltip)
         damages = []
@@ -814,7 +828,7 @@ class MainWindow(QMainWindow):
         blocked_hits = 0
         dodged_hits = 0
         for index in indexes:
-            if model._filtered_records[index.row()].type not in EventLog.STATISTIC_RECORD_TYPES:
+            if model._filtered_records[index.row()].type not in statistic_types:
                 continue
             damage_index = model.index(index.row(), 6)
             property1 = model.index(index.row(), 7)
