@@ -194,7 +194,7 @@ class DamageRecord(Record):
             attacker = DamageRecord._parse_actor_name(match_dict.get("attacker", ""))
             default_target = "Вы" if record_type in ("self_effect_applied", "self_effect_removed") else ""
             target = DamageRecord._parse_actor_name(match_dict.get("target", default_target))
-            if record_type == "targeted_effect_removed" and match_dict["target"].strip() != "Вы":
+            if record_type in ("targeted_effect_applied", "targeted_effect_removed") and match_dict["target"].strip() != "Вы":
                 target["is_spirit"] = True
                 if not target["spirit_owner"]:
                     target["spirit_owner"] = "Вы"
