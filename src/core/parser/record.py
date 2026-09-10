@@ -136,7 +136,10 @@ class DamageRecord(Record):
             default_target = "Вы" if record_type in ("self_effect_applied", "self_effect_removed") else ""
             target = DamageRecord._parse_actor_name(match_dict.get("target", default_target))
             if record_type == "damage_to_spirit":
-                target["is_spirit"] = True
+                if match_dict["target"].strip() == "Вы":
+                    record_type = "damage_dealt"
+                else:
+                    target["is_spirit"] = True
 
             effects = []
             effects_str = match_dict.get("effects", "")
