@@ -539,7 +539,7 @@ class MainWindow(QMainWindow):
 
         container_layout = QVBoxLayout(container)
         container_layout.setContentsMargins(0, 0, 0, 0)
-        container_layout.setSpacing(10)
+        container_layout.setSpacing(4)
 
         groups: dict[str, list[FilterDefinition]] = {}
         for definition in filter_definitions:
@@ -566,7 +566,7 @@ class MainWindow(QMainWindow):
             grid = QGridLayout()
             grid.setContentsMargins(0, 0, 0, 0)
             grid.setHorizontalSpacing(12)
-            grid.setVerticalSpacing(6)
+            grid.setVerticalSpacing(2)
 
             for index, definition in enumerate(definitions):
                 checkbox = QCheckBox(definition.label, container)
