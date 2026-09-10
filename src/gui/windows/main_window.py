@@ -24,6 +24,7 @@ from PySide6.QtWidgets import (
     QGridLayout,
     QHBoxLayout,
     QInputDialog,
+    QLabel,
     QMainWindow,
     QMessageBox,
     QScrollArea,
@@ -595,7 +596,23 @@ class MainWindow(QMainWindow):
                 checkbox.setChecked(enabled)
                 checkbox.toggled.connect(lambda checked, key=definition.key: self.on_filter_toggled(key, checked))
                 self.filter_checkboxes[definition.key] = checkbox
-                grid.addWidget(checkbox, index // 2, index % 2)
+                if definition.description:
+                    filter_row = QHBoxLayout()
+                    filter_row.setContentsMargins(0, 0, 0, 0)
+                    filter_row.setSpacing(4)
+                    filter_row.addWidget(checkbox)
+                    hint = QLabel(container)
+                    hint.setObjectName(f"filter_hint_{definition.key}")
+                    hint.setPixmap(self.style().standardIcon(QStyle.StandardPixmap.SP_MessageBoxInformation).pixmap(14, 14))
+                    hint.setToolTip(definition.description)
+                    hint.setAccessibleName(f"Подсказка: {definition.label}")
+                    hint.setAccessibleDescription(definition.description)
+                    hint.setCursor(Qt.CursorShape.WhatsThisCursor)
+                    filter_row.addWidget(hint)
+                    filter_row.addStretch()
+                    grid.addLayout(filter_row, index // 2, index % 2)
+                else:
+                    grid.addWidget(checkbox, index // 2, index % 2)
 
             container_layout.addLayout(grid)
 
