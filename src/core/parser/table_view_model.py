@@ -96,6 +96,8 @@ class DamageTableModel(QAbstractTableModel):
                         if col == 7:
                             return record.resource
                         if col == 8:
+                            if record.drained_amount is not None:
+                                return f"Цель теряет {record.drained_amount} {record.drained_resource}"
                             return record.property2
                     if col == 6 and record.absorbed_damage is not None:
                         return str(record.absorbed_damage)
@@ -138,6 +140,11 @@ class DamageTableModel(QAbstractTableModel):
                 return QIcon.fromTheme("dialog-information")
 
         if role == Qt.ToolTipRole:
+            if col == 8 and record.drained_amount is not None:
+                return (
+                    f"Неуказанная цель теряет {record.drained_amount} {record.drained_resource}. "
+                    "Потеря ресурса не входит в статистику восстановления."
+                )
             if col == 6 and record.type in ("resource_restored", "vampirism", "damage_converted_to_healing"):
                 return f"Восстановлено {record.restored_amount} {record.resource}."
             if col == 6 and record.type == "damage_absorbed":

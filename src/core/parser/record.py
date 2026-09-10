@@ -8,6 +8,11 @@ SPIRIT_OWNER_REGEX = re.compile(r"^(?P<owner>.+?):\s*дух\s+(?P<spirit>.+)$")
 COUNTER_ATTACK_SUFFIX_REGEX = re.compile(r"\s+\(Counter-attack \d+ layer\)$")
 
 RECORD_TYPES = {
+    "spirit_resource_transfer": re.compile(
+        r"^(?P<target_owner>\S+) (?P<target>[^\r\n]+?) из-за (?P<skill>[^\r\n]+?) "
+        r"получает (?P<restored_amount>\d+) оч\.\s+маневров, "
+        r"а цель теряет (?P<drained_amount>\d+) оч\. (?P<drained_resource>ОМ)\.?\s*$"
+    ),
     "turret_damage": re.compile(
         r'^\((?P<attacker>[^()\r\n]+)\) Турель использует прием "(?P<skill>[^"\r\n]+)"\. '
         r'(?P<target>[^\r\n]+?) получает (?P<damage>\d+) ед\. '
@@ -182,6 +187,8 @@ class DamageRecord(Record):
     absorbed_damage: int | None = None
     restored_amount: int | None = None
     resource: str = ""
+    drained_amount: int | None = None
+    drained_resource: str = ""
     is_dot: bool = False
 
     def __repr__(self):
@@ -204,6 +211,11 @@ class DamageRecord(Record):
                 continue
 
             match_dict = match.groupdict()
+            if record_type == "spirit_resource_transfer":
+                record_type = "resource_restored"
+                match_dict["target"] = f"{match_dict['target_owner']}: дух {match_dict['target']}"
+                match_dict["attacker"] = match_dict["target"]
+                match_dict["resource"] = "Маневры"
             if record_type == "turret_damage":
                 record_type = "damage_dealt"
             if record_type == "damage_reflected":
@@ -282,6 +294,8 @@ class DamageRecord(Record):
                     else None
                 ),
                 resource=match_dict.get("resource", ""),
+                drained_amount=int(match_dict["drained_amount"]) if match_dict.get("drained_amount") is not None else None,
+                drained_resource=match_dict.get("drained_resource", ""),
                 absorbed_damage=(
                     int(match_dict["absorbed_damage"])
                     if match_dict.get("absorbed_damage") is not None
