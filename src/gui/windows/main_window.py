@@ -42,7 +42,6 @@ from gui.widgets.combat_timeline import CombatTimeline, TimelineSection
 
 
 class MainWindow(QMainWindow):
-    TIME_RANGE_GROUP_TITLE = "Временной отрезок"
     STATIC_FILTER_WIDGETS = [
         "cb_outgoing_your_damage",
         "cb_incoming_your_damage",
@@ -437,7 +436,6 @@ class MainWindow(QMainWindow):
         start = self.ui.te_start_time.value()
         end = self.ui.te_end_time.value()
         self.combat_timeline.clear_selection()
-        self.ui.time_range_group.setTitle(self.TIME_RANGE_GROUP_TITLE)
         self.ui.damage_table_view.model().set_time_range(start, end)
 
     def reset_time_range(self):
@@ -450,7 +448,6 @@ class MainWindow(QMainWindow):
             self.ui.te_end_time.clear()
 
         self.combat_timeline.clear_selection()
-        self.ui.time_range_group.setTitle(self.TIME_RANGE_GROUP_TITLE)
         self.ui.damage_table_view.model().clear_time_range(apply_filters)
 
     def on_minimum_damage_changed(self, text):
@@ -734,7 +731,6 @@ class MainWindow(QMainWindow):
                 self.ui.te_start_time.clear()
             with QSignalBlocker(self.ui.te_end_time):
                 self.ui.te_end_time.clear()
-            self.ui.time_range_group.setTitle(self.TIME_RANGE_GROUP_TITLE)
             model.clear_time_range()
             self.action_clear_selection()
             self.ui.damage_table_view.scrollToTop()
@@ -759,13 +755,11 @@ class MainWindow(QMainWindow):
                 self.ui.te_start_time.setValue(section.start.time())
             with QSignalBlocker(self.ui.te_end_time):
                 self.ui.te_end_time.setValue(section.end.time())
-            self.ui.time_range_group.setTitle(self.TIME_RANGE_GROUP_TITLE)
         else:
             with QSignalBlocker(self.ui.te_start_time):
                 self.ui.te_start_time.clear()
             with QSignalBlocker(self.ui.te_end_time):
                 self.ui.te_end_time.clear()
-            self.ui.time_range_group.setTitle(f"Временные отрезки: {len(sections)}")
 
         model.set_timestamp_ranges(ranges)
         self.action_clear_selection()

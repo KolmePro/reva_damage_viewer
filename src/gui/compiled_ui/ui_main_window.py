@@ -739,7 +739,7 @@ class Ui_MainWindow(object):
         self.dodge_hits_label.setToolTip(QCoreApplication.translate("MainWindow", u"\u041a\u043e\u043b\u0438\u0447\u0435\u0441\u0442\u0432\u043e \u0443\u043a\u043b\u043e\u043d\u0435\u043d\u0438\u0439 \u0438 \u043f\u0440\u043e\u0446\u0435\u043d\u0442 \u043e\u0442 \u043e\u0431\u0449\u0435\u0433\u043e \u0447\u0438\u0441\u043b\u0430 \u0430\u0442\u0430\u043a \u0432 \u0442\u0435\u043a\u0443\u0449\u0435\u0439 \u0432\u044b\u0431\u043e\u0440\u043a\u0435.", None))
 #endif // QT_CONFIG(tooltip)
         self.dodge_hits_value.setText(QCoreApplication.translate("MainWindow", u"n/a", None))
-        self.time_range_group.setTitle(QCoreApplication.translate("MainWindow", u"\u0412\u0440\u0435\u043c\u0435\u043d\u043d\u043e\u0439 \u043e\u0442\u0440\u0435\u0437\u043e\u043a", None))
+        self.time_range_group.setTitle("")
         self.label_start_time.setText(QCoreApplication.translate("MainWindow", u"\u041e\u0442", None))
 #if QT_CONFIG(tooltip)
         self.te_start_time.setToolTip(QCoreApplication.translate("MainWindow", u"\u041f\u043e\u043a\u0430\u0437\u044b\u0432\u0430\u0442\u044c \u0437\u0430\u043f\u0438\u0441\u0438 \u043d\u0435 \u0440\u0430\u043d\u044c\u0448\u0435 \u0443\u043a\u0430\u0437\u0430\u043d\u043d\u043e\u0433\u043e \u0432\u0440\u0435\u043c\u0435\u043d\u0438.", None))
