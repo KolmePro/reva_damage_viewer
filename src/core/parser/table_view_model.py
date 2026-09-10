@@ -228,11 +228,22 @@ class DamageTableModel(QAbstractTableModel):
         if not self._record_in_time_range(record):
             return False
 
+        alternative_matches = {}
         for definition in self.filter_definitions:
+            if definition.alternative_group:
+                if self._record_matches_definition(record, definition):
+                    group = definition.alternative_group
+                    alternative_matches[group] = (
+                        alternative_matches.get(group, False)
+                        or self.filters.get(definition.key, True)
+                    )
+                continue
             if self.filters.get(definition.key, True):
                 continue
             if self._record_matches_definition(record, definition):
                 return False
+        if any(not enabled for enabled in alternative_matches.values()):
+            return False
 
         if not self._match_text(self.attacker_name, record.attacker):
             return False

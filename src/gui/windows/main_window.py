@@ -508,7 +508,7 @@ class MainWindow(QMainWindow):
         text_edit = QTextEdit(dialog)
         text_edit.setReadOnly(True)
         text_edit.setLineWrapMode(QTextEdit.LineWrapMode.NoWrap)
-        text_edit.setPlainText("\n\n".join(self.last_unparsed_records))
+        text_edit.setPlainText("\n".join(record.strip() for record in self.last_unparsed_records if record.strip()))
         layout.addWidget(text_edit)
 
         buttons = QDialogButtonBox(QDialogButtonBox.StandardButton.Close, dialog)
@@ -666,7 +666,12 @@ class MainWindow(QMainWindow):
         return f"filters/{key}/enabled"
 
     def _load_filter_enabled(self, definition: FilterDefinition):
-        value = self.settings.value(self._filter_settings_key(definition.key), definition.default_enabled)
+        default_enabled = definition.default_enabled
+        if definition.key in ("incoming_healing", "outgoing_healing", "other_healing"):
+            default_enabled = self.settings.value(
+                self._filter_settings_key("health_restored"), default_enabled,
+            )
+        value = self.settings.value(self._filter_settings_key(definition.key), default_enabled)
         if isinstance(value, bool):
             return value
         if isinstance(value, str):

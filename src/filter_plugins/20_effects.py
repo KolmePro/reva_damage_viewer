@@ -1,11 +1,36 @@
 FILTERS = [
     {
-        "key": "health_restored",
-        "label": "Восстановление ОЗ",
+        "key": "incoming_healing",
+        "label": "Входящее лечение",
         "group": "Эффекты",
+        "alternative_group": "healing_direction",
         "match_all": [
             {"field": "type", "value": "resource_restored"},
             {"field": "resource", "value": "ОЗ"},
+            {"field": "target", "value": "$player_name"},
+        ],
+    },
+    {
+        "key": "outgoing_healing",
+        "label": "Исходящее лечение",
+        "group": "Эффекты",
+        "alternative_group": "healing_direction",
+        "match_all": [
+            {"field": "type", "value": "resource_restored"},
+            {"field": "resource", "value": "ОЗ"},
+            {"field": "attacker", "value": "$player_name"},
+        ],
+    },
+    {
+        "key": "other_healing",
+        "label": "Лечение других",
+        "group": "Эффекты",
+        "alternative_group": "healing_direction",
+        "match_all": [
+            {"field": "type", "value": "resource_restored"},
+            {"field": "resource", "value": "ОЗ"},
+            {"field": "attacker", "operator": "ne", "value": "$player_name"},
+            {"field": "target", "operator": "ne", "value": "$player_name"},
         ],
     },
     {

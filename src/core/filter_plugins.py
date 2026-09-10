@@ -24,6 +24,7 @@ class FilterDefinition:
     default_enabled: bool
     conditions: tuple[FilterCondition, ...]
     source: str
+    alternative_group: str = ""
 
 
 def ensure_filter_plugin_dir(plugin_dir: Path, default_plugin_dir: Path) -> None:
@@ -94,6 +95,7 @@ def _normalize_filter_definition(raw_filter: dict[str, Any], source_name: str) -
         default_enabled=default_enabled,
         conditions=conditions,
         source=source_name,
+        alternative_group=raw_filter.get("alternative_group", ""),
     )
 
 
