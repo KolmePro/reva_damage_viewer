@@ -66,7 +66,7 @@ RECORD_TYPES = {
     "spirit_resource_restored_localized": re.compile(
         r"^(?P<attacker_owner>\S+) (?P<attacker>[^\r\n]+?) использовали "
         r"(?P<skill>[^\r\n]*?) для исцеления (?P<target>[^\r\n]+?) "
-        r"(?P<restored_amount>\d+) очков (?P<resource>ОЗ|ОМ|Маневры) "
+        r"(?P<restored_amount>\d+) очков\s+(?P<resource>ОЗ|ОМ|Маневры|маневров) "
         r"\((?P<property2>Критический удар|Обычный)\)\.?\s*$"
     ),
     "damage_dealt": re.compile(
@@ -220,6 +220,8 @@ class DamageRecord(Record):
             if record_type == "spirit_resource_restored_localized":
                 record_type = "resource_restored"
                 match_dict["attacker"] = f"{match_dict['attacker_owner']}: дух {match_dict['attacker']}"
+                if match_dict["resource"] == "маневров":
+                    match_dict["resource"] = "Маневры"
             if record_type == "spirit_damage_localized":
                 record_type = "damage_dealt"
                 for actor in ("attacker", "target"):
