@@ -1,10 +1,20 @@
 FILTERS = [
     {
-        "key": "resource_restored",
-        "label": "Восстановление ресурсов",
+        "key": "health_restored",
+        "label": "Восстановление ОЗ",
         "group": "Эффекты",
         "match_all": [
             {"field": "type", "value": "resource_restored"},
+            {"field": "resource", "value": "ОЗ"},
+        ],
+    },
+    {
+        "key": "mana_restored",
+        "label": "Восстановление ОМ",
+        "group": "Эффекты",
+        "match_all": [
+            {"field": "type", "value": "resource_restored"},
+            {"field": "resource", "value": "ОМ"},
         ],
     },
     {
