@@ -8,6 +8,10 @@ SPIRIT_OWNER_REGEX = re.compile(r"^(?P<owner>.+?):\s*дух\s+(?P<spirit>.+)$")
 COUNTER_ATTACK_SUFFIX_REGEX = re.compile(r"\s+\(Counter-attack \d+ layer\)$")
 
 RECORD_TYPES = {
+    "targeted_effect_removed": re.compile(
+        r"^(?P<target>[^\r\n]+?): (?P<skill>[^:\r\n]+? \+\d+(?:\.\d+)?%?)\. "
+        r"Эффект не действует\.\s*$"
+    ),
     "player_death": re.compile(r"^(?P<target>Вы) погибаете\.\s*$"),
     "player_revived": re.compile(r"^(?P<target>Вы) снова в строю\.?\s*$"),
     "player_kill": re.compile(
@@ -190,6 +194,10 @@ class DamageRecord(Record):
             attacker = DamageRecord._parse_actor_name(match_dict.get("attacker", ""))
             default_target = "Вы" if record_type in ("self_effect_applied", "self_effect_removed") else ""
             target = DamageRecord._parse_actor_name(match_dict.get("target", default_target))
+            if record_type == "targeted_effect_removed" and match_dict["target"].strip() != "Вы":
+                target["is_spirit"] = True
+                if not target["spirit_owner"]:
+                    target["spirit_owner"] = "Вы"
             is_dot = record_type == "damage_to_spirit"
             if is_dot:
                 if match_dict["target"].strip() == "Вы":

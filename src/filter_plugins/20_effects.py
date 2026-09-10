@@ -65,7 +65,7 @@ FILTERS = [
         "label": "Эффекты на вас",
         "group": "Эффекты",
         "match_all": [
-            {"field": "type", "operator": "in", "value": ["effect_applied", "targeted_effect_applied", "effect_removed", "self_effect_applied", "self_effect_removed"]},
+            {"field": "type", "operator": "in", "value": ["effect_applied", "targeted_effect_applied", "effect_removed", "targeted_effect_removed", "self_effect_applied", "self_effect_removed"]},
             {"field": "target", "value": "$player_name"},
         ],
     },
@@ -74,7 +74,7 @@ FILTERS = [
         "label": "Эффекты на других",
         "group": "Эффекты",
         "match_all": [
-            {"field": "type", "operator": "in", "value": ["effect_applied", "targeted_effect_applied", "effect_removed", "self_effect_applied", "self_effect_removed"]},
+            {"field": "type", "operator": "in", "value": ["effect_applied", "targeted_effect_applied", "effect_removed", "targeted_effect_removed", "self_effect_applied", "self_effect_removed"]},
             {"field": "target", "operator": "ne", "value": "$player_name"},
         ],
     },

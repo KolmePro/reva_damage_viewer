@@ -63,6 +63,7 @@ class DamageTableModel(QAbstractTableModel):
             "targeted_effect_applied": "Наложение эффекта",
             "self_effect_applied": "Наложение эффекта",
             "effect_removed": "Снятие эффекта",
+            "targeted_effect_removed": "Снятие эффекта",
             "self_effect_removed": "Снятие эффекта",
         }
         event_label = event_labels.get(record.type)
@@ -261,7 +262,7 @@ class DamageTableModel(QAbstractTableModel):
             return False
         if (
             (self.minimum_damage or self.maximum_damage)
-            and record.type in ("resource_restored", "vampirism", "damage_absorbed", "effect_applied", "targeted_effect_applied", "effect_removed", "self_effect_applied", "self_effect_removed", "self_skill_used", "self_skill_used_targeted", "skill_used_targeted", "player_death", "player_revived", "player_kill", "position_swap")
+            and record.type in ("resource_restored", "vampirism", "damage_absorbed", "effect_applied", "targeted_effect_applied", "effect_removed", "targeted_effect_removed", "self_effect_applied", "self_effect_removed", "self_skill_used", "self_skill_used_targeted", "skill_used_targeted", "player_death", "player_revived", "player_kill", "position_swap")
         ):
             return False
         if self.minimum_damage and record.damage <= self.minimum_damage:
