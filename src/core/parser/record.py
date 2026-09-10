@@ -52,6 +52,10 @@ RECORD_TYPES = {
         r'^Атакующий: (?P<attacker>Вы)\. Цель: (?P<target>[^\r\n]+?)\. '
         r'Использовано умение: "(?P<skill>[^"\r\n]+)"\s*$'
     ),
+    "skill_used_targeted": re.compile(
+        r'^Атакующий: (?P<attacker>[^\r\n]+?)\. Цель: (?P<target>[^\r\n]+?)\. '
+        r'Использовано умение: "(?P<skill>[^"\r\n]+)"\s*$'
+    ),
 }
 
 

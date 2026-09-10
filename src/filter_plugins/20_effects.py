@@ -55,7 +55,17 @@ FILTERS = [
         "label": "Ваши умения",
         "group": "Эффекты",
         "match_all": [
-            {"field": "type", "operator": "in", "value": ["self_skill_used", "self_skill_used_targeted"]},
+            {"field": "type", "operator": "in", "value": ["self_skill_used", "self_skill_used_targeted", "skill_used_targeted"]},
+            {"field": "attacker", "value": "$player_name"},
+        ],
+    },
+    {
+        "key": "other_skills",
+        "label": "Умения других",
+        "group": "Эффекты",
+        "match_all": [
+            {"field": "type", "value": "skill_used_targeted"},
+            {"field": "attacker", "operator": "ne", "value": "$player_name"},
         ],
     },
     {
