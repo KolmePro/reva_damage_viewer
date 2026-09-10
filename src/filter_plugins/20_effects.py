@@ -39,7 +39,7 @@ FILTERS = [
         "group": "Эффекты",
         "match_all": [
             {"field": "type", "value": "resource_restored"},
-            {"field": "resource", "operator": "in", "value": ["ОМ", "Маневры"]},
+            {"field": "resource", "operator": "in", "value": ["ОМ", "Маневры", "Ярость"]},
         ],
     },
     {
