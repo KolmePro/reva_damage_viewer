@@ -9,12 +9,12 @@ FILTERS = [
         ],
     },
     {
-        "key": "mana_restored",
-        "label": "Восстановление ОМ",
+        "key": "mana_restored",  # Сохраняем настройки прежнего фильтра ОМ.
+        "label": "Восстановление (прочее)",
         "group": "Эффекты",
         "match_all": [
             {"field": "type", "value": "resource_restored"},
-            {"field": "resource", "value": "ОМ"},
+            {"field": "resource", "operator": "in", "value": ["ОМ", "Маневры"]},
         ],
     },
     {

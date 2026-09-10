@@ -11,7 +11,7 @@ RECORD_TYPES = {
     "resource_restored": re.compile(
         r"^(?P<attacker>[^\r\n]+?): использован прием (?P<skill>[^\r\n]+?)\. "
         r"(?P<target>[^\r\n]+?): восстановлено (?P<restored_amount>\d+) "
-        r"(?P<resource>ОМ|ОЗ) \((?P<property2>Критический удар|Обычный)\)\s*$"
+        r"(?P<resource>ОМ|ОЗ|Маневры) \((?P<property2>Критический удар|Обычный)\)\s*$"
     ),
     "damage_absorbed": re.compile(
         r"^(?P<target>[^\r\n]+?): поглощение нанесенного противником "
