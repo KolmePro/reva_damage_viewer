@@ -48,6 +48,18 @@ class DamageTableModel(QAbstractTableModel):
         record = self._filtered_records[index.row()]
         col = index.column()
 
+        if record.type == "self_skill_used":
+            if role == Qt.DisplayRole and col == 0:
+                actor_name = self._format_actor_name(
+                    record.attacker, False, player_name=self.player_name,
+                )
+                return f'{actor_name}: использовано умение "{record.skill}"'
+            if role == Qt.DecorationRole and col == 0:
+                return QIcon.fromTheme("emblem-mail")
+            if role == Qt.ToolTipRole and col == 0:
+                return record.origin_string
+            return None
+
         if role == Qt.ForegroundRole and record.type in ("effect_applied", "effect_removed", "self_effect_applied", "self_effect_removed"):
             color = QColor("#AAFFAA") if record.type in ("effect_applied", "self_effect_applied") else QColor("#FFAAAA")
             return QBrush(color)
@@ -224,7 +236,7 @@ class DamageTableModel(QAbstractTableModel):
             return False
         if (
             (self.minimum_damage or self.maximum_damage)
-            and record.type in ("effect_applied", "effect_removed", "self_effect_applied", "self_effect_removed")
+            and record.type in ("effect_applied", "effect_removed", "self_effect_applied", "self_effect_removed", "self_skill_used")
         ):
             return False
         if self.minimum_damage and record.damage <= self.minimum_damage:

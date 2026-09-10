@@ -731,7 +731,7 @@ class MainWindow(QMainWindow):
 
         for row in range(model.rowCount()):
             record = model._filtered_records[row]
-            if record.type in ("effect_applied", "effect_removed", "self_effect_applied", "self_effect_removed"):
+            if record.type in ("effect_applied", "effect_removed", "self_effect_applied", "self_effect_removed", "self_skill_used"):
                 table.setSpan(row, 0, 1, model.columnCount())
 
     def action_clear_selection(self):

@@ -1,5 +1,13 @@
 FILTERS = [
     {
+        "key": "your_skills",
+        "label": "Ваши умения",
+        "group": "Эффекты",
+        "match_all": [
+            {"field": "type", "value": "self_skill_used"},
+        ],
+    },
+    {
         "key": "your_effects",
         "label": "Эффекты на вас",
         "group": "Эффекты",

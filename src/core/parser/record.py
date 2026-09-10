@@ -32,6 +32,9 @@ RECORD_TYPES = {
     "self_effect_removed": re.compile(
         r"^(?P<skill>[^:\r\n]+? \+\d+(?:\.\d+)?%?)\. Эффект не действует\.$"
     ),
+    "self_skill_used": re.compile(
+        r'^(?P<attacker>Вы): использовано умение "(?P<skill>[^"\r\n]+)"\s*$'
+    ),
 }
 
 
