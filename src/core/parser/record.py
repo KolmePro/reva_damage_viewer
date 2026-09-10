@@ -8,6 +8,10 @@ SPIRIT_OWNER_REGEX = re.compile(r"^(?P<owner>.+?):\s*дух\s+(?P<spirit>.+)$")
 COUNTER_ATTACK_SUFFIX_REGEX = re.compile(r"\s+\(Counter-attack \d+ layer\)$")
 
 RECORD_TYPES = {
+    "damage_reflected_to_player": re.compile(
+        r"^(?P<attacker>[^\r\n]+?) отражает (?P<damage>\d+) ед\. урона игроку "
+        r"(?P<target>[^\r\n]+?)\.\s*$"
+    ),
     "damage_converted_to_healing": re.compile(
         r'^Измененный эффект: (?P<attacker>[^\r\n]+?) использует прием '
         r'"(?P<skill>[^"\r\n]+)" и восстанавливает '
@@ -197,6 +201,8 @@ class DamageRecord(Record):
             match_dict = match.groupdict()
             if record_type == "damage_reflected":
                 match_dict["target"] = f"{match_dict['target_owner']}: дух {match_dict['target']}"
+            elif record_type == "damage_reflected_to_player":
+                record_type = "damage_reflected"
             if record_type == "spirit_target_healing_localized":
                 record_type = "resource_restored"
                 match_dict["target"] = f"{match_dict['target_owner']}: дух {match_dict['target']}"
