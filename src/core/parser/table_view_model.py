@@ -49,6 +49,8 @@ class DamageTableModel(QAbstractTableModel):
         col = index.column()
 
         if record.type in ("self_skill_used", "self_skill_used_targeted"):
+            if role == Qt.ForegroundRole:
+                return QBrush(QColor("#99CCFF"))
             if role == Qt.DisplayRole and col == 0:
                 actor_name = self._format_actor_name(
                     record.attacker, False, player_name=self.player_name,
