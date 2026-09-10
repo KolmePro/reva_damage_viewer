@@ -598,10 +598,7 @@
     <item>
      <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,1">
       <item>
-       <widget class="QGroupBox" name="time_range_group">
-        <property name="title">
-         <string/>
-        </property>
+       <widget class="QWidget" name="time_range_group" native="true">
         <layout class="QGridLayout" name="time_range_layout" columnstretch="0,0,0,0,0,0,1">
          <item row="0" column="0">
           <widget class="QLabel" name="label_start_time">
