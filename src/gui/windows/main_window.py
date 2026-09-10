@@ -40,6 +40,7 @@ from core.filter_plugins import FilterDefinition
 from core.parser.event_log import EventLog
 from core.parser.table_view_model import DamageTableModel
 from gui.compiled_ui.ui_main_window import Ui_MainWindow
+from gui.widgets.filter_scroll_area import FilterScrollArea
 from gui.widgets.combat_timeline import CombatTimeline, TimelineSection
 from gui.widgets.original_message_delegate import OriginalMessageDelegate
 
@@ -610,7 +611,7 @@ class MainWindow(QMainWindow):
             if last_item.widget():
                 last_item.widget().deleteLater()
 
-        scroll_area = QScrollArea(self.ui.groupBox)
+        scroll_area = FilterScrollArea(self.ui.groupBox)
         scroll_area.setObjectName("dynamic_filters_scroll_area")
         scroll_area.setWidgetResizable(True)
         scroll_area.setFrameShape(QFrame.Shape.NoFrame)
@@ -618,7 +619,6 @@ class MainWindow(QMainWindow):
         scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         scroll_area.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Expanding)
         scroll_area.setWidget(container)
-        scroll_area.setMinimumWidth(container.minimumSizeHint().width())
 
         # Keep the scrollbar outside the viewport, including with overlay styles.
         scroll_row = QHBoxLayout()
