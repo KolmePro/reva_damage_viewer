@@ -28,7 +28,6 @@ from PySide6.QtWidgets import (
     QScrollArea,
     QSizePolicy,
     QStyle,
-    QTableView,
     QTextEdit,
     QToolButton,
     QVBoxLayout,
@@ -480,7 +479,7 @@ class MainWindow(QMainWindow):
         model.apply_filters()
 
     def refresh_table(self):
-        self.apply_row_spans()
+        self.ui.damage_table_view.clearSpans()
         self.auto_resize_columns()
         self.refresh_damage_summary()
 
@@ -718,21 +717,6 @@ class MainWindow(QMainWindow):
                 table.setColumnWidth(col, table.columnWidth(col) + extra_per_col)
 
         header.setStretchLastSection(True)
-
-    def apply_row_spans(self):
-        table: QTableView = self.ui.damage_table_view
-        model = table.model()
-        if not model:
-            return
-
-        for row in range(model.rowCount()):
-            for col in range(model.columnCount()):
-                table.setSpan(row, col, 1, 1)
-
-        for row in range(model.rowCount()):
-            record = model._filtered_records[row]
-            if record.type in ("effect_applied", "effect_removed", "self_effect_applied", "self_effect_removed", "self_skill_used", "self_skill_used_targeted"):
-                table.setSpan(row, 0, 1, model.columnCount())
 
     def action_clear_selection(self):
         # Clear both selected rows and the current cell's focus indicator.

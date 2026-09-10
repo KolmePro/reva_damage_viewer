@@ -9,7 +9,7 @@ from core.parser.record import DamageRecord
 
 class DamageTableModel(QAbstractTableModel):
     data_refreshed = Signal()
-    headers = ["", "Время", "Атакующий", "Цель", "Навык", "Бафы", "Урон", "Свойство 1", "Свойство 2"]
+    headers = ["Событие", "Время", "Атакующий", "Цель", "Навык", "Бафы", "Урон", "Свойство 1", "Свойство 2"]
 
     def __init__(self, filter_definitions: list[FilterDefinition] | None = None):
         super().__init__()
@@ -48,52 +48,31 @@ class DamageTableModel(QAbstractTableModel):
         record = self._filtered_records[index.row()]
         col = index.column()
 
-        if record.type in ("self_skill_used", "self_skill_used_targeted"):
+        event_labels = {
+            "self_skill_used": "Применение умения",
+            "self_skill_used_targeted": "Применение умения",
+            "effect_applied": "Наложение эффекта",
+            "self_effect_applied": "Наложение эффекта",
+            "effect_removed": "Снятие эффекта",
+            "self_effect_removed": "Снятие эффекта",
+        }
+        event_label = event_labels.get(record.type)
+        if event_label:
             if role == Qt.ForegroundRole:
-                return QBrush(QColor("#99CCFF"))
-            if role == Qt.DisplayRole and col == 0:
-                actor_name = self._format_actor_name(
-                    record.attacker, False, player_name=self.player_name,
-                )
-                description = f'{actor_name}: использовано умение "{record.skill}"'
-                if record.target:
-                    target_name = self._format_actor_name(
-                        record.target, record.is_target_spirit,
-                        record.target_spirit_owner, self.player_name,
-                    )
-                    description += f". Цель: {target_name}"
-                return description
-            if role == Qt.DecorationRole and col == 0:
-                return QIcon.fromTheme("emblem-mail")
-            if role == Qt.ToolTipRole and col == 0:
-                return record.origin_string
-            return None
-
-        if role == Qt.ForegroundRole and record.type in ("effect_applied", "effect_removed", "self_effect_applied", "self_effect_removed"):
-            color = QColor("#AAFFAA") if record.type in ("effect_applied", "self_effect_applied") else QColor("#FFAAAA")
-            return QBrush(color)
-
-        if record.type in ("effect_applied", "effect_removed", "self_effect_applied", "self_effect_removed"):
-            if role == Qt.DisplayRole and col == 0:
-                action = "действует" if record.type in ("effect_applied", "self_effect_applied") else "перестал действовать"
-                target_name = self._format_actor_name(
-                    record.target,
-                    record.is_target_spirit,
-                    record.target_spirit_owner,
-                    self.player_name,
-                )
-                description = f"Эффект '{record.skill}' {action} на цель {target_name}"
-                if record.duration_seconds is not None:
-                    description += f" (длительность: {record.duration_seconds} сек.)"
-                return description
-
-            if role == Qt.DecorationRole and col == 0:
-                return QIcon.fromTheme("emblem-mail")
-
-            if role == Qt.ToolTipRole and col == 0:
-                return record.origin_string
-
-            return None
+                if record.type in ("self_skill_used", "self_skill_used_targeted"):
+                    color = "#99CCFF"
+                elif record.type in ("effect_applied", "self_effect_applied"):
+                    color = "#AAFFAA"
+                else:
+                    color = "#FFAAAA"
+                return QBrush(QColor(color))
+            if role == Qt.DisplayRole:
+                if col == 0:
+                    if record.duration_seconds is not None:
+                        event_label += f" ({record.duration_seconds} сек.)"
+                    return event_label
+                if col >= 5:
+                    return None
 
         if role == Qt.DisplayRole:
             if col == 0:
