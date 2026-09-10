@@ -27,6 +27,15 @@ RECORD_TYPES = {
     "effect_removed": re.compile(r"Эффект \[(?P<skill>.*?)\] больше не действует на объект \"(?P<target>.*?)\"\."),
 }
 
+SELF_EFFECT_TYPES = {
+    "effect_applied": re.compile(
+        r"^(?P<skill>[^:\r\n]+? \+\d+(?:\.\d+)?%? ед)\. Действует постоянно\.$"
+    ),
+    "effect_removed": re.compile(
+        r"^(?P<skill>[^:\r\n]+? \+\d+(?:\.\d+)?%?)\. Эффект не действует\.$"
+    ),
+}
+
 
 @dataclass
 class Record:
@@ -86,14 +95,15 @@ class DamageRecord(Record):
         """
 
         record = Record.from_string(string)
-        for record_type, regex in RECORD_TYPES.items():
+        for record_type, regex in (*RECORD_TYPES.items(), *SELF_EFFECT_TYPES.items()):
             match = re.search(regex, record.message)
             if not match:
                 continue
 
             match_dict = match.groupdict()
             attacker = DamageRecord._parse_actor_name(match_dict.get("attacker", ""))
-            target = DamageRecord._parse_actor_name(match_dict.get("target", ""))
+            default_target = "Вы" if record_type in SELF_EFFECT_TYPES else ""
+            target = DamageRecord._parse_actor_name(match_dict.get("target", default_target))
 
             effects = []
             effects_str = match_dict.get("effects", "")
