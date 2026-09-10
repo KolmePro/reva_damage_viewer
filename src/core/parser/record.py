@@ -44,6 +44,13 @@ RECORD_TYPES = {
         r"\((?P<property1>[^()\r\n]+)\)\s*Урон\s*"
         r"\((?P<property2>[^()\r\n]+)\)\.?\s*$"
     ),
+    "spirit_damage_localized": re.compile(
+        r"^(?P<attacker_owner>\S+) (?P<attacker>[^\r\n]+?) использовал "
+        r"(?P<skill>[^\r\n]+?) на (?P<target_owner>\S+) (?P<target>[^\r\n]+?) "
+        r"для нанесения (?P<damage>\d+) пунктов "
+        r"\((?P<property1>[^()\r\n]+)\) урона "
+        r"\((?P<property2>[^()\r\n]+)\)\.?\s*$"
+    ),
     "effect_applied": re.compile(r"(?P<target>.*?): действует эффект (?P<skill>.*?)\."),
     "effect_removed": re.compile(r"Эффект \[(?P<skill>.*?)\] больше не действует на объект \"(?P<target>.*?)\"\."),
     "targeted_effect_applied": re.compile(
@@ -142,6 +149,10 @@ class DamageRecord(Record):
             match_dict = match.groupdict()
             if record_type == "damage_dealt_buffed_localized":
                 record_type = "damage_dealt_buffed"
+            if record_type == "spirit_damage_localized":
+                record_type = "damage_dealt"
+                for actor in ("attacker", "target"):
+                    match_dict[actor] = f"{match_dict[f'{actor}_owner']}: дух {match_dict[actor]}"
             attacker = DamageRecord._parse_actor_name(match_dict.get("attacker", ""))
             default_target = "Вы" if record_type in ("self_effect_applied", "self_effect_removed") else ""
             target = DamageRecord._parse_actor_name(match_dict.get("target", default_target))
