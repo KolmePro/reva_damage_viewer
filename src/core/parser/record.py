@@ -8,6 +8,10 @@ SPIRIT_OWNER_REGEX = re.compile(r"^(?P<owner>.+?):\s*дух\s+(?P<spirit>.+)$")
 COUNTER_ATTACK_SUFFIX_REGEX = re.compile(r"\s+\(Counter-attack \d+ layer\)$")
 
 RECORD_TYPES = {
+    "damage_reflected": re.compile(
+        r"^(?P<attacker>\S+) отразили (?P<damage>\d+) пунктов повреждения на "
+        r"(?P<target_owner>\S+) (?P<target>[^\r\n]+?)\.\s*$"
+    ),
     "akari_talisman_healing": re.compile(
         r"^(?P<attacker>\S+) (?P<skill>Талисман Акари) "
         r"(?P<target_owner>\S+) (?P<target>[^\r\n]+?)(?P<restored_amount>\d+) "
@@ -185,6 +189,8 @@ class DamageRecord(Record):
                 continue
 
             match_dict = match.groupdict()
+            if record_type == "damage_reflected":
+                match_dict["target"] = f"{match_dict['target_owner']}: дух {match_dict['target']}"
             if record_type == "akari_talisman_healing":
                 record_type = "resource_restored"
                 match_dict["target"] = f"{match_dict['target_owner']}: дух {match_dict['target']}"

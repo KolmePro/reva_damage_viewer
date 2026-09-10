@@ -49,6 +49,7 @@ class DamageTableModel(QAbstractTableModel):
         col = index.column()
 
         event_labels = {
+            "damage_reflected": "Отражение урона",
             "player_death": "Смерть",
             "player_revived": "Возвращение в бой",
             "player_kill": "Убийство",
@@ -71,7 +72,7 @@ class DamageTableModel(QAbstractTableModel):
             if role == Qt.ForegroundRole:
                 if record.type in ("player_death", "player_revived", "player_kill", "position_swap"):
                     return None
-                if record.type in ("damage_absorbed", "resource_restored", "vampirism"):
+                if record.type in ("damage_absorbed", "damage_reflected", "resource_restored", "vampirism"):
                     color = "#99CCFF"
                 elif record.type in ("self_skill_used", "self_skill_used_targeted", "skill_used_targeted"):
                     color = "#CCBBFF"
@@ -86,6 +87,8 @@ class DamageTableModel(QAbstractTableModel):
                         event_label += f" ({record.duration_seconds} сек.)"
                     return event_label
                 if col >= 5:
+                    if col == 6 and record.type == "damage_reflected":
+                        return str(record.damage)
                     if record.type in ("resource_restored", "vampirism"):
                         if col == 6:
                             return str(record.restored_amount)

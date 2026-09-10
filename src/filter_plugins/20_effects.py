@@ -101,4 +101,10 @@ FILTERS = [
             {"field": "type", "operator": "in", "value": ["player_death", "player_revived", "player_kill", "position_swap"]},
         ],
     },
+    {
+        "key": "damage_reflected",
+        "label": "Отражение урона",
+        "group": "Эффекты",
+        "match_all": [{"field": "type", "value": "damage_reflected"}],
+    },
 ]
