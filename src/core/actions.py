@@ -2,6 +2,7 @@ def connect_actions(app):
     window = app.window
     ui = window.ui
     table = ui.damage_table_view
+    window.original_message_delegate.message_clicked.connect(window.copy_original_message)
 
     ui.action_set_game_folder.triggered.connect(window.action_set_game_folder)
     ui.action_load_last_log.triggered.connect(window.action_load_last_log)

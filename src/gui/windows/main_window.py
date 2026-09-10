@@ -14,6 +14,7 @@ from PySide6.QtGui import (
     QPixmap,
 )
 from PySide6.QtWidgets import (
+    QApplication,
     QAbstractItemView,
     QCheckBox,
     QDialog,
@@ -39,6 +40,7 @@ from core.parser.event_log import EventLog
 from core.parser.table_view_model import DamageTableModel
 from gui.compiled_ui.ui_main_window import Ui_MainWindow
 from gui.widgets.combat_timeline import CombatTimeline, TimelineSection
+from gui.widgets.original_message_delegate import OriginalMessageDelegate
 
 
 class MainWindow(QMainWindow):
@@ -84,6 +86,8 @@ class MainWindow(QMainWindow):
         self.ui.le_maximum_damage.setValidator(self.damage_value_validator)
         damage_model = DamageTableModel(app.filter_definitions)
         self.ui.damage_table_view.setModel(damage_model)
+        self.original_message_delegate = OriginalMessageDelegate(self.ui.damage_table_view)
+        self.ui.damage_table_view.setItemDelegateForColumn(0, self.original_message_delegate)
         self.ui.damage_table_view.setSelectionBehavior(
             QAbstractItemView.SelectionBehavior.SelectRows
         )
@@ -723,6 +727,10 @@ class MainWindow(QMainWindow):
     def action_clear_selection(self):
         # Clear both selected rows and the current cell's focus indicator.
         self.ui.damage_table_view.selectionModel().clear()
+
+    def copy_original_message(self, message: str):
+        QApplication.clipboard().setText(message)
+        self.ui.statusbar.showMessage("Исходное сообщение скопировано", 3000)
 
     def filter_timeline_sections(self, sections: list[TimelineSection]):
         model = self.ui.damage_table_view.model()
