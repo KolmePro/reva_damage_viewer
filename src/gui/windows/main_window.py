@@ -27,6 +27,7 @@ from PySide6.QtWidgets import (
     QMainWindow,
     QMessageBox,
     QScrollArea,
+    QScrollBar,
     QSizePolicy,
     QStyle,
     QTextEdit,
@@ -614,15 +615,35 @@ class MainWindow(QMainWindow):
         scroll_area.setWidgetResizable(True)
         scroll_area.setFrameShape(QFrame.Shape.NoFrame)
         scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         scroll_area.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Expanding)
         scroll_area.setWidget(container)
-        # Reserve space for overlay scrollbars used by some Qt styles.
-        scrollbar_width = scroll_area.style().pixelMetric(QStyle.PixelMetric.PM_ScrollBarExtent)
-        container_layout.setContentsMargins(0, 0, scrollbar_width + 6, 0)
-        scroll_area.setMinimumWidth(container.minimumSizeHint().width() + scrollbar_width)
+        scroll_area.setMinimumWidth(container.minimumSizeHint().width())
+
+        # Keep the scrollbar outside the viewport, including with overlay styles.
+        scroll_row = QHBoxLayout()
+        scroll_row.setContentsMargins(0, 0, 0, 0)
+        scroll_row.setSpacing(8)
+        scroll_row.addWidget(scroll_area, 1)
+        scrollbar = QScrollBar(Qt.Orientation.Vertical, self.ui.groupBox)
+        scrollbar.setObjectName("dynamic_filters_scrollbar")
+        scrollbar.setAccessibleName("Прокрутка фильтров")
+        scroll_row.addWidget(scrollbar)
+        internal_scrollbar = scroll_area.verticalScrollBar()
+        internal_scrollbar.valueChanged.connect(scrollbar.setValue)
+        scrollbar.valueChanged.connect(internal_scrollbar.setValue)
+
+        def update_scrollbar(minimum, maximum):
+            scrollbar.setRange(minimum, maximum)
+            scrollbar.setPageStep(internal_scrollbar.pageStep())
+            scrollbar.setSingleStep(internal_scrollbar.singleStep())
+            scrollbar.setVisible(maximum > minimum)
+
+        internal_scrollbar.rangeChanged.connect(update_scrollbar)
+        update_scrollbar(internal_scrollbar.minimum(), internal_scrollbar.maximum())
 
         self.ui.damage_range_group.setMinimumHeight(self.ui.damage_range_group.sizeHint().height())
-        filter_layout.addWidget(scroll_area, 8, 0, 1, 2)
+        filter_layout.addLayout(scroll_row, 8, 0, 1, 2)
         filter_layout.setRowStretch(8, 1)
         self.ui.damage_table_view.model().set_filters(saved_filter_states)
         self.refresh_filter_group_states()
