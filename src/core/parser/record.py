@@ -42,7 +42,7 @@ RECORD_TYPES = {
     ),
     "position_swap": re.compile(
         r'^(?P<attacker>[^\r\n]+?) применяет к цели \((?P<target>[^()\r\n]+)\) '
-        r'умение "(?P<skill>Обмен местами)"\. '
+        r'умение "(?P<skill>[^"\r\n]+)"\. '
         r'(?P=attacker) и (?P=target) меняются местами\.\s*$'
     ),
     "vampirism_skill": re.compile(
