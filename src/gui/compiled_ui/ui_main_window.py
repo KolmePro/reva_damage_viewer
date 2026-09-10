@@ -235,10 +235,11 @@ class Ui_MainWindow(object):
 
         self.gridLayout.addWidget(self.line_damage_range, 5, 0, 1, 2)
 
-        self.damage_range_group = QGroupBox(self.groupBox)
+        self.damage_range_group = QWidget(self.groupBox)
         self.damage_range_group.setObjectName(u"damage_range_group")
         self.damage_range_layout = QGridLayout(self.damage_range_group)
         self.damage_range_layout.setObjectName(u"damage_range_layout")
+        self.damage_range_layout.setContentsMargins(0, 0, 0, 0)
         self.label_minimum_damage = QLabel(self.damage_range_group)
         self.label_minimum_damage.setObjectName(u"label_minimum_damage")
 
@@ -680,9 +681,8 @@ class Ui_MainWindow(object):
         self.cb_incoming_your_damage.setText(QCoreApplication.translate("MainWindow", u"\u0423\u0440\u043e\u043d \u043f\u043e \u0432\u0430\u043c", None))
         self.cb_outgoing_spirit_damage.setText(QCoreApplication.translate("MainWindow", u"\u0423\u0440\u043e\u043d \u043e\u0442 \u0434\u0443\u0445\u043e\u0432", None))
         self.cb_attack_block.setText(QCoreApplication.translate("MainWindow", u"\u0411\u043b\u043e\u043a\u0438\u0440\u043e\u0432\u0430\u043d\u0438\u044f", None))
-        self.damage_range_group.setTitle(QCoreApplication.translate("MainWindow", u"\u0414\u0438\u0430\u043f\u0430\u0437\u043e\u043d \u0443\u0440\u043e\u043d\u0430", None))
-        self.label_minimum_damage.setText(QCoreApplication.translate("MainWindow", u"\u041e\u0442", None))
-        self.label_maximum_damage.setText(QCoreApplication.translate("MainWindow", u"\u0414\u043e", None))
+        self.label_minimum_damage.setText(QCoreApplication.translate("MainWindow", u"\u041c\u0438\u043d. \u0443\u0440\u043e\u043d", None))
+        self.label_maximum_damage.setText(QCoreApplication.translate("MainWindow", u"\u041c\u0430\u043a\u0441. \u0443\u0440\u043e\u043d", None))
 #if QT_CONFIG(tooltip)
         self.le_minimum_damage.setToolTip(QCoreApplication.translate("MainWindow", u"\u041f\u043e\u043a\u0430\u0437\u044b\u0432\u0430\u0442\u044c \u0442\u043e\u043b\u044c\u043a\u043e \u0430\u0442\u0430\u043a\u0438 \u0441 \u0443\u0440\u043e\u043d\u043e\u043c \u0441\u0442\u0440\u043e\u0433\u043e \u0431\u043e\u043b\u044c\u0448\u0435 \u0443\u043a\u0430\u0437\u0430\u043d\u043d\u043e\u0433\u043e \u0437\u043d\u0430\u0447\u0435\u043d\u0438\u044f.", None))
 #endif // QT_CONFIG(tooltip)
