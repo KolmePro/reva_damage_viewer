@@ -8,6 +8,11 @@ SPIRIT_OWNER_REGEX = re.compile(r"^(?P<owner>.+?):\s*дух\s+(?P<spirit>.+)$")
 COUNTER_ATTACK_SUFFIX_REGEX = re.compile(r"\s+\(Counter-attack \d+ layer\)$")
 
 RECORD_TYPES = {
+    "turret_damage": re.compile(
+        r'^\((?P<attacker>[^()\r\n]+)\) Турель использует прием "(?P<skill>[^"\r\n]+)"\. '
+        r'(?P<target>[^\r\n]+?) получает (?P<damage>\d+) ед\. '
+        r'\((?P<property1>[^()\r\n]+)\) урона \((?P<property2>[^()\r\n]+)\)\.?\s*$'
+    ),
     "damage_reflected_to_player": re.compile(
         r"^(?P<attacker>[^\r\n]+?) отражает (?P<damage>\d+) ед\. урона игроку "
         r"(?P<target>[^\r\n]+?)\.\s*$"
@@ -199,6 +204,8 @@ class DamageRecord(Record):
                 continue
 
             match_dict = match.groupdict()
+            if record_type == "turret_damage":
+                record_type = "damage_dealt"
             if record_type == "damage_reflected":
                 match_dict["target"] = f"{match_dict['target_owner']}: дух {match_dict['target']}"
             elif record_type == "damage_reflected_to_player":

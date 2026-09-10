@@ -5,7 +5,7 @@ FILTERS = [
         "group": "Урон",
         "match_all": [
             {"field": "type", "operator": "in", "value": ["damage_dealt", "damage_dealt_buffed", "damage_to_spirit"]},
-            {"field": "attacker", "value": "Вы"},
+            {"field": "attacker", "value": "$player_name"},
         ],
     },
     {
@@ -14,7 +14,7 @@ FILTERS = [
         "group": "Урон",
         "match_all": [
             {"field": "type", "operator": "in", "value": ["damage_dealt", "damage_dealt_buffed", "damage_to_spirit"]},
-            {"field": "target", "value": "Вы"},
+            {"field": "target", "value": "$player_name"},
             {"field": "is_target_spirit", "value": False},
         ],
     },
