@@ -8,32 +8,28 @@ SPIRIT_OWNER_REGEX = re.compile(r"^(?P<owner>.+?):\s*дух\s+(?P<spirit>.+)$")
 COUNTER_ATTACK_SUFFIX_REGEX = re.compile(r"\s+\(Counter-attack \d+ layer\)$")
 
 RECORD_TYPES = {
-    "damage_dealt": (re.compile(
+    "damage_dealt": re.compile(
         r"(?P<attacker>.*?):?(?! дух ) (использует|использовано) "
         r"умение:? \[?(?P<skill>.*?)\]?\. "
         r"(?P<target>.*?):(?! дух ) "
         r"получено (?P<damage>\d*) ед\. урона "
         r"\((?P<property1>.*), (?P<property2>.*)\)\."
-    ),),
-    "damage_dealt_buffed": (re.compile(
+    ),
+    "damage_dealt_buffed": re.compile(
         r"^(?P<attacker>[^\[]*?)"
         r"(?:\[(?P<effects>.*?)\])?"
         r"\s*Использовать(?P<skill>.*?)для"
         r"(?P<target>.*?)(?:Вызванный|нанесено)"
         r"(?P<damage>\d+)Очко.*?\("
         r"(?P<property1>.*?)\)\s*Урон\s*\((?P<property2>.*?)\)"
-    ),),
-    "effect_applied": (
-        re.compile(r"(?P<target>.*?): действует эффект (?P<skill>.*?)\."),
-        re.compile(
-            r"^(?P<skill>[^:\r\n]+? \+\d+(?:\.\d+)?%? ед)\. Действует постоянно\.$"
-        ),
     ),
-    "effect_removed": (
-        re.compile(r"Эффект \[(?P<skill>.*?)\] больше не действует на объект \"(?P<target>.*?)\"\."),
-        re.compile(
-            r"^(?P<skill>[^:\r\n]+? \+\d+(?:\.\d+)?%?)\. Эффект не действует\.$"
-        ),
+    "effect_applied": re.compile(r"(?P<target>.*?): действует эффект (?P<skill>.*?)\."),
+    "effect_removed": re.compile(r"Эффект \[(?P<skill>.*?)\] больше не действует на объект \"(?P<target>.*?)\"\."),
+    "self_effect_applied": re.compile(
+        r"^(?P<skill>[^:\r\n]+? \+\d+(?:\.\d+)?%? ед)\. Действует постоянно\.$"
+    ),
+    "self_effect_removed": re.compile(
+        r"^(?P<skill>[^:\r\n]+? \+\d+(?:\.\d+)?%?)\. Эффект не действует\.$"
     ),
 }
 
@@ -96,18 +92,14 @@ class DamageRecord(Record):
         """
 
         record = Record.from_string(string)
-        for record_type, patterns in RECORD_TYPES.items():
-            match = None
-            for regex in patterns:
-                match = regex.search(record.message)
-                if match:
-                    break
+        for record_type, regex in RECORD_TYPES.items():
+            match = regex.search(record.message)
             if not match:
                 continue
 
             match_dict = match.groupdict()
             attacker = DamageRecord._parse_actor_name(match_dict.get("attacker", ""))
-            default_target = "Вы" if record_type in ("effect_applied", "effect_removed") else ""
+            default_target = "Вы" if record_type in ("self_effect_applied", "self_effect_removed") else ""
             target = DamageRecord._parse_actor_name(match_dict.get("target", default_target))
 
             effects = []

@@ -48,13 +48,13 @@ class DamageTableModel(QAbstractTableModel):
         record = self._filtered_records[index.row()]
         col = index.column()
 
-        if role == Qt.ForegroundRole and record.type in ("effect_applied", "effect_removed"):
-            color = QColor("#AAFFAA") if record.type == "effect_applied" else QColor("#FFAAAA")
+        if role == Qt.ForegroundRole and record.type in ("effect_applied", "effect_removed", "self_effect_applied", "self_effect_removed"):
+            color = QColor("#AAFFAA") if record.type in ("effect_applied", "self_effect_applied") else QColor("#FFAAAA")
             return QBrush(color)
 
-        if record.type in ("effect_applied", "effect_removed"):
+        if record.type in ("effect_applied", "effect_removed", "self_effect_applied", "self_effect_removed"):
             if role == Qt.DisplayRole and col == 0:
-                action = "действует" if record.type == "effect_applied" else "перестал действовать"
+                action = "действует" if record.type in ("effect_applied", "self_effect_applied") else "перестал действовать"
                 target_name = self._format_actor_name(
                     record.target,
                     record.is_target_spirit,
@@ -221,7 +221,7 @@ class DamageTableModel(QAbstractTableModel):
             return False
         if (
             (self.minimum_damage or self.maximum_damage)
-            and record.type in ("effect_applied", "effect_removed")
+            and record.type in ("effect_applied", "effect_removed", "self_effect_applied", "self_effect_removed")
         ):
             return False
         if self.minimum_damage and record.damage <= self.minimum_damage:
