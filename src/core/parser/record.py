@@ -9,7 +9,7 @@ COUNTER_ATTACK_SUFFIX_REGEX = re.compile(r"\s+\(Counter-attack \d+ layer\)$")
 
 RECORD_TYPES = {
     "vampirism": re.compile(
-        r"^(?P<target_owner>\S+) (?P<target>[^\r\n]+?) поглощенных "
+        r"^(?P<attacker_owner>\S+) (?P<attacker>[^\r\n]+?) поглощенных "
         r"(?P<restored_amount>\d+) пунктов HP\.\s*$"
     ),
     "resource_restored": re.compile(
@@ -158,7 +158,7 @@ class DamageRecord(Record):
 
             match_dict = match.groupdict()
             if record_type == "vampirism":
-                match_dict["target"] = f"{match_dict['target_owner']}: дух {match_dict['target']}"
+                match_dict["attacker"] = f"{match_dict['attacker_owner']}: дух {match_dict['attacker']}"
                 match_dict["resource"] = "ОЗ"
             if record_type == "damage_dealt_buffed_localized":
                 record_type = "damage_dealt_buffed"
