@@ -86,4 +86,10 @@ FILTERS = [
             {"field": "type", "value": "damage_absorbed"},
         ],
     },
+    {
+        "key": "vampirism",
+        "label": "Вампиризм",
+        "group": "Эффекты",
+        "match_all": [{"field": "type", "value": "vampirism"}],
+    },
 ]
