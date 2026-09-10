@@ -302,6 +302,17 @@ class DamageTableModel(QAbstractTableModel):
         left_value = getattr(record, condition.field)
         right_value = self._resolve_condition_value(condition.value)
 
+        if (
+            condition.value == "$player_name"
+            and condition.field in ("attacker", "target")
+            and condition.operator in ("eq", "ne")
+        ):
+            is_player = (
+                not getattr(record, f"is_{condition.field}_spirit")
+                and (left_value == "Вы" or bool(self.player_name) and left_value == self.player_name)
+            )
+            return is_player if condition.operator == "eq" else not is_player
+
         if condition.operator == "eq":
             return left_value == right_value
         if condition.operator == "ne":
