@@ -218,6 +218,8 @@ class DamageRecord(Record):
             if record_type == "own_spirit_damage_short":
                 record_type = "damage_dealt"
                 match_dict["attacker"] = f"{match_dict['attacker_owner']}: дух {match_dict['attacker']}"
+                match_dict["property1"] = "Обычный"
+                match_dict["property2"] = "Обычный"
             if record_type == "spirit_resource_transfer":
                 record_type = "resource_restored"
                 match_dict["attacker"] = f"{match_dict['attacker_owner']}: дух {match_dict['attacker']}"
