@@ -8,6 +8,10 @@ SPIRIT_OWNER_REGEX = re.compile(r"^(?P<owner>.+?):\s*дух\s+(?P<spirit>.+)$")
 COUNTER_ATTACK_SUFFIX_REGEX = re.compile(r"\s+\(Counter-attack \d+ layer\)$")
 
 RECORD_TYPES = {
+    "own_spirit_damage_short": re.compile(
+        r"^(?P<attacker_owner>Вы) (?P<attacker>[^\s:]+) "
+        r"(?P<target>[^\r\n]+?) (?P<damage>\d+)\s*$"
+    ),
     "spirit_resource_transfer": re.compile(
         r"^(?P<attacker_owner>\S+) (?P<attacker>[^\r\n]+?) из-за (?P<skill>[^\r\n]+?) "
         r"получает (?P<restored_amount>\d+) оч\.\s+маневров, "
@@ -211,6 +215,9 @@ class DamageRecord(Record):
                 continue
 
             match_dict = match.groupdict()
+            if record_type == "own_spirit_damage_short":
+                record_type = "damage_dealt"
+                match_dict["attacker"] = f"{match_dict['attacker_owner']}: дух {match_dict['attacker']}"
             if record_type == "spirit_resource_transfer":
                 record_type = "resource_restored"
                 match_dict["attacker"] = f"{match_dict['attacker_owner']}: дух {match_dict['attacker']}"
