@@ -43,14 +43,6 @@ FILTERS = [
         ],
     },
     {
-        "key": "damage_absorbed",
-        "label": "Поглощение урона",
-        "group": "Эффекты",
-        "match_all": [
-            {"field": "type", "value": "damage_absorbed"},
-        ],
-    },
-    {
         "key": "your_skills",
         "label": "Ваши умения",
         "group": "Эффекты",
@@ -84,6 +76,14 @@ FILTERS = [
         "match_all": [
             {"field": "type", "operator": "in", "value": ["effect_applied", "targeted_effect_applied", "effect_removed", "self_effect_applied", "self_effect_removed"]},
             {"field": "target", "operator": "ne", "value": "$player_name"},
+        ],
+    },
+    {
+        "key": "damage_absorbed",
+        "label": "Поглощение урона",
+        "group": "Эффекты",
+        "match_all": [
+            {"field": "type", "value": "damage_absorbed"},
         ],
     },
 ]
