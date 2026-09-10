@@ -12,9 +12,9 @@ RECORD_TYPES = {
         r"^(?P<attacker>\S+) отразили (?P<damage>\d+) пунктов повреждения на "
         r"(?P<target_owner>\S+) (?P<target>[^\r\n]+?)\.\s*$"
     ),
-    "akari_talisman_healing": re.compile(
-        r"^(?P<attacker>\S+) (?P<skill>Талисман Акари) "
-        r"(?P<target_owner>\S+) (?P<target>[^\r\n]+?)(?P<restored_amount>\d+) "
+    "spirit_target_healing_localized": re.compile(
+        r"^(?P<attacker>\S+) (?P<skill>[^\r\n]+?) "
+        r"(?P<target_owner>Вы|[^\s:]+-[^\s:]+) (?P<target>[^:\r\n]+?)(?P<restored_amount>\d+) "
         r"(?P<resource>ОЗ) \((?P<property2>Критический удар|Обычный)\)\.?\s*$"
     ),
     "rage_restored": re.compile(
@@ -191,7 +191,7 @@ class DamageRecord(Record):
             match_dict = match.groupdict()
             if record_type == "damage_reflected":
                 match_dict["target"] = f"{match_dict['target_owner']}: дух {match_dict['target']}"
-            if record_type == "akari_talisman_healing":
+            if record_type == "spirit_target_healing_localized":
                 record_type = "resource_restored"
                 match_dict["target"] = f"{match_dict['target_owner']}: дух {match_dict['target']}"
             if record_type == "rage_restored":
