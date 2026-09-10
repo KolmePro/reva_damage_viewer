@@ -49,6 +49,7 @@ class DamageTableModel(QAbstractTableModel):
         col = index.column()
 
         event_labels = {
+            "resource_restored": "Восстановление ресурса",
             "damage_absorbed": "Поглощение урона",
             "self_skill_used": "Применение умения",
             "self_skill_used_targeted": "Применение умения",
@@ -60,7 +61,7 @@ class DamageTableModel(QAbstractTableModel):
         event_label = event_labels.get(record.type)
         if event_label:
             if role == Qt.ForegroundRole:
-                if record.type == "damage_absorbed":
+                if record.type in ("damage_absorbed", "resource_restored"):
                     color = "#CCBBFF"
                 elif record.type in ("self_skill_used", "self_skill_used_targeted"):
                     color = "#99CCFF"
@@ -75,6 +76,13 @@ class DamageTableModel(QAbstractTableModel):
                         event_label += f" ({record.duration_seconds} сек.)"
                     return event_label
                 if col >= 5:
+                    if record.type == "resource_restored":
+                        if col == 6:
+                            return str(record.restored_amount)
+                        if col == 7:
+                            return record.resource
+                        if col == 8:
+                            return record.property2
                     if col == 6 and record.absorbed_damage is not None:
                         return str(record.absorbed_damage)
                     return None
@@ -116,6 +124,8 @@ class DamageTableModel(QAbstractTableModel):
                 return QIcon.fromTheme("dialog-information")
 
         if role == Qt.ToolTipRole:
+            if col == 6 and record.type == "resource_restored":
+                return f"Восстановлено {record.restored_amount} {record.resource}; не учитывается в статистике урона."
             if col == 6 and record.type == "damage_absorbed":
                 return "Поглощённый урон; не учитывается в статистике нанесённого урона."
             if col == 0:
@@ -231,7 +241,7 @@ class DamageTableModel(QAbstractTableModel):
             return False
         if (
             (self.minimum_damage or self.maximum_damage)
-            and record.type in ("damage_absorbed", "effect_applied", "effect_removed", "self_effect_applied", "self_effect_removed", "self_skill_used", "self_skill_used_targeted")
+            and record.type in ("resource_restored", "damage_absorbed", "effect_applied", "effect_removed", "self_effect_applied", "self_effect_removed", "self_skill_used", "self_skill_used_targeted")
         ):
             return False
         if self.minimum_damage and record.damage <= self.minimum_damage:

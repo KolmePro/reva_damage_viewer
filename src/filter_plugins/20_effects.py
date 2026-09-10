@@ -1,5 +1,13 @@
 FILTERS = [
     {
+        "key": "resource_restored",
+        "label": "Восстановление ресурсов",
+        "group": "Эффекты",
+        "match_all": [
+            {"field": "type", "value": "resource_restored"},
+        ],
+    },
+    {
         "key": "damage_absorbed",
         "label": "Поглощение урона",
         "group": "Эффекты",

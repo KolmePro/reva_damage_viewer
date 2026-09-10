@@ -4,6 +4,7 @@ FILTERS = [
         "label": "Обычные атаки",
         "group": "Результат удара",
         "match_all": [
+            {"field": "type", "operator": "in", "value": ["damage_dealt", "damage_dealt_buffed"]},
             {"field": "property2", "value": "Обычный"},
         ],
     },
@@ -12,6 +13,7 @@ FILTERS = [
         "label": "Критические удары",
         "group": "Результат удара",
         "match_all": [
+            {"field": "type", "operator": "in", "value": ["damage_dealt", "damage_dealt_buffed"]},
             {"field": "property2", "value": "Критический удар"},
         ],
     },
@@ -20,6 +22,7 @@ FILTERS = [
         "label": "Блокирования",
         "group": "Результат удара",
         "match_all": [
+            {"field": "type", "operator": "in", "value": ["damage_dealt", "damage_dealt_buffed"]},
             {"field": "property2", "value": "Блокирование"},
         ],
     },
@@ -28,6 +31,7 @@ FILTERS = [
         "label": "Комбо-удары",
         "group": "Результат удара",
         "match_all": [
+            {"field": "type", "operator": "in", "value": ["damage_dealt", "damage_dealt_buffed"]},
             {"field": "property2", "value": "Комбо-удар"},
         ],
     },
@@ -36,6 +40,7 @@ FILTERS = [
         "label": "Уклонения",
         "group": "Результат удара",
         "match_all": [
+            {"field": "type", "operator": "in", "value": ["damage_dealt", "damage_dealt_buffed"]},
             {"field": "property2", "operator": "startswith", "value": "Вероятность уклонения"},
         ],
     },

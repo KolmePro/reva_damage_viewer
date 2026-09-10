@@ -8,6 +8,11 @@ SPIRIT_OWNER_REGEX = re.compile(r"^(?P<owner>.+?):\s*дух\s+(?P<spirit>.+)$")
 COUNTER_ATTACK_SUFFIX_REGEX = re.compile(r"\s+\(Counter-attack \d+ layer\)$")
 
 RECORD_TYPES = {
+    "resource_restored": re.compile(
+        r"^(?P<attacker>[^\r\n]+?): использован прием (?P<skill>[^\r\n]+?)\. "
+        r"(?P<target>[^\r\n]+?): восстановлено (?P<restored_amount>\d+) "
+        r"(?P<resource>ОМ|ОЗ) \((?P<property2>Критический удар|Обычный)\)\s*$"
+    ),
     "damage_absorbed": re.compile(
         r"^(?P<target>[^\r\n]+?): поглощение нанесенного противником "
         r"\((?P<attacker>[^\r\n]+?)\) урона в размере (?P<absorbed_damage>\d+) ед\.\s*$"
@@ -91,6 +96,8 @@ class DamageRecord(Record):
     timestamp: datetime | None = field(default=None, compare=False)
     duration_seconds: int | None = None  # Длительность, явно указанная в логе.
     absorbed_damage: int | None = None
+    restored_amount: int | None = None
+    resource: str = ""
 
     def __repr__(self):
         return (
@@ -142,6 +149,12 @@ class DamageRecord(Record):
                 property1=match_dict.get("property1", ""),
                 property2=match_dict.get("property2", ""),
                 effects=effects,
+                restored_amount=(
+                    int(match_dict["restored_amount"])
+                    if match_dict.get("restored_amount") is not None
+                    else None
+                ),
+                resource=match_dict.get("resource", ""),
                 absorbed_damage=(
                     int(match_dict["absorbed_damage"])
                     if match_dict.get("absorbed_damage") is not None
