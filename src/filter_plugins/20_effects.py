@@ -1,5 +1,13 @@
 FILTERS = [
     {
+        "key": "damage_absorbed",
+        "label": "Поглощение урона",
+        "group": "Эффекты",
+        "match_all": [
+            {"field": "type", "value": "damage_absorbed"},
+        ],
+    },
+    {
         "key": "your_skills",
         "label": "Ваши умения",
         "group": "Эффекты",

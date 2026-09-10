@@ -792,6 +792,8 @@ class MainWindow(QMainWindow):
         blocked_hits = 0
         dodged_hits = 0
         for index in indexes:
+            if model._filtered_records[index.row()].type not in EventLog.DAMAGE_RECORD_TYPES:
+                continue
             damage_index = model.index(index.row(), 6)
             property1 = model.index(index.row(), 7)
             property2 = model.index(index.row(), 8)

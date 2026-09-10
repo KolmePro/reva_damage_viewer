@@ -49,6 +49,7 @@ class DamageTableModel(QAbstractTableModel):
         col = index.column()
 
         event_labels = {
+            "damage_absorbed": "Поглощение урона",
             "self_skill_used": "Применение умения",
             "self_skill_used_targeted": "Применение умения",
             "effect_applied": "Наложение эффекта",
@@ -59,7 +60,9 @@ class DamageTableModel(QAbstractTableModel):
         event_label = event_labels.get(record.type)
         if event_label:
             if role == Qt.ForegroundRole:
-                if record.type in ("self_skill_used", "self_skill_used_targeted"):
+                if record.type == "damage_absorbed":
+                    color = "#CCBBFF"
+                elif record.type in ("self_skill_used", "self_skill_used_targeted"):
                     color = "#99CCFF"
                 elif record.type in ("effect_applied", "self_effect_applied"):
                     color = "#AAFFAA"
@@ -72,6 +75,8 @@ class DamageTableModel(QAbstractTableModel):
                         event_label += f" ({record.duration_seconds} сек.)"
                     return event_label
                 if col >= 5:
+                    if col == 6 and record.absorbed_damage is not None:
+                        return str(record.absorbed_damage)
                     return None
 
         if role == Qt.DisplayRole:
@@ -111,6 +116,8 @@ class DamageTableModel(QAbstractTableModel):
                 return QIcon.fromTheme("dialog-information")
 
         if role == Qt.ToolTipRole:
+            if col == 6 and record.type == "damage_absorbed":
+                return "Поглощённый урон; не учитывается в статистике нанесённого урона."
             if col == 0:
                 return record.origin_string
             if col == 5:
@@ -224,7 +231,7 @@ class DamageTableModel(QAbstractTableModel):
             return False
         if (
             (self.minimum_damage or self.maximum_damage)
-            and record.type in ("effect_applied", "effect_removed", "self_effect_applied", "self_effect_removed", "self_skill_used", "self_skill_used_targeted")
+            and record.type in ("damage_absorbed", "effect_applied", "effect_removed", "self_effect_applied", "self_effect_removed", "self_skill_used", "self_skill_used_targeted")
         ):
             return False
         if self.minimum_damage and record.damage <= self.minimum_damage:
