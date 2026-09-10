@@ -54,6 +54,7 @@ class DamageTableModel(QAbstractTableModel):
             "self_skill_used": "Применение умения",
             "self_skill_used_targeted": "Применение умения",
             "effect_applied": "Наложение эффекта",
+            "targeted_effect_applied": "Наложение эффекта",
             "self_effect_applied": "Наложение эффекта",
             "effect_removed": "Снятие эффекта",
             "self_effect_removed": "Снятие эффекта",
@@ -65,7 +66,7 @@ class DamageTableModel(QAbstractTableModel):
                     color = "#99CCFF"
                 elif record.type in ("self_skill_used", "self_skill_used_targeted"):
                     color = "#CCBBFF"
-                elif record.type in ("effect_applied", "self_effect_applied"):
+                elif record.type in ("effect_applied", "self_effect_applied", "targeted_effect_applied"):
                     color = "#AAFFAA"
                 else:
                     color = "#FFAAAA"
@@ -241,7 +242,7 @@ class DamageTableModel(QAbstractTableModel):
             return False
         if (
             (self.minimum_damage or self.maximum_damage)
-            and record.type in ("resource_restored", "damage_absorbed", "effect_applied", "effect_removed", "self_effect_applied", "self_effect_removed", "self_skill_used", "self_skill_used_targeted")
+            and record.type in ("resource_restored", "damage_absorbed", "effect_applied", "targeted_effect_applied", "effect_removed", "self_effect_applied", "self_effect_removed", "self_skill_used", "self_skill_used_targeted")
         ):
             return False
         if self.minimum_damage and record.damage <= self.minimum_damage:
