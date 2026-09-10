@@ -9,7 +9,7 @@ COUNTER_ATTACK_SUFFIX_REGEX = re.compile(r"\s+\(Counter-attack \d+ layer\)$")
 
 RECORD_TYPES = {
     "spirit_resource_transfer": re.compile(
-        r"^(?P<target_owner>\S+) (?P<target>[^\r\n]+?) из-за (?P<skill>[^\r\n]+?) "
+        r"^(?P<attacker_owner>\S+) (?P<attacker>[^\r\n]+?) из-за (?P<skill>[^\r\n]+?) "
         r"получает (?P<restored_amount>\d+) оч\.\s+маневров, "
         r"а цель теряет (?P<drained_amount>\d+) оч\. (?P<drained_resource>ОМ)\.?\s*$"
     ),
@@ -213,8 +213,7 @@ class DamageRecord(Record):
             match_dict = match.groupdict()
             if record_type == "spirit_resource_transfer":
                 record_type = "resource_restored"
-                match_dict["target"] = f"{match_dict['target_owner']}: дух {match_dict['target']}"
-                match_dict["attacker"] = match_dict["target"]
+                match_dict["attacker"] = f"{match_dict['attacker_owner']}: дух {match_dict['attacker']}"
                 match_dict["resource"] = "Маневры"
             if record_type == "turret_damage":
                 record_type = "damage_dealt"
