@@ -26,6 +26,7 @@ class SkillDamageDialog(QDialog):
             "Умение", "Урон", "Доля урона, %", "Атак", "Криты", "Промахи", "Средний урон",
         ])
         for column, tooltip in {
+            2: "Доля умения в общем уроне. Значение округляется вверх до одного знака после запятой.",
             3: "Число записей урона, включая промахи. Несколько целей или тиков считаются отдельными атаками.",
             4: "Количество критов и их доля среди всех атак умения. Сортировка по количеству.",
             5: "Количество промахов и их доля среди всех атак умения. Сортировка по количеству. "
@@ -43,11 +44,14 @@ class SkillDamageDialog(QDialog):
         for skill, stats in sorted(statistics.items()):
             name = skill or "Без указания умения"
             share = stats.damage / totals.damage * 100 if totals.damage else 0.0
+            displayed_share = self._damage_share_rounded_up(
+                stats.damage, totals.damage
+            )
             items = []
             for column, (label, value) in enumerate((
                 (name, name.casefold()),
                 (f"{stats.damage:,}".replace(",", " "), stats.damage),
-                (f"{share:.2f}", share),
+                (f"{displayed_share:.1f}", share),
                 (f"{stats.attacks:,}".replace(",", " "), stats.attacks),
                 (self._format_count_chance(stats.critical_hits, stats.critical_chance), stats.critical_hits),
                 (self._format_count_chance(stats.misses, stats.miss_chance), stats.misses),
@@ -81,3 +85,11 @@ class SkillDamageDialog(QDialog):
     @staticmethod
     def _format_count_chance(count: int, chance: float) -> str:
         return f"{count:,} ({chance:.1f}%)".replace(",", " ")
+
+    @staticmethod
+    def _damage_share_rounded_up(damage: int, total_damage: int) -> float:
+        if damage <= 0 or total_damage <= 0:
+            return 0.0
+        # Percentage with one decimal is tenths of a percent (per mille).
+        tenths = (damage * 1000 + total_damage - 1) // total_damage
+        return tenths / 10
