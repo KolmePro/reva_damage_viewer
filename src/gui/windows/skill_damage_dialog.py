@@ -10,7 +10,10 @@ class SkillDamageDialog(QDialog):
         super().__init__(parent)
         self.ui = Ui_SkillDamageDialog()
         self.ui.setupUi(self)
-        self.ui.button_box.button(QDialogButtonBox.StandardButton.Close).setText("Закрыть")
+        close_button = self.ui.button_box.button(QDialogButtonBox.StandardButton.Close)
+        close_button.setText("Закрыть")
+        # Keep Qt from focusing and highlighting the first table cell on opening.
+        close_button.setFocus(Qt.FocusReason.OtherFocusReason)
         self.model = QStandardItemModel(self)
         self.model.setHorizontalHeaderLabels(["Умение", "Урон", "Доля урона, %"])
         self.model.setSortRole(Qt.ItemDataRole.UserRole)
