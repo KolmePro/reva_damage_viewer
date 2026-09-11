@@ -724,7 +724,10 @@
        </widget>
       </item>
       <item>
-       <widget class="QTableView" name="damage_table_view"/>
+       <widget class="QTableView" name="damage_table_view">
+        <property name="contextMenuPolicy"><enum>Qt::ActionsContextMenu</enum></property>
+        <addaction name="action_skill_damage"/>
+       </widget>
       </item>
      </layout>
     </item>
@@ -814,7 +817,7 @@
   </action>
   <action name="action_skill_damage">
    <property name="text"><string>Анализ урона</string></property>
-   <property name="toolTip"><string>Урон каждого умения по всем отображаемым строкам с учётом фильтров</string></property>
+   <property name="toolTip"><string>Анализ умений по выделенным записям, а без выделения — по всем отображаемым строкам</string></property>
   </action>
   <action name="action_show_statusbar">
    <property name="checkable"><bool>true</bool></property>

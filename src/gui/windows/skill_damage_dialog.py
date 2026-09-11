@@ -7,10 +7,15 @@ from gui.compiled_ui.ui_skill_damage_dialog import Ui_SkillDamageDialog
 
 
 class SkillDamageDialog(QDialog):
-    def __init__(self, statistics: dict[str, SkillDamageStatistics], parent=None, *, dps: float | None = None):
+    def __init__(
+        self, statistics: dict[str, SkillDamageStatistics], parent=None, *,
+        dps: float | None = None, selected_records_count: int | None = None,
+    ):
         super().__init__(parent)
         self.ui = Ui_SkillDamageDialog()
         self.ui.setupUi(self)
+        if selected_records_count is not None:
+            self.ui.scope_label.setText(f"Анализ выделенных записей: {selected_records_count}.")
         close_button = self.ui.button_box.button(QDialogButtonBox.StandardButton.Close)
         close_button.setText("Закрыть")
         # Keep Qt from focusing and highlighting the first table cell on opening.

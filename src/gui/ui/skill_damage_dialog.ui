@@ -8,7 +8,8 @@
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QLabel" name="scope_label">
-     <property name="text"><string>Все отображаемые строки с учётом фильтров и времени, независимо от выделения строк. Шансы и средний урон рассчитаны по всем атакам умения, включая промахи.</string></property>
+     <property name="text"><string>Анализ всех отображаемых записей с учётом фильтров и времени.</string></property>
+     <property name="toolTip"><string>Шансы и средний урон рассчитаны по всем атакам умения в выборке, включая промахи.</string></property>
      <property name="wordWrap"><bool>true</bool></property>
     </widget>
    </item>

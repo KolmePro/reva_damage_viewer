@@ -243,10 +243,15 @@ class MainWindow(QMainWindow):
         )
 
     def show_skill_damage(self):
-        records = self.ui.damage_table_view.model()._filtered_records
+        table = self.ui.damage_table_view
+        records = table.model()._filtered_records
+        indexes = table.selectionModel().selectedRows()
+        if indexes:
+            records = [records[index.row()] for index in sorted(indexes, key=lambda index: index.row())]
         log = EventLog(records)
         dialog = SkillDamageDialog(
-            log.skill_statistics(), self, dps=log.damage_per_second(include_reflected=True)
+            log.skill_statistics(), self, dps=log.damage_per_second(include_reflected=True),
+            selected_records_count=len(indexes) if indexes else None,
         )
         dialog.exec()
 
