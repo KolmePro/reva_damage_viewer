@@ -1,0 +1,75 @@
+name: Release Windows executable
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+
+    steps:
+      - name: Check out source code
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Check tag and application version
+        shell: pwsh
+        run: |
+          $version = (Get-Content -LiteralPath src/VERSION -Raw).Trim()
+          if ($env:GITHUB_REF_NAME -ne "v$version") {
+            throw "Тег $env:GITHUB_REF_NAME не совпадает с версией v$version из src/VERSION"
+          }
+
+      - name: Build executable
+        run: python -m PyInstaller --clean --noconfirm main.spec
+
+      - name: Prepare release files
+        shell: pwsh
+        run: |
+          $version = (Get-Content -LiteralPath src/VERSION -Raw).Trim()
+          $assetName = "DamageViewer-v$version-windows-x64.exe"
+          Move-Item -LiteralPath dist/DamageViewer.exe -Destination "dist/$assetName"
+          $hash = (Get-FileHash -LiteralPath "dist/$assetName" -Algorithm SHA256).Hash.ToLowerInvariant()
+          "$hash  $assetName" | Set-Content -LiteralPath dist/SHA256SUMS.txt -Encoding ascii
+
+      - name: Save build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: DamageViewer-${{ github.ref_name }}-windows-x64
+          path: |
+            dist/DamageViewer-*.exe
+            dist/SHA256SUMS.txt
+
+      - name: Publish GitHub release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $version = (Get-Content -LiteralPath src/VERSION -Raw).Trim()
+          $asset = (Get-ChildItem -LiteralPath dist -Filter "DamageViewer-*.exe" -File).FullName
+          $releaseArgs = @(
+            $env:GITHUB_REF_NAME
+            $asset
+            (Resolve-Path -LiteralPath dist/SHA256SUMS.txt).Path
+            "--verify-tag"
+            "--generate-notes"
+            "--title"
+            "DamageViewer $env:GITHUB_REF_NAME"
+          )
+          if ($version.Contains("-")) {
+            $releaseArgs += "--prerelease"
+          }
+          gh release create @releaseArgs

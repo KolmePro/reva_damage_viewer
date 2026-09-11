@@ -35,6 +35,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from core.config import VERSION
 from core.filter_plugins import FilterDefinition
 from core.parser.event_log import EventLog
 from core.parser.table_view_model import DamageTableModel
@@ -264,7 +265,8 @@ class MainWindow(QMainWindow):
         QMessageBox.about(
             self,
             "О программе",
-            "<b>DamageViewer — Калькулятор урона</b><br><br>"
+            "<b>DamageViewer — Калькулятор урона</b><br>"
+            f"Версия {VERSION}<br><br>"
             "DamageViewer разбирает логи боя из чата Revelation Online. "
             "Сохраните историю чата в игре и откройте полученный HTML-файл "
             "в программе.<br><br>"

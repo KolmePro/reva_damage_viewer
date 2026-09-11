@@ -14,3 +14,8 @@ else:
 
 RESOURCE_PATH = BUNDLED_PATH / "resources"
 FILTER_PLUGIN_PATH = BUNDLED_PATH / "filter_plugins"
+
+try:
+    VERSION = (BUNDLED_PATH / "VERSION").read_text(encoding="utf-8").strip()
+except OSError:
+    VERSION = "dev"

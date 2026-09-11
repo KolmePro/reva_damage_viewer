@@ -1,2 +1,2 @@
-PySide6
-PyInstaller
+PySide6==6.9.2
+PyInstaller==6.17.0

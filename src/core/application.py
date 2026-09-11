@@ -8,6 +8,7 @@ from core.config import (
     COMPANY_NAME,
     FILTER_PLUGIN_PATH,
     RESOURCE_PATH,
+    VERSION,
 )
 from core.filter_plugins import load_filter_definitions
 from core.logger import setup_logger
@@ -22,6 +23,7 @@ class Application(QApplication):
 
         self.setOrganizationName(COMPANY_NAME)
         self.setApplicationName(APP_NAME)
+        self.setApplicationVersion(VERSION)
 
         self.logger = setup_logger(debug_mode=debug_mode)
         if self.debug_mode:
