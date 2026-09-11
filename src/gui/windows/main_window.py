@@ -244,7 +244,7 @@ class MainWindow(QMainWindow):
 
     def show_skill_damage(self):
         records = self.ui.damage_table_view.model()._filtered_records
-        dialog = SkillDamageDialog(EventLog(records).damage_by_skill(), self)
+        dialog = SkillDamageDialog(EventLog(records).skill_statistics(), self)
         dialog.exec()
 
     def show_about(self):

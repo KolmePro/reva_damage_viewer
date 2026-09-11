@@ -8,6 +8,26 @@ from typing import Iterator, List
 from .record import DamageRecord
 
 
+@dataclass
+class SkillDamageStatistics:
+    damage: int = 0
+    attacks: int = 0
+    critical_hits: int = 0
+    misses: int = 0
+
+    @property
+    def critical_chance(self) -> float:
+        return self.critical_hits / self.attacks * 100 if self.attacks else 0.0
+
+    @property
+    def miss_chance(self) -> float:
+        return self.misses / self.attacks * 100 if self.attacks else 0.0
+
+    @property
+    def average_damage(self) -> float:
+        return self.damage / self.attacks if self.attacks else 0.0
+
+
 @dataclass(frozen=True)
 class CombatSegment:
     start_index: int
@@ -52,11 +72,23 @@ class EventLog(UserList):
 
     def damage_by_skill(self) -> dict[str, int]:
         """Sum damage by skill, excluding healing, absorption and other events."""
-        totals: dict[str, int] = {}
+        return {skill: stats.damage for skill, stats in self.skill_statistics().items()}
+
+    def skill_statistics(self) -> dict[str, SkillDamageStatistics]:
+        """Aggregate damage events; each event counts as one attack, including misses."""
+        totals: dict[str, SkillDamageStatistics] = {}
         for record in self.data:
             if record.type in (*self.DAMAGE_RECORD_TYPES, "damage_reflected"):
                 skill = record.skill.strip()
-                totals[skill] = totals.get(skill, 0) + record.damage
+                if skill not in totals:
+                    totals[skill] = SkillDamageStatistics()
+                stats = totals[skill]
+                stats.damage += record.damage
+                stats.attacks += 1
+                if record.property2 == "Критический удар":
+                    stats.critical_hits += 1
+                elif record.property2.startswith("Вероятность уклонения"):
+                    stats.misses += 1
         return totals
 
     @staticmethod

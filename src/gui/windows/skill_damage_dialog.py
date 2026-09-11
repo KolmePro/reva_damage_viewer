@@ -2,11 +2,12 @@ from PySide6.QtCore import Qt
 from PySide6.QtGui import QStandardItem, QStandardItemModel
 from PySide6.QtWidgets import QDialog, QDialogButtonBox, QHeaderView
 
+from core.parser.event_log import SkillDamageStatistics
 from gui.compiled_ui.ui_skill_damage_dialog import Ui_SkillDamageDialog
 
 
 class SkillDamageDialog(QDialog):
-    def __init__(self, damage_by_skill: dict[str, int], parent=None):
+    def __init__(self, statistics: dict[str, SkillDamageStatistics], parent=None):
         super().__init__(parent)
         self.ui = Ui_SkillDamageDialog()
         self.ui.setupUi(self)
@@ -15,17 +16,34 @@ class SkillDamageDialog(QDialog):
         # Keep Qt from focusing and highlighting the first table cell on opening.
         close_button.setFocus(Qt.FocusReason.OtherFocusReason)
         self.model = QStandardItemModel(self)
-        self.model.setHorizontalHeaderLabels(["Умение", "Урон", "Доля урона, %"])
+        self.model.setHorizontalHeaderLabels([
+            "Умение", "Урон", "Доля урона, %", "Атак", "Критов", "Шанс крита, %",
+            "Промахов", "Шанс промаха, %", "Средний урон",
+        ])
+        for column, tooltip in {
+            3: "Число записей урона, включая промахи. Несколько целей или тиков считаются отдельными атаками.",
+            5: "Количество критических ударов / количество всех атак умения × 100.",
+            6: "Атаки с результатом «Вероятность уклонения» в логе. Нулевой урон сам по себе не считается промахом.",
+            7: "Количество промахов / количество всех атак умения × 100.",
+            8: "Суммарный урон / количество всех атак умения, включая промахи.",
+        }.items():
+            self.model.horizontalHeaderItem(column).setToolTip(tooltip)
         self.model.setSortRole(Qt.ItemDataRole.UserRole)
-        total = sum(damage_by_skill.values())
-        for skill, damage in sorted(damage_by_skill.items()):
+        total = sum(stats.damage for stats in statistics.values())
+        for skill, stats in sorted(statistics.items()):
             name = skill or "Без указания умения"
-            share = damage / total * 100 if total else 0.0
+            share = stats.damage / total * 100 if total else 0.0
             items = []
             for column, (label, value) in enumerate((
                 (name, name.casefold()),
-                (f"{damage:,}".replace(",", " "), damage),
+                (f"{stats.damage:,}".replace(",", " "), stats.damage),
                 (f"{share:.2f}", share),
+                (f"{stats.attacks:,}".replace(",", " "), stats.attacks),
+                (f"{stats.critical_hits:,}".replace(",", " "), stats.critical_hits),
+                (f"{stats.critical_chance:.2f}", stats.critical_chance),
+                (f"{stats.misses:,}".replace(",", " "), stats.misses),
+                (f"{stats.miss_chance:.2f}", stats.miss_chance),
+                (f"{stats.average_damage:,.2f}".replace(",", " "), stats.average_damage),
             )):
                 item = QStandardItem(label)
                 item.setData(value, Qt.ItemDataRole.UserRole)
@@ -36,9 +54,9 @@ class SkillDamageDialog(QDialog):
         self.ui.damage_table.setModel(self.model)
         header = self.ui.damage_table.horizontalHeader()
         header.setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
-        header.setSectionResizeMode(1, QHeaderView.ResizeMode.ResizeToContents)
-        header.setSectionResizeMode(2, QHeaderView.ResizeMode.ResizeToContents)
+        for column in range(1, self.model.columnCount()):
+            header.setSectionResizeMode(column, QHeaderView.ResizeMode.ResizeToContents)
         self.ui.damage_table.sortByColumn(1, Qt.SortOrder.DescendingOrder)
-        if damage_by_skill:
+        if statistics:
             formatted_total = f"{total:,}".replace(",", " ")
             self.ui.summary_label.setText(f"Всего урона: {formatted_total}")

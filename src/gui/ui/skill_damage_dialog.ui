@@ -4,11 +4,11 @@
  <widget class="QDialog" name="SkillDamageDialog">
   <property name="windowTitle"><string>Анализ урона</string></property>
   <property name="sizeGripEnabled"><bool>true</bool></property>
-  <property name="geometry"><rect><x>0</x><y>0</y><width>720</width><height>480</height></rect></property>
+  <property name="geometry"><rect><x>0</x><y>0</y><width>1200</width><height>480</height></rect></property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QLabel" name="scope_label">
-     <property name="text"><string>Все отображаемые строки с учётом фильтров и времени, независимо от выделения строк.</string></property>
+     <property name="text"><string>Все отображаемые строки с учётом фильтров и времени, независимо от выделения строк. Шансы и средний урон рассчитаны по всем атакам умения, включая промахи.</string></property>
      <property name="wordWrap"><bool>true</bool></property>
     </widget>
    </item>
