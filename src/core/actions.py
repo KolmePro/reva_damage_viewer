@@ -19,6 +19,7 @@ def connect_actions(app):
     ui.action_set_combat_pause.triggered.connect(window.action_set_combat_pause)
     ui.action_quick_help.triggered.connect(window.show_quick_help)
     ui.action_about.triggered.connect(window.show_about)
+    ui.action_skill_damage.triggered.connect(window.show_skill_damage)
 
     ui.le_your_nickname.textChanged.connect(window.on_player_name_changed)
     ui.le_attacker_name.textChanged.connect(window.on_attacker_name_changed)

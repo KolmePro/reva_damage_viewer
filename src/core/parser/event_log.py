@@ -50,6 +50,15 @@ class EventLog(UserList):
     def __iter__(self) -> Iterator[DamageRecord]:
         return iter(self.data)
 
+    def damage_by_skill(self) -> dict[str, int]:
+        """Sum damage by skill, excluding healing, absorption and other events."""
+        totals: dict[str, int] = {}
+        for record in self.data:
+            if record.type in (*self.DAMAGE_RECORD_TYPES, "damage_reflected"):
+                skill = record.skill.strip()
+                totals[skill] = totals.get(skill, 0) + record.damage
+        return totals
+
     @staticmethod
     def parse_chat(log_path: str, collect_unparsed: bool = False) -> "EventLog":
         """

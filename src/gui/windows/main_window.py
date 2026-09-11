@@ -39,6 +39,7 @@ from core.filter_plugins import FilterDefinition
 from core.parser.event_log import EventLog
 from core.parser.table_view_model import DamageTableModel
 from gui.compiled_ui.ui_main_window import Ui_MainWindow
+from gui.windows.skill_damage_dialog import SkillDamageDialog
 from gui.widgets.filter_scroll_area import FilterScrollArea
 from gui.widgets.combat_timeline import CombatTimeline, TimelineSection
 from gui.widgets.original_message_delegate import OriginalMessageDelegate
@@ -220,6 +221,11 @@ class MainWindow(QMainWindow):
             "4. Порог паузы между боями можно изменить под шкалой "
             "или в меню «Настройки». Значение сохраняется автоматически.",
         )
+
+    def show_skill_damage(self):
+        records = self.ui.damage_table_view.model()._filtered_records
+        dialog = SkillDamageDialog(EventLog(records).damage_by_skill(), self)
+        dialog.exec()
 
     def show_about(self):
         QMessageBox.about(
