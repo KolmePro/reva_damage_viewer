@@ -21,7 +21,13 @@
      <attribute name="verticalHeaderVisible"><bool>false</bool></attribute>
     </widget>
    </item>
-   <item><widget class="QLabel" name="summary_label"><property name="text"><string>Нет записей о нанесённом уроне.</string></property></widget></item>
+   <item>
+    <widget class="QLabel" name="summary_label">
+     <property name="text"><string>Нет записей о нанесённом уроне.</string></property>
+     <property name="wordWrap"><bool>true</bool></property>
+     <property name="toolTip"><string>Общие шансы и средний урон рассчитываются от общего количества атак, включая промахи.</string></property>
+    </widget>
+   </item>
    <item>
     <widget class="QDialogButtonBox" name="button_box">
      <property name="standardButtons"><set>QDialogButtonBox::Close</set></property>

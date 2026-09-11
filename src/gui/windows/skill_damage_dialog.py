@@ -17,33 +17,35 @@ class SkillDamageDialog(QDialog):
         close_button.setFocus(Qt.FocusReason.OtherFocusReason)
         self.model = QStandardItemModel(self)
         self.model.setHorizontalHeaderLabels([
-            "Умение", "Урон", "Доля урона, %", "Атак", "Критов", "Шанс крита, %",
-            "Промахов", "Шанс промаха, %", "Средний урон",
+            "Умение", "Урон", "Доля урона, %", "Атак", "Криты", "Промахи", "Средний урон",
         ])
         for column, tooltip in {
             3: "Число записей урона, включая промахи. Несколько целей или тиков считаются отдельными атаками.",
-            5: "Количество критических ударов / количество всех атак умения × 100.",
-            6: "Атаки с результатом «Вероятность уклонения» в логе. Нулевой урон сам по себе не считается промахом.",
-            7: "Количество промахов / количество всех атак умения × 100.",
-            8: "Суммарный урон / количество всех атак умения, включая промахи.",
+            4: "Количество критов и их доля среди всех атак умения. Сортировка по количеству.",
+            5: "Количество промахов и их доля среди всех атак умения. Сортировка по количеству. "
+               "Промах — результат «Вероятность уклонения» в логе; нулевой урон сам по себе не считается промахом.",
+            6: "Суммарный урон / количество всех атак умения, включая промахи. Округлено до целого.",
         }.items():
             self.model.horizontalHeaderItem(column).setToolTip(tooltip)
         self.model.setSortRole(Qt.ItemDataRole.UserRole)
-        total = sum(stats.damage for stats in statistics.values())
+        totals = SkillDamageStatistics(
+            damage=sum(stats.damage for stats in statistics.values()),
+            attacks=sum(stats.attacks for stats in statistics.values()),
+            critical_hits=sum(stats.critical_hits for stats in statistics.values()),
+            misses=sum(stats.misses for stats in statistics.values()),
+        )
         for skill, stats in sorted(statistics.items()):
             name = skill or "Без указания умения"
-            share = stats.damage / total * 100 if total else 0.0
+            share = stats.damage / totals.damage * 100 if totals.damage else 0.0
             items = []
             for column, (label, value) in enumerate((
                 (name, name.casefold()),
                 (f"{stats.damage:,}".replace(",", " "), stats.damage),
                 (f"{share:.2f}", share),
                 (f"{stats.attacks:,}".replace(",", " "), stats.attacks),
-                (f"{stats.critical_hits:,}".replace(",", " "), stats.critical_hits),
-                (f"{stats.critical_chance:.2f}", stats.critical_chance),
-                (f"{stats.misses:,}".replace(",", " "), stats.misses),
-                (f"{stats.miss_chance:.2f}", stats.miss_chance),
-                (f"{stats.average_damage:,.2f}".replace(",", " "), stats.average_damage),
+                (self._format_count_chance(stats.critical_hits, stats.critical_chance), stats.critical_hits),
+                (self._format_count_chance(stats.misses, stats.miss_chance), stats.misses),
+                (f"{stats.average_damage:,.0f}".replace(",", " "), stats.average_damage),
             )):
                 item = QStandardItem(label)
                 item.setData(value, Qt.ItemDataRole.UserRole)
@@ -58,5 +60,16 @@ class SkillDamageDialog(QDialog):
             header.setSectionResizeMode(column, QHeaderView.ResizeMode.ResizeToContents)
         self.ui.damage_table.sortByColumn(1, Qt.SortOrder.DescendingOrder)
         if statistics:
-            formatted_total = f"{total:,}".replace(",", " ")
-            self.ui.summary_label.setText(f"Всего урона: {formatted_total}")
+            damage = f"{totals.damage:,}".replace(",", " ")
+            attacks = f"{totals.attacks:,}".replace(",", " ")
+            average = f"{totals.average_damage:,.0f}".replace(",", " ")
+            critical = self._format_count_chance(totals.critical_hits, totals.critical_chance)
+            misses = self._format_count_chance(totals.misses, totals.miss_chance)
+            self.ui.summary_label.setText(
+                f"Итого: урон — {damage}; атак — {attacks}; криты — {critical}; "
+                f"промахи — {misses}; средний урон — {average}."
+            )
+
+    @staticmethod
+    def _format_count_chance(count: int, chance: float) -> str:
+        return f"{count:,} ({chance:.1f}%)".replace(",", " ")
