@@ -9,7 +9,26 @@ from core.parser.record import DamageRecord
 
 class DamageTableModel(QAbstractTableModel):
     data_refreshed = Signal()
-    headers = ["Событие", "Время", "Атакующий", "Цель", "Навык", "Бафы", "Урон", "Свойство 1", "Свойство 2"]
+    DPS_COLUMN = 0
+    EVENT_COLUMN = 1
+    TIME_COLUMN = 2
+    ATTACKER_COLUMN = 3
+    TARGET_COLUMN = 4
+    SKILL_COLUMN = 5
+    EFFECTS_COLUMN = 6
+    DAMAGE_COLUMN = 7
+    PROPERTY1_COLUMN = 8
+    PROPERTY2_COLUMN = 9
+    DAMAGE_RECORD_TYPES = (
+        "damage_dealt",
+        "damage_dealt_buffed",
+        "damage_to_spirit",
+        "damage_reflected",
+    )
+    headers = [
+        "DPS", "Событие", "Время", "Атакующий", "Цель", "Навык", "Бафы",
+        "Урон", "Свойство 1", "Свойство 2",
+    ]
 
     def __init__(self, filter_definitions: list[FilterDefinition] | None = None):
         super().__init__()
@@ -30,6 +49,8 @@ class DamageTableModel(QAbstractTableModel):
         self.timestamp_ranges: list[tuple[datetime, datetime, bool, bool]] = []
         self.minimum_damage = 0
         self.maximum_damage = 0
+        self._damage_per_second: dict[datetime | time, int] = {}
+        self._maximum_second_damage = 0
 
     def set_records(self, records: list[DamageRecord]):
         self._all_records = records
@@ -46,7 +67,10 @@ class DamageTableModel(QAbstractTableModel):
             return None
 
         record = self._filtered_records[index.row()]
-        col = index.column()
+        if index.column() == self.DPS_COLUMN:
+            return self._dps_cell_data(record, role)
+        # The remaining columns preserve the original data mapping.
+        col = index.column() - 1
 
         if record.type == "unparsed":
             if role == Qt.DisplayRole and col == 0:
@@ -177,10 +201,17 @@ class DamageTableModel(QAbstractTableModel):
         return None
 
     def headerData(self, section, orientation, role=Qt.DisplayRole):
+        if orientation == Qt.Horizontal:
+            if role == Qt.DisplayRole:
+                return self.headers[section]
+            if role == Qt.ToolTipRole and section == self.DPS_COLUMN:
+                return (
+                    "Суммарный урон всех отображаемых атак в эту секунду. "
+                    "Цвет показывает интенсивность относительно самой сильной секунды в таблице."
+                )
+            return None
         if role != Qt.DisplayRole:
             return None
-        if orientation == Qt.Horizontal:
-            return self.headers[section]
         return str(section + 1)
 
     def set_filter(self, key, value):
@@ -244,8 +275,64 @@ class DamageTableModel(QAbstractTableModel):
     def apply_filters(self):
         self.beginResetModel()
         self._filtered_records = [record for record in self._all_records if self._record_allowed(record)]
+        self._rebuild_damage_per_second()
         self.endResetModel()
         self.data_refreshed.emit()
+
+    def _rebuild_damage_per_second(self):
+        totals: dict[datetime | time, int] = {}
+        for record in self._filtered_records:
+            if record.type not in self.DAMAGE_RECORD_TYPES:
+                continue
+            key = self._second_key(record)
+            totals[key] = totals.get(key, 0) + record.damage
+        self._damage_per_second = totals
+        self._maximum_second_damage = max(totals.values(), default=0)
+
+    def _dps_cell_data(self, record: DamageRecord, role):
+        if record.type == "unparsed":
+            return None
+        damage = self._damage_per_second.get(self._second_key(record))
+        if damage is None:
+            return None
+        if role == Qt.DisplayRole:
+            return f"{damage:,}".replace(",", " ")
+        if role == Qt.TextAlignmentRole:
+            return Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter
+        if role == Qt.ForegroundRole:
+            return QBrush(QColor("#FFFFFF"))
+        if role == Qt.BackgroundRole:
+            return QBrush(self._damage_intensity_color(damage))
+        if role == Qt.ToolTipRole:
+            return (
+                f"Урон за эту секунду: {damage:,}.\n"
+                "Цвет рассчитан относительно максимального DPS среди отображаемых строк."
+            ).replace(",", " ")
+        return None
+
+    @staticmethod
+    def _second_key(record: DamageRecord) -> datetime | time:
+        timestamp = getattr(record, "timestamp", None)
+        if isinstance(timestamp, datetime):
+            return timestamp.replace(microsecond=0)
+        return record.time.replace(microsecond=0)
+
+    def _damage_intensity_color(self, damage: int) -> QColor:
+        if self._maximum_second_damage <= 0:
+            return QColor("#365A7A")
+        intensity = max(0, damage) / self._maximum_second_damage
+        if intensity < 0.5:
+            return self._blend_color(QColor("#285A8C"), QColor("#9A6700"), intensity * 2)
+        return self._blend_color(QColor("#9A6700"), QColor("#B42318"), (intensity - 0.5) * 2)
+
+    @staticmethod
+    def _blend_color(start: QColor, end: QColor, amount: float) -> QColor:
+        amount = max(0.0, min(1.0, amount))
+        return QColor(
+            round(start.red() + (end.red() - start.red()) * amount),
+            round(start.green() + (end.green() - start.green()) * amount),
+            round(start.blue() + (end.blue() - start.blue()) * amount),
+        )
 
     def _match_text(self, query, text):
         invert = query.startswith("-")

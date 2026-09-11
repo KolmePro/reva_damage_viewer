@@ -89,7 +89,9 @@ class MainWindow(QMainWindow):
         damage_model = DamageTableModel(app.filter_definitions)
         self.ui.damage_table_view.setModel(damage_model)
         self.original_message_delegate = OriginalMessageDelegate(self.ui.damage_table_view)
-        self.ui.damage_table_view.setItemDelegateForColumn(0, self.original_message_delegate)
+        self.ui.damage_table_view.setItemDelegateForColumn(
+            damage_model.EVENT_COLUMN, self.original_message_delegate
+        )
         self.ui.damage_table_view.setSelectionBehavior(
             QAbstractItemView.SelectionBehavior.SelectRows
         )
@@ -522,7 +524,9 @@ class MainWindow(QMainWindow):
         model = table.model()
         for row, record in enumerate(model._filtered_records):
             if record.type == "unparsed":
-                table.setSpan(row, 0, 1, model.columnCount())
+                table.setSpan(
+                    row, model.EVENT_COLUMN, 1, model.columnCount() - model.EVENT_COLUMN
+                )
         self.refresh_damage_summary()
 
     def _setup_debug_actions(self):
@@ -870,9 +874,9 @@ class MainWindow(QMainWindow):
         for index in indexes:
             if model._filtered_records[index.row()].type not in statistic_types:
                 continue
-            damage_index = model.index(index.row(), 6)
-            property1 = model.index(index.row(), 7)
-            property2 = model.index(index.row(), 8)
+            damage_index = model.index(index.row(), model.DAMAGE_COLUMN)
+            property1 = model.index(index.row(), model.PROPERTY1_COLUMN)
+            property2 = model.index(index.row(), model.PROPERTY2_COLUMN)
             value = model.data(damage_index, role=Qt.DisplayRole)
             damage_type_1 = model.data(property1, role=Qt.DisplayRole)
             damage_type_2 = model.data(property2, role=Qt.DisplayRole)
