@@ -59,16 +59,15 @@ class SkillDamageDialog(QDialog):
         for column in range(1, self.model.columnCount()):
             header.setSectionResizeMode(column, QHeaderView.ResizeMode.ResizeToContents)
         self.ui.damage_table.sortByColumn(1, Qt.SortOrder.DescendingOrder)
-        if statistics:
-            damage = f"{totals.damage:,}".replace(",", " ")
-            attacks = f"{totals.attacks:,}".replace(",", " ")
-            average = f"{totals.average_damage:,.0f}".replace(",", " ")
-            critical = self._format_count_chance(totals.critical_hits, totals.critical_chance)
-            misses = self._format_count_chance(totals.misses, totals.miss_chance)
-            self.ui.summary_label.setText(
-                f"Итого: урон — {damage}; атак — {attacks}; криты — {critical}; "
-                f"промахи — {misses}; средний урон — {average}."
-            )
+        self.ui.total_damage_value.setText(f"{totals.damage:,}".replace(",", " "))
+        self.ui.total_attacks_value.setText(f"{totals.attacks:,}".replace(",", " "))
+        self.ui.total_critical_value.setText(f"{totals.critical_hits:,}".replace(",", " "))
+        self.ui.total_misses_value.setText(f"{totals.misses:,}".replace(",", " "))
+        self.ui.total_average_value.setText(f"{totals.average_damage:,.0f}".replace(",", " "))
+        self.ui.total_critical_detail.setText(f"{totals.critical_chance:.1f}% всех атак")
+        self.ui.total_misses_detail.setText(f"{totals.miss_chance:.1f}% всех атак")
+        if not statistics:
+            self.ui.summary_label.setText("Итого по выборке — нет записей о нанесённом уроне")
 
     @staticmethod
     def _format_count_chance(count: int, chance: float) -> str:

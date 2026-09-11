@@ -4,7 +4,7 @@
  <widget class="QDialog" name="SkillDamageDialog">
   <property name="windowTitle"><string>Анализ урона</string></property>
   <property name="sizeGripEnabled"><bool>true</bool></property>
-  <property name="geometry"><rect><x>0</x><y>0</y><width>1200</width><height>480</height></rect></property>
+  <property name="geometry"><rect><x>0</x><y>0</y><width>1200</width><height>580</height></rect></property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QLabel" name="scope_label">
@@ -22,10 +22,76 @@
     </widget>
    </item>
    <item>
-    <widget class="QLabel" name="summary_label">
-     <property name="text"><string>Нет записей о нанесённом уроне.</string></property>
-     <property name="wordWrap"><bool>true</bool></property>
+    <widget class="QWidget" name="summary_panel">
      <property name="toolTip"><string>Общие шансы и средний урон рассчитываются от общего количества атак, включая промахи.</string></property>
+     <property name="styleSheet">
+      <string notr="true">QFrame[summaryCard="true"] {
+ background-color: palette(base);
+ border: 1px solid palette(mid);
+ border-radius: 8px;
+}
+QFrame#total_damage_card { border-top: 3px solid #6f9ed8; }
+QLabel { background: transparent; border: none; }
+QLabel[summaryRole="value"] { font-size: 22px; font-weight: 600; }
+QLabel[summaryRole="detail"] { font-size: 12px; }
+QLabel#summary_label { font-weight: 600; }</string>
+     </property>
+     <layout class="QVBoxLayout" name="summary_layout">
+      <property name="leftMargin"><number>0</number></property>
+      <property name="topMargin"><number>8</number></property>
+      <property name="rightMargin"><number>0</number></property>
+      <property name="bottomMargin"><number>0</number></property>
+      <property name="spacing"><number>8</number></property>
+      <item><widget class="QLabel" name="summary_label">
+       <property name="text"><string>Итого по выборке</string></property>
+       <property name="wordWrap"><bool>true</bool></property>
+      </widget></item>
+      <item>
+       <layout class="QHBoxLayout" name="summary_cards_layout" stretch="1,1,1,1,1">
+        <property name="spacing"><number>10</number></property>
+        <item><widget class="QFrame" name="total_damage_card">
+         <property name="summaryCard" stdset="0"><bool>true</bool></property>
+         <layout class="QVBoxLayout" name="total_damage_layout">
+          <item><widget class="QLabel" name="total_damage_title"><property name="text"><string>Общий урон</string></property></widget></item>
+          <item><widget class="QLabel" name="total_damage_value"><property name="text"><string>0</string></property><property name="summaryRole" stdset="0"><string notr="true">value</string></property><property name="textInteractionFlags"><set>Qt::TextSelectableByMouse</set></property></widget></item>
+          <item><widget class="QLabel" name="total_damage_detail"><property name="text"><string>по всем умениям</string></property><property name="summaryRole" stdset="0"><string notr="true">detail</string></property></widget></item>
+         </layout>
+        </widget></item>
+        <item><widget class="QFrame" name="total_attacks_card">
+         <property name="summaryCard" stdset="0"><bool>true</bool></property>
+         <layout class="QVBoxLayout" name="total_attacks_layout">
+          <item><widget class="QLabel" name="total_attacks_title"><property name="text"><string>Атаки</string></property></widget></item>
+          <item><widget class="QLabel" name="total_attacks_value"><property name="text"><string>0</string></property><property name="summaryRole" stdset="0"><string notr="true">value</string></property><property name="textInteractionFlags"><set>Qt::TextSelectableByMouse</set></property></widget></item>
+          <item><widget class="QLabel" name="total_attacks_detail"><property name="text"><string>включая промахи</string></property><property name="summaryRole" stdset="0"><string notr="true">detail</string></property></widget></item>
+         </layout>
+        </widget></item>
+        <item><widget class="QFrame" name="total_critical_card">
+         <property name="summaryCard" stdset="0"><bool>true</bool></property>
+         <layout class="QVBoxLayout" name="total_critical_layout">
+          <item><widget class="QLabel" name="total_critical_title"><property name="text"><string>Криты</string></property></widget></item>
+          <item><widget class="QLabel" name="total_critical_value"><property name="text"><string>0</string></property><property name="summaryRole" stdset="0"><string notr="true">value</string></property><property name="textInteractionFlags"><set>Qt::TextSelectableByMouse</set></property></widget></item>
+          <item><widget class="QLabel" name="total_critical_detail"><property name="text"><string>0.0% всех атак</string></property><property name="summaryRole" stdset="0"><string notr="true">detail</string></property></widget></item>
+         </layout>
+        </widget></item>
+        <item><widget class="QFrame" name="total_misses_card">
+         <property name="summaryCard" stdset="0"><bool>true</bool></property>
+         <layout class="QVBoxLayout" name="total_misses_layout">
+          <item><widget class="QLabel" name="total_misses_title"><property name="text"><string>Промахи</string></property></widget></item>
+          <item><widget class="QLabel" name="total_misses_value"><property name="text"><string>0</string></property><property name="summaryRole" stdset="0"><string notr="true">value</string></property><property name="textInteractionFlags"><set>Qt::TextSelectableByMouse</set></property></widget></item>
+          <item><widget class="QLabel" name="total_misses_detail"><property name="text"><string>0.0% всех атак</string></property><property name="summaryRole" stdset="0"><string notr="true">detail</string></property></widget></item>
+         </layout>
+        </widget></item>
+        <item><widget class="QFrame" name="total_average_card">
+         <property name="summaryCard" stdset="0"><bool>true</bool></property>
+         <layout class="QVBoxLayout" name="total_average_layout">
+          <item><widget class="QLabel" name="total_average_title"><property name="text"><string>Средний урон</string></property></widget></item>
+          <item><widget class="QLabel" name="total_average_value"><property name="text"><string>0</string></property><property name="summaryRole" stdset="0"><string notr="true">value</string></property><property name="textInteractionFlags"><set>Qt::TextSelectableByMouse</set></property></widget></item>
+          <item><widget class="QLabel" name="total_average_detail"><property name="text"><string>на одну атаку</string></property><property name="summaryRole" stdset="0"><string notr="true">detail</string></property></widget></item>
+         </layout>
+        </widget></item>
+       </layout>
+      </item>
+     </layout>
     </widget>
    </item>
    <item>
