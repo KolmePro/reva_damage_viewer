@@ -7,7 +7,7 @@ from gui.compiled_ui.ui_skill_damage_dialog import Ui_SkillDamageDialog
 
 
 class SkillDamageDialog(QDialog):
-    def __init__(self, statistics: dict[str, SkillDamageStatistics], parent=None):
+    def __init__(self, statistics: dict[str, SkillDamageStatistics], parent=None, *, dps: float | None = None):
         super().__init__(parent)
         self.ui = Ui_SkillDamageDialog()
         self.ui.setupUi(self)
@@ -60,6 +60,7 @@ class SkillDamageDialog(QDialog):
             header.setSectionResizeMode(column, QHeaderView.ResizeMode.ResizeToContents)
         self.ui.damage_table.sortByColumn(1, Qt.SortOrder.DescendingOrder)
         self.ui.total_damage_value.setText(f"{totals.damage:,}".replace(",", " "))
+        self.ui.total_dps_value.setText("—" if dps is None else f"{dps:,.0f}".replace(",", " "))
         self.ui.total_attacks_value.setText(f"{totals.attacks:,}".replace(",", " "))
         self.ui.total_critical_value.setText(f"{totals.critical_hits:,}".replace(",", " "))
         self.ui.total_misses_value.setText(f"{totals.misses:,}".replace(",", " "))

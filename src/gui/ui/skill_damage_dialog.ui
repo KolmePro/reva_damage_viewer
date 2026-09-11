@@ -47,7 +47,7 @@ QLabel#summary_label { font-weight: 600; }</string>
        <property name="wordWrap"><bool>true</bool></property>
       </widget></item>
       <item>
-       <layout class="QHBoxLayout" name="summary_cards_layout" stretch="1,1,1,1,1">
+       <layout class="QHBoxLayout" name="summary_cards_layout" stretch="1,1,1,1,1,1">
         <property name="spacing"><number>10</number></property>
         <item><widget class="QFrame" name="total_damage_card">
          <property name="summaryCard" stdset="0"><bool>true</bool></property>
@@ -55,6 +55,15 @@ QLabel#summary_label { font-weight: 600; }</string>
           <item><widget class="QLabel" name="total_damage_title"><property name="text"><string>Общий урон</string></property></widget></item>
           <item><widget class="QLabel" name="total_damage_value"><property name="text"><string>0</string></property><property name="summaryRole" stdset="0"><string notr="true">value</string></property><property name="textInteractionFlags"><set>Qt::TextSelectableByMouse</set></property></widget></item>
           <item><widget class="QLabel" name="total_damage_detail"><property name="text"><string>по всем умениям</string></property><property name="summaryRole" stdset="0"><string notr="true">detail</string></property></widget></item>
+         </layout>
+        </widget></item>
+        <item><widget class="QFrame" name="total_dps_card">
+         <property name="summaryCard" stdset="0"><bool>true</bool></property>
+         <property name="toolTip"><string>Общий урон / время между первой и последней записью урона в выборке, включая паузы и отражённый урон. При нулевой длительности показан прочерк.</string></property>
+         <layout class="QVBoxLayout" name="total_dps_layout">
+          <item><widget class="QLabel" name="total_dps_title"><property name="text"><string>DPS</string></property></widget></item>
+          <item><widget class="QLabel" name="total_dps_value"><property name="text"><string>—</string></property><property name="summaryRole" stdset="0"><string notr="true">value</string></property><property name="textInteractionFlags"><set>Qt::TextSelectableByMouse</set></property></widget></item>
+          <item><widget class="QLabel" name="total_dps_detail"><property name="text"><string>урон в секунду</string></property><property name="summaryRole" stdset="0"><string notr="true">detail</string></property></widget></item>
          </layout>
         </widget></item>
         <item><widget class="QFrame" name="total_attacks_card">

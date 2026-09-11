@@ -205,10 +205,19 @@ class EventLog(UserList):
             forced_segment_start_record_ids,
         )
 
-    def damage_per_second(self) -> float | None:
+    def damage_per_second(self, *, include_reflected: bool = False) -> float | None:
         """DPS по атакам лога; None, если длительность равна нулю."""
-        damage_records = [record for record in self.data if record.type in self.DAMAGE_RECORD_TYPES]
-        return EventLog(damage_records).amount_per_second()
+        record_types = self.DAMAGE_RECORD_TYPES
+        if include_reflected:
+            record_types = (*record_types, "damage_reflected")
+        records = [record for record in self.data if record.type in record_types]
+        if not records:
+            return 0.0
+        timestamps = EventLog(records)._resolved_timestamps()
+        duration = (max(timestamps) - min(timestamps)).total_seconds()
+        if duration <= 0:
+            return None
+        return sum(record.damage for record in records) / duration
 
     def amount_per_second(self, *, converted_healing: bool = False) -> float | None:
         """Урон и восстановление в секунду по событиям текущей выборки."""

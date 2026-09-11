@@ -95,6 +95,32 @@ class Ui_SkillDamageDialog(object):
 
         self.summary_cards_layout.addWidget(self.total_damage_card)
 
+        self.total_dps_card = QFrame(self.summary_panel)
+        self.total_dps_card.setObjectName(u"total_dps_card")
+        self.total_dps_card.setProperty(u"summaryCard", True)
+        self.total_dps_layout = QVBoxLayout(self.total_dps_card)
+        self.total_dps_layout.setObjectName(u"total_dps_layout")
+        self.total_dps_title = QLabel(self.total_dps_card)
+        self.total_dps_title.setObjectName(u"total_dps_title")
+
+        self.total_dps_layout.addWidget(self.total_dps_title)
+
+        self.total_dps_value = QLabel(self.total_dps_card)
+        self.total_dps_value.setObjectName(u"total_dps_value")
+        self.total_dps_value.setProperty(u"summaryRole", u"value")
+        self.total_dps_value.setTextInteractionFlags(Qt.TextSelectableByMouse)
+
+        self.total_dps_layout.addWidget(self.total_dps_value)
+
+        self.total_dps_detail = QLabel(self.total_dps_card)
+        self.total_dps_detail.setObjectName(u"total_dps_detail")
+        self.total_dps_detail.setProperty(u"summaryRole", u"detail")
+
+        self.total_dps_layout.addWidget(self.total_dps_detail)
+
+
+        self.summary_cards_layout.addWidget(self.total_dps_card)
+
         self.total_attacks_card = QFrame(self.summary_panel)
         self.total_attacks_card.setObjectName(u"total_attacks_card")
         self.total_attacks_card.setProperty(u"summaryCard", True)
@@ -204,6 +230,7 @@ class Ui_SkillDamageDialog(object):
         self.summary_cards_layout.setStretch(2, 1)
         self.summary_cards_layout.setStretch(3, 1)
         self.summary_cards_layout.setStretch(4, 1)
+        self.summary_cards_layout.setStretch(5, 1)
 
         self.summary_layout.addLayout(self.summary_cards_layout)
 
@@ -233,6 +260,12 @@ class Ui_SkillDamageDialog(object):
         self.total_damage_title.setText(QCoreApplication.translate("SkillDamageDialog", u"\u041e\u0431\u0449\u0438\u0439 \u0443\u0440\u043e\u043d", None))
         self.total_damage_value.setText(QCoreApplication.translate("SkillDamageDialog", u"0", None))
         self.total_damage_detail.setText(QCoreApplication.translate("SkillDamageDialog", u"\u043f\u043e \u0432\u0441\u0435\u043c \u0443\u043c\u0435\u043d\u0438\u044f\u043c", None))
+#if QT_CONFIG(tooltip)
+        self.total_dps_card.setToolTip(QCoreApplication.translate("SkillDamageDialog", u"\u041e\u0431\u0449\u0438\u0439 \u0443\u0440\u043e\u043d / \u0432\u0440\u0435\u043c\u044f \u043c\u0435\u0436\u0434\u0443 \u043f\u0435\u0440\u0432\u043e\u0439 \u0438 \u043f\u043e\u0441\u043b\u0435\u0434\u043d\u0435\u0439 \u0437\u0430\u043f\u0438\u0441\u044c\u044e \u0443\u0440\u043e\u043d\u0430 \u0432 \u0432\u044b\u0431\u043e\u0440\u043a\u0435, \u0432\u043a\u043b\u044e\u0447\u0430\u044f \u043f\u0430\u0443\u0437\u044b \u0438 \u043e\u0442\u0440\u0430\u0436\u0451\u043d\u043d\u044b\u0439 \u0443\u0440\u043e\u043d. \u041f\u0440\u0438 \u043d\u0443\u043b\u0435\u0432\u043e\u0439 \u0434\u043b\u0438\u0442\u0435\u043b\u044c\u043d\u043e\u0441\u0442\u0438 \u043f\u043e\u043a\u0430\u0437\u0430\u043d \u043f\u0440\u043e\u0447\u0435\u0440\u043a.", None))
+#endif // QT_CONFIG(tooltip)
+        self.total_dps_title.setText(QCoreApplication.translate("SkillDamageDialog", u"DPS", None))
+        self.total_dps_value.setText(QCoreApplication.translate("SkillDamageDialog", u"\u2014", None))
+        self.total_dps_detail.setText(QCoreApplication.translate("SkillDamageDialog", u"\u0443\u0440\u043e\u043d \u0432 \u0441\u0435\u043a\u0443\u043d\u0434\u0443", None))
         self.total_attacks_title.setText(QCoreApplication.translate("SkillDamageDialog", u"\u0410\u0442\u0430\u043a\u0438", None))
         self.total_attacks_value.setText(QCoreApplication.translate("SkillDamageDialog", u"0", None))
         self.total_attacks_detail.setText(QCoreApplication.translate("SkillDamageDialog", u"\u0432\u043a\u043b\u044e\u0447\u0430\u044f \u043f\u0440\u043e\u043c\u0430\u0445\u0438", None))
