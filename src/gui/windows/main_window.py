@@ -251,6 +251,7 @@ class MainWindow(QMainWindow):
         log = EventLog(records)
         dialog = SkillDamageDialog(
             log.skill_statistics(), self, dps=log.damage_per_second(include_reflected=True),
+            duration_seconds=log.damage_duration_seconds(include_reflected=True),
             selected_records_count=len(indexes) if indexes else None,
         )
         dialog.exec()

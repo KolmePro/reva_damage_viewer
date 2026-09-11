@@ -121,6 +121,32 @@ class Ui_SkillDamageDialog(object):
 
         self.summary_cards_layout.addWidget(self.total_dps_card)
 
+        self.total_duration_card = QFrame(self.summary_panel)
+        self.total_duration_card.setObjectName(u"total_duration_card")
+        self.total_duration_card.setProperty(u"summaryCard", True)
+        self.total_duration_layout = QVBoxLayout(self.total_duration_card)
+        self.total_duration_layout.setObjectName(u"total_duration_layout")
+        self.total_duration_title = QLabel(self.total_duration_card)
+        self.total_duration_title.setObjectName(u"total_duration_title")
+
+        self.total_duration_layout.addWidget(self.total_duration_title)
+
+        self.total_duration_value = QLabel(self.total_duration_card)
+        self.total_duration_value.setObjectName(u"total_duration_value")
+        self.total_duration_value.setProperty(u"summaryRole", u"value")
+        self.total_duration_value.setTextInteractionFlags(Qt.TextSelectableByMouse)
+
+        self.total_duration_layout.addWidget(self.total_duration_value)
+
+        self.total_duration_detail = QLabel(self.total_duration_card)
+        self.total_duration_detail.setObjectName(u"total_duration_detail")
+        self.total_duration_detail.setProperty(u"summaryRole", u"detail")
+
+        self.total_duration_layout.addWidget(self.total_duration_detail)
+
+
+        self.summary_cards_layout.addWidget(self.total_duration_card)
+
         self.total_attacks_card = QFrame(self.summary_panel)
         self.total_attacks_card.setObjectName(u"total_attacks_card")
         self.total_attacks_card.setProperty(u"summaryCard", True)
@@ -231,6 +257,7 @@ class Ui_SkillDamageDialog(object):
         self.summary_cards_layout.setStretch(3, 1)
         self.summary_cards_layout.setStretch(4, 1)
         self.summary_cards_layout.setStretch(5, 1)
+        self.summary_cards_layout.setStretch(6, 1)
 
         self.summary_layout.addLayout(self.summary_cards_layout)
 
@@ -269,6 +296,12 @@ class Ui_SkillDamageDialog(object):
         self.total_dps_title.setText(QCoreApplication.translate("SkillDamageDialog", u"DPS", None))
         self.total_dps_value.setText(QCoreApplication.translate("SkillDamageDialog", u"\u2014", None))
         self.total_dps_detail.setText(QCoreApplication.translate("SkillDamageDialog", u"\u0443\u0440\u043e\u043d \u0432 \u0441\u0435\u043a\u0443\u043d\u0434\u0443", None))
+#if QT_CONFIG(tooltip)
+        self.total_duration_card.setToolTip(QCoreApplication.translate("SkillDamageDialog", u"\u0418\u043d\u0442\u0435\u0440\u0432\u0430\u043b \u043c\u0435\u0436\u0434\u0443 \u043f\u0435\u0440\u0432\u043e\u0439 \u0438 \u043f\u043e\u0441\u043b\u0435\u0434\u043d\u0435\u0439 \u0437\u0430\u043f\u0438\u0441\u044c\u044e \u0443\u0440\u043e\u043d\u0430 \u0432 \u0432\u044b\u0431\u043e\u0440\u043a\u0435. \u042d\u0442\u043e \u0432\u0440\u0435\u043c\u044f \u0438\u0441\u043f\u043e\u043b\u044c\u0437\u0443\u0435\u0442\u0441\u044f \u0434\u043b\u044f \u0440\u0430\u0441\u0447\u0451\u0442\u0430 DPS.", None))
+#endif // QT_CONFIG(tooltip)
+        self.total_duration_title.setText(QCoreApplication.translate("SkillDamageDialog", u"\u0412\u0440\u0435\u043c\u044f", None))
+        self.total_duration_value.setText(QCoreApplication.translate("SkillDamageDialog", u"0", None))
+        self.total_duration_detail.setText(QCoreApplication.translate("SkillDamageDialog", u"\u0441\u0435\u043a\u0443\u043d\u0434", None))
         self.total_attacks_title.setText(QCoreApplication.translate("SkillDamageDialog", u"\u0410\u0442\u0430\u043a\u0438", None))
         self.total_attacks_value.setText(QCoreApplication.translate("SkillDamageDialog", u"0", None))
         self.total_attacks_detail.setText(QCoreApplication.translate("SkillDamageDialog", u"\u0432\u043a\u043b\u044e\u0447\u0430\u044f \u043f\u0440\u043e\u043c\u0430\u0445\u0438", None))

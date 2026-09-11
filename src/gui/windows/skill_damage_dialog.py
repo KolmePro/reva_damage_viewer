@@ -9,7 +9,8 @@ from gui.compiled_ui.ui_skill_damage_dialog import Ui_SkillDamageDialog
 class SkillDamageDialog(QDialog):
     def __init__(
         self, statistics: dict[str, SkillDamageStatistics], parent=None, *,
-        dps: float | None = None, selected_records_count: int | None = None,
+        dps: float | None = None, duration_seconds: float = 0,
+        selected_records_count: int | None = None,
     ):
         super().__init__(parent)
         self.ui = Ui_SkillDamageDialog()
@@ -66,6 +67,8 @@ class SkillDamageDialog(QDialog):
         self.ui.damage_table.sortByColumn(1, Qt.SortOrder.DescendingOrder)
         self.ui.total_damage_value.setText(f"{totals.damage:,}".replace(",", " "))
         self.ui.total_dps_value.setText("—" if dps is None else f"{dps:,.0f}".replace(",", " "))
+        duration = f"{duration_seconds:,.0f}".replace(",", " ")
+        self.ui.total_duration_value.setText(duration)
         self.ui.total_attacks_value.setText(f"{totals.attacks:,}".replace(",", " "))
         self.ui.total_critical_value.setText(f"{totals.critical_hits:,}".replace(",", " "))
         self.ui.total_misses_value.setText(f"{totals.misses:,}".replace(",", " "))
