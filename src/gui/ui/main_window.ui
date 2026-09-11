@@ -813,7 +813,7 @@
    <property name="shortcut"><string>Alt+F4</string></property>
   </action>
   <action name="action_skill_damage">
-   <property name="text"><string>Урон по умениям</string></property>
+   <property name="text"><string>Анализ урона</string></property>
    <property name="toolTip"><string>Урон каждого умения по всем отображаемым строкам с учётом фильтров</string></property>
   </action>
   <action name="action_show_statusbar">

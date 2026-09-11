@@ -2,7 +2,7 @@
 <ui version="4.0">
  <class>SkillDamageDialog</class>
  <widget class="QDialog" name="SkillDamageDialog">
-  <property name="windowTitle"><string>Урон по умениям</string></property>
+  <property name="windowTitle"><string>Анализ урона</string></property>
   <property name="sizeGripEnabled"><bool>true</bool></property>
   <property name="geometry"><rect><x>0</x><y>0</y><width>720</width><height>480</height></rect></property>
   <layout class="QVBoxLayout" name="verticalLayout">

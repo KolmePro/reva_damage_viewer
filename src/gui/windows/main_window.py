@@ -110,6 +110,7 @@ class MainWindow(QMainWindow):
             self.ui.action_show_statusbar, self.ui.toolbar.toggleViewAction()
         )
         self.ui.action_set_combat_pause.setIcon(self._create_combat_pause_icon())
+        self.ui.action_skill_damage.setIcon(self._create_damage_analysis_icon())
         self._setup_debug_actions()
 
         default_pause = int(EventLog.DEFAULT_INTERRUPTION_THRESHOLD.total_seconds())
@@ -170,6 +171,25 @@ class MainWindow(QMainWindow):
         self.ui.combat_pause_label.setPixmap(self._create_combat_pause_icon().pixmap(20, 20))
         timeline_layout.addWidget(self.combat_timeline_scroll_area, 1)
         self.ui.verticalLayout_2.insertWidget(0, self.combat_timeline_container)
+
+    def _create_damage_analysis_icon(self):
+        pixmap = QPixmap(24, 24)
+        pixmap.fill(Qt.GlobalColor.transparent)
+        painter = QPainter(pixmap)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+        color = self.palette().color(QPalette.ColorRole.ButtonText)
+        pen = QPen(color)
+        pen.setWidthF(1.7)
+        pen.setCapStyle(Qt.PenCapStyle.RoundCap)
+        painter.setPen(pen)
+        painter.drawLine(3, 3, 3, 21)
+        painter.drawLine(3, 21, 22, 21)
+        painter.setPen(Qt.PenStyle.NoPen)
+        painter.setBrush(color)
+        for x, height in ((6, 7), (12, 12), (18, 17)):
+            painter.drawRoundedRect(x, 19 - height, 3, height, 0.7, 0.7)
+        painter.end()
+        return QIcon(pixmap)
 
     def _create_combat_pause_icon(self):
         pixmap = QPixmap(24, 24)

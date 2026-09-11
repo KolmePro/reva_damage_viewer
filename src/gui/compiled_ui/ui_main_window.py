@@ -619,7 +619,7 @@ class Ui_MainWindow(object):
 #if QT_CONFIG(shortcut)
         self.action_exit.setShortcut(QCoreApplication.translate("MainWindow", u"Alt+F4", None))
 #endif // QT_CONFIG(shortcut)
-        self.action_skill_damage.setText(QCoreApplication.translate("MainWindow", u"\u0423\u0440\u043e\u043d \u043f\u043e \u0443\u043c\u0435\u043d\u0438\u044f\u043c", None))
+        self.action_skill_damage.setText(QCoreApplication.translate("MainWindow", u"\u0410\u043d\u0430\u043b\u0438\u0437 \u0443\u0440\u043e\u043d\u0430", None))
 #if QT_CONFIG(tooltip)
         self.action_skill_damage.setToolTip(QCoreApplication.translate("MainWindow", u"\u0423\u0440\u043e\u043d \u043a\u0430\u0436\u0434\u043e\u0433\u043e \u0443\u043c\u0435\u043d\u0438\u044f \u043f\u043e \u0432\u0441\u0435\u043c \u043e\u0442\u043e\u0431\u0440\u0430\u0436\u0430\u0435\u043c\u044b\u043c \u0441\u0442\u0440\u043e\u043a\u0430\u043c \u0441 \u0443\u0447\u0451\u0442\u043e\u043c \u0444\u0438\u043b\u044c\u0442\u0440\u043e\u0432", None))
 #endif // QT_CONFIG(tooltip)
