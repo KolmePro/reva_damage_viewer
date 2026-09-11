@@ -88,6 +88,7 @@ class MainWindow(QMainWindow):
         self.ui.le_maximum_damage.setValidator(self.damage_value_validator)
         damage_model = DamageTableModel(app.filter_definitions)
         self.ui.damage_table_view.setModel(damage_model)
+        self.ui.damage_table_view.setColumnHidden(damage_model.DPS_COLUMN, True)
         self.original_message_delegate = OriginalMessageDelegate(self.ui.damage_table_view)
         self.ui.damage_table_view.setItemDelegateForColumn(
             damage_model.EVENT_COLUMN, self.original_message_delegate
@@ -106,6 +107,7 @@ class MainWindow(QMainWindow):
         self.group_filter_keys: dict[str, list[str]] = {}
         self.filter_key_to_group: dict[str, str] = {}
         self.group_filter_checkboxes: dict[str, QCheckBox] = {}
+        self.show_dps_column_checkbox: QCheckBox | None = None
         self._setup_combat_timeline()
         self._setup_filter_panel(app.filter_definitions)
         self.ui.menu_view.insertAction(
@@ -622,6 +624,32 @@ class MainWindow(QMainWindow):
                 self.filter_checkboxes[definition.key] = checkbox
                 grid.addWidget(checkbox, index // 2, index % 2)
 
+            if group_name == "Прочее":
+                self.show_dps_column_checkbox = QCheckBox(
+                    "Показывать колонку DPS", container
+                )
+                self.show_dps_column_checkbox.setObjectName(
+                    "show_dps_column_checkbox"
+                )
+                self.show_dps_column_checkbox.setToolTip(
+                    "Показывать первую колонку с уроном за каждую секунду "
+                    "и цветовой интенсивностью относительно пикового значения."
+                )
+                show_dps_column = self._load_boolean_setting(
+                    "table/show_dps_column", False
+                )
+                self.show_dps_column_checkbox.setChecked(show_dps_column)
+                self.show_dps_column_checkbox.toggled.connect(
+                    self.set_dps_column_visible
+                )
+                grid_index = len(definitions)
+                grid.addWidget(
+                    self.show_dps_column_checkbox,
+                    grid_index // 2,
+                    grid_index % 2,
+                )
+                self.set_dps_column_visible(show_dps_column, save=False)
+
             container_layout.addLayout(grid)
 
             divider = QFrame(container)
@@ -723,6 +751,21 @@ class MainWindow(QMainWindow):
     def _save_filter_enabled(self, key: str, enabled: bool):
         self.settings.setValue(self._filter_settings_key(key), enabled)
 
+    def set_dps_column_visible(self, visible: bool, *, save: bool = True):
+        model = self.ui.damage_table_view.model()
+        self.ui.damage_table_view.setColumnHidden(model.DPS_COLUMN, not visible)
+        if save:
+            self.settings.setValue("table/show_dps_column", visible)
+        self.auto_resize_columns()
+
+    def _load_boolean_setting(self, key: str, default: bool) -> bool:
+        value = self.settings.value(key, default)
+        if isinstance(value, bool):
+            return value
+        if isinstance(value, str):
+            return value.lower() in {"1", "true", "yes", "on"}
+        return bool(value)
+
     def refresh_filter_group_states(self, changed_group_name: str | None = None):
         group_names = [changed_group_name] if changed_group_name else list(self.group_filter_keys)
 
@@ -755,12 +798,19 @@ class MainWindow(QMainWindow):
         table.resizeColumnsToContents()
 
         total_width = table.viewport().width()
-        used_width = sum(table.columnWidth(col) for col in range(n_cols))
+        visible_columns = [
+            col for col in range(n_cols) if not table.isColumnHidden(col)
+        ]
+        used_width = sum(table.columnWidth(col) for col in visible_columns)
         extra = max(0, total_width - used_width)
 
-        if extra > 0 and n_cols > 1:
-            extra_per_col = extra // (n_cols - 1)
-            for col in range(1, n_cols - 1):
+        fixed_columns = {model.DPS_COLUMN, model.EVENT_COLUMN}
+        resizable_columns = [
+            col for col in visible_columns[:-1] if col not in fixed_columns
+        ]
+        if extra > 0 and resizable_columns:
+            extra_per_col = extra // len(resizable_columns)
+            for col in resizable_columns:
                 table.setColumnWidth(col, table.columnWidth(col) + extra_per_col)
 
         header.setStretchLastSection(True)
