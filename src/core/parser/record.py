@@ -3,6 +3,8 @@ from dataclasses import dataclass, field
 from datetime import datetime, time
 from typing import List, Optional
 
+from .l18n_fix import normalize_skill_name
+
 LINE_REGEX = re.compile(r"\[(?P<time>.*?)\]\s(?P<message>.*)")
 SPIRIT_OWNER_REGEX = re.compile(r"^(?P<owner>.+?):\s*дух\s+(?P<spirit>.+)$")
 COUNTER_ATTACK_SUFFIX_REGEX = re.compile(r"\s+\(Counter-attack \d+ layer\)$")
@@ -306,7 +308,7 @@ class DamageRecord(Record):
                 is_target_spirit=target["is_spirit"],
                 target_spirit_owner=target["spirit_owner"],
                 target_spirit_owner_server=target["spirit_owner_server"],
-                skill=match_dict.get("skill", ""),
+                skill=normalize_skill_name(match_dict.get("skill", "")),
                 damage=int(match_dict.get("damage", 0)),
                 property1=match_dict.get("property1", ""),
                 property2=match_dict.get("property2", ""),
