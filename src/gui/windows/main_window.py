@@ -312,7 +312,11 @@ class MainWindow(QMainWindow):
             QMessageBox.warning(self, "Ошибка", "Папка с игрой не выбрана или в ней нет логов!")
             return None
 
-        log_files = list(chat_path.glob("chat_*.html"))
+        log_files = [
+            path
+            for path in chat_path.iterdir()
+            if path.is_file() and path.suffix.lower() == ".html"
+        ]
         if not log_files:
             QMessageBox.warning(self, "Ошибка", "В папке с игрой нет логов боя!")
             return None
@@ -329,7 +333,7 @@ class MainWindow(QMainWindow):
             self,
             title,
             self._log_dialog_start_dir(),
-            "Логи боя Revelation Online (chat_*.html);;HTML-файлы (*.html);;Все файлы (*.*)",
+            "HTML-файлы (*.html);;Все файлы (*.*)",
         )
         return [Path(log_path) for log_path in log_paths]
 
