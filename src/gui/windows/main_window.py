@@ -467,9 +467,11 @@ class MainWindow(QMainWindow):
         self._refresh_combat_segments()
 
     def on_player_name_changed(self, new_player_name):
-        self.ui.damage_table_view.model().player_name = new_player_name
+        model = self.ui.damage_table_view.model()
+        model.player_name = new_player_name
+        model.rebuild_inferred_self_effects()
         self.settings.setValue("player_name", new_player_name)
-        self.ui.damage_table_view.model().apply_filters()
+        model.apply_filters()
 
     def on_attacker_name_changed(self, new_attacker_name):
         self.ui.damage_table_view.model().attacker_name = new_attacker_name

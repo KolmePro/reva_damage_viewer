@@ -19,11 +19,24 @@ class DamageTableModel(QAbstractTableModel):
     DAMAGE_COLUMN = 7
     PROPERTY1_COLUMN = 8
     PROPERTY2_COLUMN = 9
-    DAMAGE_RECORD_TYPES = (
+    PLAYER_DAMAGE_RECORD_TYPES = (
         "damage_dealt",
         "damage_dealt_buffed",
         "damage_to_spirit",
+    )
+    DAMAGE_RECORD_TYPES = (
+        *PLAYER_DAMAGE_RECORD_TYPES,
         "damage_reflected",
+    )
+    SELF_EFFECT_APPLIED_TYPES = (
+        "effect_applied",
+        "targeted_effect_applied",
+        "self_effect_applied",
+    )
+    SELF_EFFECT_REMOVED_TYPES = (
+        "effect_removed",
+        "targeted_effect_removed",
+        "self_effect_removed",
     )
     headers = [
         "DPS", "Событие", "Время", "Атакующий", "Цель", "Навык", "Бафы",
@@ -71,11 +84,13 @@ class DamageTableModel(QAbstractTableModel):
         self.maximum_damage = 0
         self._damage_per_second: dict[datetime | time, int] = {}
         self._maximum_second_damage = 0
+        self._inferred_self_effects: dict[int, tuple[str, ...]] = {}
         self._sort_column = self.TIME_COLUMN
         self._sort_order = Qt.SortOrder.AscendingOrder
 
     def set_records(self, records: list[DamageRecord]):
         self._all_records = records
+        self.rebuild_inferred_self_effects()
         self.apply_filters()
 
     def rowCount(self, parent=None):
@@ -161,8 +176,10 @@ class DamageTableModel(QAbstractTableModel):
                 )
             if col == 4:
                 return record.skill
-            if col == 5 and record.effects:
-                return str(len(record.effects))
+            if col == 5:
+                effects = self._record_effects(record)
+                if effects:
+                    return str(len(effects))
             if col == 6:
                 return str(record.damage)
             if col == 7:
@@ -173,7 +190,7 @@ class DamageTableModel(QAbstractTableModel):
         if role == Qt.DecorationRole:
             if col == 0:
                 return QIcon.fromTheme("emblem-mail")
-            if col == 5 and record.effects:
+            if col == 5 and self._record_effects(record):
                 return QIcon.fromTheme("dialog-information")
 
         if role == Qt.ToolTipRole:
@@ -189,7 +206,8 @@ class DamageTableModel(QAbstractTableModel):
             if col == 0:
                 return record.origin_string
             if col == 5:
-                return "\n".join(record.effects) if record.effects else "Нет бафов."
+                effects = self._record_effects(record)
+                return "\n".join(effects) if effects else "Нет бафов."
 
         if role == Qt.ForegroundRole and col == 6:
             damage_colors = {
@@ -338,7 +356,8 @@ class DamageTableModel(QAbstractTableModel):
         if column == self.SKILL_COLUMN:
             return record.skill.casefold() or None
         if column == self.EFFECTS_COLUMN:
-            return len(record.effects) if record.effects else None
+            effects = self._record_effects(record)
+            return len(effects) if effects else None
         if column == self.DAMAGE_COLUMN:
             if record.type in ("resource_restored", "vampirism", "damage_converted_to_healing"):
                 return record.restored_amount
@@ -362,6 +381,65 @@ class DamageTableModel(QAbstractTableModel):
                 return f"цель теряет {record.drained_amount} {record.drained_resource}".casefold()
             return record.property2.casefold() or None
         return None
+
+    def rebuild_inferred_self_effects(self):
+        active_effects: dict[str, str] = {}
+        inferred_effects: dict[int, tuple[str, ...]] = {}
+
+        for record in self._all_records:
+            if (
+                record.type in self.SELF_EFFECT_APPLIED_TYPES
+                and self._targets_player(record)
+            ):
+                active_effects[self._effect_key(record.skill)] = record.skill
+                continue
+            if (
+                record.type in self.SELF_EFFECT_REMOVED_TYPES
+                and self._targets_player(record)
+            ):
+                active_effects.pop(self._effect_key(record.skill), None)
+                continue
+            if (
+                record.type in self.PLAYER_DAMAGE_RECORD_TYPES
+                and self._attacker_is_player(record)
+            ):
+                inferred_effects[id(record)] = tuple(active_effects.values())
+
+        self._inferred_self_effects = inferred_effects
+
+    def _record_effects(self, record: DamageRecord) -> list[str]:
+        effects_by_key: dict[str, str] = {}
+        for effect in (
+            *record.effects,
+            *self._inferred_self_effects.get(id(record), ()),
+        ):
+            effects_by_key.setdefault(self._effect_key(effect), effect)
+        return list(effects_by_key.values())
+
+    def _attacker_is_player(self, record: DamageRecord) -> bool:
+        return (
+            not record.is_attacker_spirit
+            and (
+                record.attacker == "Вы"
+                or bool(self.player_name) and record.attacker == self.player_name
+            )
+        )
+
+    def _targets_player(self, record: DamageRecord) -> bool:
+        return (
+            not record.is_target_spirit
+            and (
+                record.target == "Вы"
+                or bool(self.player_name) and record.target == self.player_name
+            )
+        )
+
+    @staticmethod
+    def _effect_key(effect: str) -> str:
+        normalized = effect.strip()
+        if normalized.casefold().endswith(" ед"):
+            normalized = normalized[:-3].rstrip()
+        return normalized.casefold()
 
     def _rebuild_damage_per_second(self):
         totals: dict[datetime | time, int] = {}
