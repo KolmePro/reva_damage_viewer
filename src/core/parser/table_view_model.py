@@ -29,6 +29,26 @@ class DamageTableModel(QAbstractTableModel):
         "DPS", "Событие", "Время", "Атакующий", "Цель", "Навык", "Бафы",
         "Урон", "Свойство 1", "Свойство 2",
     ]
+    EVENT_LABELS = {
+        "damage_converted_to_healing": "Лечение уроном",
+        "damage_reflected": "Отражение урона",
+        "player_death": "Смерть",
+        "player_revived": "Возвращение в бой",
+        "player_kill": "Убийство",
+        "position_swap": "Обмен местами",
+        "vampirism": "Вампиризм",
+        "resource_restored": "Восстановление ресурса",
+        "damage_absorbed": "Поглощение урона",
+        "self_skill_used": "Применение умения",
+        "self_skill_used_targeted": "Применение умения",
+        "skill_used_targeted": "Применение умения",
+        "effect_applied": "Наложение эффекта",
+        "targeted_effect_applied": "Наложение эффекта",
+        "self_effect_applied": "Наложение эффекта",
+        "effect_removed": "Снятие эффекта",
+        "targeted_effect_removed": "Снятие эффекта",
+        "self_effect_removed": "Снятие эффекта",
+    }
 
     def __init__(self, filter_definitions: list[FilterDefinition] | None = None):
         super().__init__()
@@ -51,6 +71,8 @@ class DamageTableModel(QAbstractTableModel):
         self.maximum_damage = 0
         self._damage_per_second: dict[datetime | time, int] = {}
         self._maximum_second_damage = 0
+        self._sort_column = self.TIME_COLUMN
+        self._sort_order = Qt.SortOrder.AscendingOrder
 
     def set_records(self, records: list[DamageRecord]):
         self._all_records = records
@@ -83,27 +105,7 @@ class DamageTableModel(QAbstractTableModel):
                 return QSize(0, 0)
             return None
 
-        event_labels = {
-            "damage_converted_to_healing": "Лечение уроном",
-            "damage_reflected": "Отражение урона",
-            "player_death": "Смерть",
-            "player_revived": "Возвращение в бой",
-            "player_kill": "Убийство",
-            "position_swap": "Обмен местами",
-            "vampirism": "Вампиризм",
-            "resource_restored": "Восстановление ресурса",
-            "damage_absorbed": "Поглощение урона",
-            "self_skill_used": "Применение умения",
-            "self_skill_used_targeted": "Применение умения",
-            "skill_used_targeted": "Применение умения",
-            "effect_applied": "Наложение эффекта",
-            "targeted_effect_applied": "Наложение эффекта",
-            "self_effect_applied": "Наложение эффекта",
-            "effect_removed": "Снятие эффекта",
-            "targeted_effect_removed": "Снятие эффекта",
-            "self_effect_removed": "Снятие эффекта",
-        }
-        event_label = event_labels.get(record.type)
+        event_label = self.EVENT_LABELS.get(record.type)
         if event_label:
             if role == Qt.ForegroundRole:
                 if record.type in ("player_death", "player_revived", "player_kill", "position_swap"):
@@ -276,8 +278,90 @@ class DamageTableModel(QAbstractTableModel):
         self.beginResetModel()
         self._filtered_records = [record for record in self._all_records if self._record_allowed(record)]
         self._rebuild_damage_per_second()
+        self._sort_filtered_records()
         self.endResetModel()
         self.data_refreshed.emit()
+
+    def sort(self, column, order=Qt.SortOrder.AscendingOrder):
+        if not 0 <= column < self.columnCount():
+            return
+        self._sort_column = column
+        self._sort_order = order
+        self.beginResetModel()
+        self._sort_filtered_records()
+        self.endResetModel()
+
+    def _sort_filtered_records(self):
+        records_with_values = []
+        records_without_values = []
+        for record in self._filtered_records:
+            value = self._sort_value(record, self._sort_column)
+            target = records_without_values if value is None else records_with_values
+            target.append((value, record))
+
+        records_with_values.sort(
+            key=lambda item: item[0],
+            reverse=self._sort_order == Qt.SortOrder.DescendingOrder,
+        )
+        self._filtered_records = [
+            record for _, record in (*records_with_values, *records_without_values)
+        ]
+
+    def _sort_value(self, record: DamageRecord, column: int):
+        if column == self.DPS_COLUMN:
+            return self._damage_per_second.get(self._second_key(record))
+        if column == self.EVENT_COLUMN:
+            if record.type == "unparsed":
+                return record.origin_string.casefold()
+            label = self.EVENT_LABELS.get(record.type, "")
+            if record.duration_seconds is not None:
+                label += f" ({record.duration_seconds} сек.)"
+            return label.casefold() or None
+        if record.type == "unparsed":
+            return None
+        if column == self.TIME_COLUMN:
+            return record.timestamp or datetime.combine(datetime.min.date(), record.time)
+        if column == self.ATTACKER_COLUMN:
+            return self._format_actor_name(
+                record.attacker,
+                record.is_attacker_spirit,
+                record.attacker_spirit_owner,
+                self.player_name,
+            ).casefold() or None
+        if column == self.TARGET_COLUMN:
+            return self._format_actor_name(
+                record.target,
+                record.is_target_spirit,
+                record.target_spirit_owner,
+                self.player_name,
+            ).casefold() or None
+        if column == self.SKILL_COLUMN:
+            return record.skill.casefold() or None
+        if column == self.EFFECTS_COLUMN:
+            return len(record.effects) if record.effects else None
+        if column == self.DAMAGE_COLUMN:
+            if record.type in ("resource_restored", "vampirism", "damage_converted_to_healing"):
+                return record.restored_amount
+            if record.type == "damage_absorbed":
+                return record.absorbed_damage
+            if record.type in self.DAMAGE_RECORD_TYPES:
+                return record.damage
+            return None
+        if column == self.PROPERTY1_COLUMN:
+            if record.type in ("resource_restored", "vampirism", "damage_converted_to_healing"):
+                return record.resource.casefold() or None
+            if record.type in self.EVENT_LABELS:
+                return None
+            return record.property1.casefold() or None
+        if column == self.PROPERTY2_COLUMN:
+            if record.type in self.EVENT_LABELS and record.type not in (
+                "resource_restored", "vampirism", "damage_converted_to_healing"
+            ):
+                return None
+            if record.drained_amount is not None:
+                return f"цель теряет {record.drained_amount} {record.drained_resource}".casefold()
+            return record.property2.casefold() or None
+        return None
 
     def _rebuild_damage_per_second(self):
         totals: dict[datetime | time, int] = {}

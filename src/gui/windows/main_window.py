@@ -89,6 +89,10 @@ class MainWindow(QMainWindow):
         self.ui.le_maximum_damage.setValidator(self.damage_value_validator)
         damage_model = DamageTableModel(app.filter_definitions)
         self.ui.damage_table_view.setModel(damage_model)
+        self.ui.damage_table_view.setSortingEnabled(True)
+        self.ui.damage_table_view.sortByColumn(
+            damage_model.TIME_COLUMN, Qt.SortOrder.AscendingOrder
+        )
         self.ui.damage_table_view.setColumnHidden(damage_model.DPS_COLUMN, True)
         self.original_message_delegate = OriginalMessageDelegate(self.ui.damage_table_view)
         self.ui.damage_table_view.setItemDelegateForColumn(
